@@ -44,6 +44,13 @@ dependencies {
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	// swagger-ui
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+
+	// lombok
+	compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
 }
 
 tasks.withType<Test> {
