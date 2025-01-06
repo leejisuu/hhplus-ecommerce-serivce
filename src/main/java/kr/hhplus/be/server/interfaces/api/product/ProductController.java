@@ -3,20 +3,21 @@ package kr.hhplus.be.server.interfaces.api.product;
 import io.swagger.v3.oas.annotations.Operation;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
-import kr.hhplus.be.server.interfaces.api.product.dto.ProductsResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
-    @Operation(summary = "Get products", description = "상품 목록을 조회한다.")
-    @GetMapping("all")
-    public ApiResponse<ProductsResponse> getProducts() {
+    @Operation(summary = "상품 목록 조회 API", description = "판매중인 상품 목록을 조회한다.")
+    @GetMapping("/selling")
+    public ApiResponse<List<ProductResponse>> getSellingProducts() {
         ProductResponse product1 = ProductResponse.builder()
                 .id(1L)
                 .name("상품1")
@@ -41,10 +42,6 @@ public class ProductController {
                 .price(3500)
                 .build();
 
-        ProductsResponse productsResponse = ProductsResponse.builder()
-                .products(List.of(product1, product2, product3))
-                .build();
-
-        return ApiResponse.ok(productsResponse);
+        return ApiResponse.ok(List.of(product1, product2, product3));
     }
 }
