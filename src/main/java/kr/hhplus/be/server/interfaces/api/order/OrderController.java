@@ -4,35 +4,35 @@ import io.swagger.v3.oas.annotations.Operation;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.interfaces.api.order.dto.OrderCreateRequest;
 import kr.hhplus.be.server.interfaces.api.order.dto.OrderCreateResponse;
-import kr.hhplus.be.server.interfaces.api.order.dto.OrderProductDetailRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("order")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
-    @Operation(summary = "Create order", description = "주문을 생성한다.")
+    @Operation(summary = "주문 API", description = "주문을 생성한다.")
     @PostMapping("create")
     public ApiResponse<OrderCreateResponse> createOrder(@RequestBody OrderCreateRequest request) {
-        OrderProductDetailRequest product1 = OrderProductDetailRequest.builder()
-                .productId(1L)
-                .qantity(2)
+        ProductResponse product1 = ProductResponse.builder()
+                .id(1L)
+                .name("상품1")
+                .stock(10)
+                .price(1000)
                 .build();
 
-        OrderProductDetailRequest product2 = OrderProductDetailRequest.builder()
-                .productId(2L)
-                .qantity(6)
+        ProductResponse product2 = ProductResponse.builder()
+                .id(2L)
+                .name("상품2")
+                .stock(100)
+                .price(5000)
                 .build();
 
         OrderCreateResponse response = OrderCreateResponse.builder()
                 .id(1L)
-                .userId(1L)
                 .status("COMPLETED")
                 .netAmt(10000)
                 .discountAmt(1000)
@@ -43,5 +43,35 @@ public class OrderController {
                 .build();
 
         return ApiResponse.ok(response);
+    }
+
+    @Operation(summary = "상위 상품 목록 조회 API", description = "상위 인기 상품 목록을 조회한다.")
+    @GetMapping("/top-selling-products")
+    public ApiResponse<List<ProductResponse>> getTopSellingProducts() {
+        ProductResponse product1 = ProductResponse.builder()
+                .id(1L)
+                .name("상품1")
+                .status("판매중")
+                .stock(1000)
+                .price(9900)
+                .build();
+
+        ProductResponse product2 = ProductResponse.builder()
+                .id(2L)
+                .name("상품2")
+                .status("판매중")
+                .stock(7)
+                .price(19900)
+                .build();
+
+        ProductResponse product3 = ProductResponse.builder()
+                .id(3L)
+                .name("상품3")
+                .status("판매중")
+                .stock(10)
+                .price(3500)
+                .build();
+
+        return ApiResponse.ok(List.of(product1, product2, product3));
     }
 }

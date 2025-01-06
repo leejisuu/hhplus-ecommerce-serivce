@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class UserPointRequest {
+public class UserPointChargeRequest {
 
     private Long userId;
     private int chargeAmt;
 
     @Builder
-    public UserPointRequest(Long userId, int chargeAmt) {
+    public UserPointChargeRequest(Long userId, int chargeAmt) {
         this.userId = userId;
         this.chargeAmt = chargeAmt;
     }

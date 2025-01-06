@@ -7,6 +7,6 @@ import java.util.List;
 @Getter
 public class OrderCreateRequest {
     private Long userId;
-    private List<OrderProductDetailRequest> products;
+    private List<OrderDetailRequest> products;
     private Long couponId;
 }
