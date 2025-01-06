@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.interfaces.api.order.dto;
 
+import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,19 +11,18 @@ import java.util.List;
 public class OrderCreateResponse {
 
     private Long id;
-    private Long userId;
     private String status;
     private int netAmt;
     private int discountAmt;
     private int totalAmt;
     private Long couponId;
-    private List<OrderProductDetailRequest> products;
+    private List<ProductResponse> products;
     private LocalDateTime createdAt;
 
     @Builder
-    public OrderCreateResponse(Long id, Long userId, String status, int netAmt, int discountAmt, int totalAmt, Long couponId, List<OrderProductDetailRequest> products, LocalDateTime createdAt) {
+
+    public OrderCreateResponse(Long id, String status, int netAmt, int discountAmt, int totalAmt, Long couponId, List<ProductResponse> products, LocalDateTime createdAt) {
         this.id = id;
-        this.userId = userId;
         this.status = status;
         this.netAmt = netAmt;
         this.discountAmt = discountAmt;
