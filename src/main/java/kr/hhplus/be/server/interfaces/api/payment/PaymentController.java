@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("payment")
+@RequestMapping("/api/v1/payments")
 public class PaymentController {
 
-    @Operation(summary = "Make payment", description = "결제한다.")
-    @PostMapping
+    @Operation(summary = "결제 API", description = "결제한다.")
+    @PostMapping("/make")
     public ApiResponse<PaymentMakeResponse> makePayment(@RequestBody PaymentMakeRequest request) {
         PaymentMakeResponse response = PaymentMakeResponse.builder()
                 .id(1L)
