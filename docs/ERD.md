@@ -69,10 +69,20 @@
 | id            | bigint      | 상품 고유 식별자 (Primary Key)           |
 | name          | varchar     | 상품 이름                             |
 | status        | varchar     | 상품 상태 (SELLING-판매중/STOPPED-판매 종료) |
-| stock         | int         | 상품 재고 수량                          |
 | price         | int         | 상품 가격                             |
 | created_at    | datetime    | 상품 데이터 생성일                        |
 | updated_at    | datetime    | 상품 데이터 수정일                        |
+
+### 테이블명: product_stock 테이블
+상품의 재고 정보를 담고 있는 재고 테이블이다.
+
+| 컬럼명       | 데이터 타입 | 설명                     |
+|--------------|-------------|--------------------------|
+| id           | bigint      | 재고 고유 식별자 (Primary Key) |
+| product_id   | bigint      | 상품 ID                  |
+| quantity     | int         | 재고 수량                |
+| created_at   | datetime    | 재고 데이터 생성일         |
+| updated_at   | datetime    | 재고 데이터 수정일         |
 
 ### 테이블명: order
 주문 정보를 담고 있는 주문 마스터 테이블이다.
@@ -128,4 +138,5 @@
 * order(1) -> payment(1): 하나의 주문은 하나의 결제를 참조한다.
 
 
+* product(1) -> product_stock(1) : 하나의 상품은 하나의 재고 정보를 가진다.
 * product(1) -> order_detail(N): 하나의 상품은 여러 주문 상세에 포함될 수 있다.  
