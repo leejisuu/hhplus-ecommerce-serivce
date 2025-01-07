@@ -1,8 +1,11 @@
-package kr.hhplus.be.server.domain.coupon;
+package kr.hhplus.be.server.domain.coupon.entity;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.domain.user.User;
+import kr.hhplus.be.server.domain.coupon.DiscountType;
+import kr.hhplus.be.server.domain.coupon.IssuedCouponStatus;
+import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,5 +46,17 @@ public class IssuedCoupon {
 
     private IssuedCouponStatus status;
 
-
+    @Builder
+    public IssuedCoupon(User user, Coupon coupon, String name, DiscountType discountType, int discountAmt, LocalDateTime issuedAt, LocalDateTime validStartedAt, LocalDateTime validEndedAt, LocalDateTime usedAt, IssuedCouponStatus status) {
+        this.user = user;
+        this.coupon = coupon;
+        this.name = name;
+        this.discountType = discountType;
+        this.discountAmt = discountAmt;
+        this.issuedAt = issuedAt;
+        this.validStartedAt = validStartedAt;
+        this.validEndedAt = validEndedAt;
+        this.usedAt = usedAt;
+        this.status = status;
+    }
 }

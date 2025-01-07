@@ -2,7 +2,7 @@ package kr.hhplus.be.server.interfaces.api.user;
 
 import io.swagger.v3.oas.annotations.Operation;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
-import kr.hhplus.be.server.interfaces.api.coupon.dto.CouponResponse;
+import kr.hhplus.be.server.interfaces.api.coupon.dto.IssuedCouponResponse;
 import kr.hhplus.be.server.interfaces.api.user.dto.UserPointChargeRequest;
 import kr.hhplus.be.server.interfaces.api.user.dto.UserPointResponse;
 import org.springframework.web.bind.annotation.*;
@@ -38,30 +38,30 @@ public class UserController {
 
     @Operation(summary = "보유 쿠폰 조회 API", description = "유저가 보유한 쿠폰 목록을 반환한다.")
     @PostMapping("/{userId}/coupons")
-    public ApiResponse<List<CouponResponse>> getUserCoupons(@PathVariable Long userId) {
+    public ApiResponse<List<IssuedCouponResponse>> getUserCoupons(@PathVariable Long userId) {
 
-        CouponResponse coupon1 = CouponResponse.builder()
+        IssuedCouponResponse coupon1 = IssuedCouponResponse.builder()
                 .id(1L)
                 .couponId(2L)
                 .name("정률 할인 쿠폰")
                 .discountType("PERCENTAGE")
                 .discountAmt(10)
                 .issuedAt(LocalDateTime.of(2025, 1, 1, 11, 0, 0))
-                .validStartAt(LocalDateTime.of(2025, 1, 1, 11, 0, 0))
-                .validEndAt(LocalDateTime.of(2025, 2, 1, 11, 0, 0))
+                .validStartedAt(LocalDateTime.of(2025, 1, 1, 11, 0, 0))
+                .validEndedAt(LocalDateTime.of(2025, 2, 1, 11, 0, 0))
                 .usedAt(null)
                 .status("UNUSED")
                 .build();
 
-        CouponResponse coupon2 = CouponResponse.builder()
+        IssuedCouponResponse coupon2 = IssuedCouponResponse.builder()
                 .id(1L)
                 .couponId(3L)
                 .name("정액 할인 쿠폰")
                 .discountType("FIXED_AMOUNT")
                 .discountAmt(4000)
                 .issuedAt(LocalDateTime.of(2025, 1, 1, 11, 0, 0))
-                .validStartAt(LocalDateTime.of(2025, 1, 1, 11, 0, 0))
-                .validEndAt(LocalDateTime.of(2025, 2, 1, 11, 0, 0))
+                .validStartedAt(LocalDateTime.of(2025, 1, 1, 11, 0, 0))
+                .validEndedAt(LocalDateTime.of(2025, 2, 1, 11, 0, 0))
                 .usedAt(null)
                 .status("UNUSED")
                 .build();
