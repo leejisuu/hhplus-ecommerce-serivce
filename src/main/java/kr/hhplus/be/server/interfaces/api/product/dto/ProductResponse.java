@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.interfaces.api.product.dto;
 
+import kr.hhplus.be.server.domain.product.Product;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,5 +19,15 @@ public class ProductResponse {
         this.status = status;
         this.stock = stock;
         this.price = price;
+    }
+
+    public static ProductResponse of(Product product) {
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .status(product.getStatus().name())
+                .stock(product.getProductStock().getQuantity())
+                .price(product.getPrice())
+                .build();
     }
 }

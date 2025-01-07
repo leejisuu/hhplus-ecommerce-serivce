@@ -15,7 +15,7 @@ import java.util.List;
 public class UserController {
 
     @Operation(summary = "잔액 조회 API", description = "유저의 보유 잔액을 반환한다.")
-    @GetMapping("/point/{userId}")
+    @GetMapping("/{userId}/point")
     public ApiResponse<UserPointResponse> getUserPoint(@PathVariable Long userId) {
         UserPointResponse userPointResponse = UserPointResponse.builder()
                 .id(1L)
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @Operation(summary = "보유 쿠폰 조회 API", description = "유저가 보유한 쿠폰 목록을 반환한다.")
-    @PostMapping("/coupons/{userId}")
+    @PostMapping("/{userId}/coupons")
     public ApiResponse<List<CouponResponse>> getUserCoupons(@PathVariable Long userId) {
 
         CouponResponse coupon1 = CouponResponse.builder()
