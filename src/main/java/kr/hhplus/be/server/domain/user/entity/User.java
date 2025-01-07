@@ -1,8 +1,7 @@
-package kr.hhplus.be.server.domain.user;
+package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.domain.coupon.IssuedCoupon;
-import kr.hhplus.be.server.domain.point.PointHistory;
+import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import kr.hhplus.be.server.support.exception.CustomException;
 import kr.hhplus.be.server.support.exception.ErrorCode;
 import lombok.AccessLevel;
@@ -26,10 +25,10 @@ public class User {
 
     private int point;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<PointHistory> pointHistories;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<IssuedCoupon> userCoupons;
 
     @Builder
@@ -53,6 +52,4 @@ public class User {
 
         this.point -= amount;
     }
-
-
 }

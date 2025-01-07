@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.domain.user;
 
+import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.support.exception.CustomException;
 import kr.hhplus.be.server.support.exception.ErrorCode;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
