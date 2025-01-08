@@ -1,10 +1,10 @@
 package kr.hhplus.be.server.domain.product;
 
-import org.springframework.stereotype.Component;
-
-import java.util.List;
+import kr.hhplus.be.server.domain.product.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductRepository {
 
-    List<Product> getSellingProducts(ProductStatus productStatus);
+    Page<Product> getSellingProducts(ProductStatus productStatus, Pageable pageable);
 }

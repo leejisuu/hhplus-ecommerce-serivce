@@ -1,16 +1,15 @@
-package kr.hhplus.be.server.domain.product;
+package kr.hhplus.be.server.domain.product.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import kr.hhplus.be.server.domain.common.BaseEntity;
+import kr.hhplus.be.server.domain.product.ProductStatus;
+import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "product")
-public class Product {
+public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
