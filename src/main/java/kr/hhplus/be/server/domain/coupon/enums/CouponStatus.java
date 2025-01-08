@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.coupon;
+package kr.hhplus.be.server.domain.coupon.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -2,16 +2,17 @@ package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
+import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
+import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
+import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.interfaces.api.coupon.dto.IssuedCouponResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.Arrays.stream;
 
 @RequiredArgsConstructor
 @Service
@@ -21,15 +22,16 @@ public class CouponService {
     private final IssuedCouponRepository issuedCouponRepository;
 
     public IssuedCoupon issueCoupon(Long couponId, User user, LocalDateTime issuedAt) {
+        // 비관적 락을 이용해서 쿠폰 마스터 정보를 조회한다.
         Coupon coupon = couponRepository.getCouponWithLock(couponId);
-        return issuedCouponRepository.saveIssuedCoupon(coupon.makeIssuedCoupon(user, issuedAt));
+        // coupon을 통해 유효성 체크와 IssuedCoupon를 생성하여 반환한다.
+        IssuedCoupon issuedCoupon = coupon.makeIssuedCoupon(user, issuedAt);
+        return issuedCouponRepository.saveIssuedCoupon(issuedCoupon);
     }
 
-    public List<IssuedCouponResponse> getUserCoupons(Long userId) {
-        List<IssuedCoupon> userCoupons = issuedCouponRepository.getUserCouponsByUserIdAndStatus(userId);
+    public Page<IssuedCouponResponse> getAvailableUserCoupons(Long userId, LocalDateTime currentTime, Pageable pageable) {
+        Page<IssuedCoupon> userCouponsPage = issuedCouponRepository.getAvailableUserCoupons(userId, IssuedCouponStatus.UNUSED, currentTime, pageable);
 
-        return userCoupons.stream()
-                .map(IssuedCouponResponse::of)
-                .collect(Collectors.toList());
+        return userCouponsPage.map(IssuedCouponResponse::of);
     }
 }

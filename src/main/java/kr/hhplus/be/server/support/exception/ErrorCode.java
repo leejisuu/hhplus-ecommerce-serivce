@@ -15,7 +15,9 @@ public enum ErrorCode {
     // 쿠폰
     INSUFFICIENT_COUPON_QUANTITY(HttpStatus.BAD_REQUEST, "쿠폰이 모두 소진되었습니다."),
     ALREADY_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "이미 발급받은 쿠폰입니다."),
-    DEACTIVATED_COUPON(HttpStatus.BAD_REQUEST, "발급 불가능한 쿠폰입니다.");
+    DEACTIVATED_COUPON(HttpStatus.BAD_REQUEST, "발급 불가능한 쿠폰입니다."),
+    COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "쿠폰 유효기간이 만료되었습니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;

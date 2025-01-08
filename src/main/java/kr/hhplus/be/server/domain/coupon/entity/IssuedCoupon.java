@@ -1,8 +1,9 @@
 package kr.hhplus.be.server.domain.coupon.entity;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.domain.coupon.DiscountType;
-import kr.hhplus.be.server.domain.coupon.IssuedCouponStatus;
+import kr.hhplus.be.server.domain.common.BaseEntity;
+import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
+import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
 import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -14,7 +15,10 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class IssuedCoupon {
+@Table(name = "issued_coupon", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "coupon_id"})
+})
+public class IssuedCoupon extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
