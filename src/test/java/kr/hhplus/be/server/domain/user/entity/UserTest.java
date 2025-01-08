@@ -1,6 +1,5 @@
-package kr.hhplus.be.server.domain.user;
+package kr.hhplus.be.server.domain.user.entity;
 
-import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.support.exception.CustomException;
 import kr.hhplus.be.server.support.exception.ErrorCode;
 import org.junit.jupiter.api.Test;
