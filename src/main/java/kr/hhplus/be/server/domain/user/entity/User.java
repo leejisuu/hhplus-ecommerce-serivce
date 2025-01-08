@@ -21,14 +21,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "point", nullable = false)
     private int point;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PointHistory> pointHistories;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IssuedCoupon> userCoupons;
 
     @Builder
@@ -51,5 +53,12 @@ public class User {
         }
 
         this.point -= amount;
+    }
+
+    public void addPointHistories(PointHistory pointHistory) {
+        // User의 pointHistories 리스트에 추가
+        this.pointHistories.add(pointHistory);
+        // PointHistory의 user 필드 설정
+        pointHistory.setUser(this);
     }
 }

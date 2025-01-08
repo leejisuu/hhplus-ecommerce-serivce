@@ -12,7 +12,12 @@ public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public User getUser(Long userId) {
+    public User getUserWithLock(Long userId) {
         return userJpaRepository.findByIdWithLock(userId);
+    }
+
+    @Override
+    public User getUser(Long userId) {
+        return userJpaRepository.findById(userId).orElseThrow();
     }
 }
