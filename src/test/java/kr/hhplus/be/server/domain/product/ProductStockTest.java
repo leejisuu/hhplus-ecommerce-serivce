@@ -1,8 +1,9 @@
 package kr.hhplus.be.server.domain.product;
 
+import kr.hhplus.be.server.domain.product.entity.Product;
+import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.support.exception.CustomException;
 import kr.hhplus.be.server.support.exception.ErrorCode;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
