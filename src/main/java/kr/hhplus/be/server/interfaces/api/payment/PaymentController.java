@@ -18,13 +18,7 @@ public class PaymentController {
     @Operation(summary = "결제 API", description = "결제한다.")
     @PostMapping("/make")
     public ApiResponse<PaymentMakeResponse> makePayment(@RequestBody PaymentMakeRequest request) {
-        PaymentMakeResponse response = PaymentMakeResponse.builder()
-                .id(1L)
-                .orderId(4L)
-                .status("COMPLETED")
-                .totalAmt(67000)
-                .createdAt(LocalDateTime.of(2024, 1, 3, 11, 0))
-                .build();
+        PaymentMakeResponse response = null;
 
         return ApiResponse.ok(response);
     }
