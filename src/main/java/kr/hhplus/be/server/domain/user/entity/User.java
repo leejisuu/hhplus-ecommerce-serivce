@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
+import kr.hhplus.be.server.domain.common.BaseEntity;
 import kr.hhplus.be.server.support.exception.CustomException;
 import kr.hhplus.be.server.support.exception.ErrorCode;
 import lombok.AccessLevel;
@@ -9,13 +9,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,12 +24,6 @@ public class User {
 
     @Column(name = "point", nullable = false)
     private int point;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PointHistory> pointHistories;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<IssuedCoupon> userCoupons;
 
     @Builder
     public User(String name, int point) {
@@ -55,10 +47,4 @@ public class User {
         this.point -= amount;
     }
 
-    public void addPointHistories(PointHistory pointHistory) {
-        // User의 pointHistories 리스트에 추가
-        this.pointHistories.add(pointHistory);
-        // PointHistory의 user 필드 설정
-        pointHistory.setUser(this);
-    }
 }

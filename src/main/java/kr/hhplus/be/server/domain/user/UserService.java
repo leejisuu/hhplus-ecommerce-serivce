@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.user;
 
 import kr.hhplus.be.server.domain.user.entity.PointHistory;
 import kr.hhplus.be.server.domain.user.entity.User;
+import kr.hhplus.be.server.domain.user.repository.PointHistoryRepository;
+import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import kr.hhplus.be.server.interfaces.api.user.dto.UserPointChargeRequest;
 import kr.hhplus.be.server.interfaces.api.user.dto.UserPointResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +31,8 @@ public class UserService {
         User user = userRepository.getUserWithLock(userId);
         // 유저가 보유한 포인트에 충전 요청 금액 합산
         user.addPoint(chargeAmt);
-
-        // 포인트 히스토리 생성 및 연관 관계 설정
-        PointHistory pointHistory = PointHistory.createChargePointHistory(user);
-        user.addPointHistories(pointHistory);
-
         // PointHistory 저장
-        pointHistoryRepository.save(pointHistory);
+        pointHistoryRepository.save(PointHistory.createChargePointHistory(user));
 
         return UserPointResponse.from(user);
     }

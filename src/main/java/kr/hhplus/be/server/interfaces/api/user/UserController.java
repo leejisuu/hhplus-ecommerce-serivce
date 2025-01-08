@@ -3,14 +3,10 @@ package kr.hhplus.be.server.interfaces.api.user;
 import io.swagger.v3.oas.annotations.Operation;
 import kr.hhplus.be.server.domain.user.UserService;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
-import kr.hhplus.be.server.interfaces.api.coupon.dto.IssuedCouponResponse;
 import kr.hhplus.be.server.interfaces.api.user.dto.UserPointChargeRequest;
 import kr.hhplus.be.server.interfaces.api.user.dto.UserPointResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController

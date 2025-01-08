@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.domain.common.BaseCreatedAtEntity;
 import kr.hhplus.be.server.domain.user.PointType;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class PointHistory {
+public class PointHistory extends BaseCreatedAtEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,9 +36,5 @@ public class PointHistory {
                 .user(user)
                 .pointType(PointType.CHARGE)
                 .build();
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }
