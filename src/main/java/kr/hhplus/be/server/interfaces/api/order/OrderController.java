@@ -7,7 +7,6 @@ import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.interfaces.api.order.dto.OrderCreateRequest;
 import kr.hhplus.be.server.interfaces.api.order.dto.OrderCreateResponse;
 import kr.hhplus.be.server.interfaces.api.order.dto.TopSellingProductResponse;
-import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

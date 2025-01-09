@@ -2,11 +2,14 @@ package kr.hhplus.be.server.domain.order.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
+import kr.hhplus.be.server.domain.product.dto.OrderDetailCommand;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "order_detail")
@@ -33,5 +36,13 @@ public class OrderDetail extends BaseEntity {
         this.product = product;
         this.quantity = quantity;
         this.price = price;
+    }
+
+    public static OrderDetail from(OrderDetailCommand orderDetailCommand, Product product) {
+        return OrderDetail.builder()
+                .product(product)
+                .quantity(orderDetailCommand.quantity())
+                .price(product.getPrice())
+                .build();
     }
 }

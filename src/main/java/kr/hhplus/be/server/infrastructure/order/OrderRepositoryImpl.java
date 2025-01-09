@@ -5,9 +5,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.hhplus.be.server.domain.order.OrderRepository;
 import kr.hhplus.be.server.domain.order.OrderStatus;
 import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
+import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.QOrder;
 import kr.hhplus.be.server.domain.order.entity.QOrderDetail;
-import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.QProduct;
 import kr.hhplus.be.server.domain.product.entity.QProductStock;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +63,15 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .orderBy(qOrderDetail.quantity.sum().desc())
                 .limit(limit)
                 .fetch();
+    }
+
+    @Override
+    public Order createOrder(Order order) {
+        return jpaRepository.save(order);
+    }
+
+    @Override
+    public Order getOrder(Long orderId) {
+        return jpaRepository.findById(orderId).orElse(null);
     }
 }
