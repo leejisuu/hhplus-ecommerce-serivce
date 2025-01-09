@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.order;
 
+import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
+import kr.hhplus.be.server.interfaces.api.order.dto.TopSellingProductResponse;
 import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,10 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public List<ProductResponse> getTopSellingProducts(LocalDate todayDate, int limit) {
-        List<Product> products = orderRepository.getTopSellingProducts(todayDate, limit);
-        return products.stream()
-                .map(ProductResponse::of)
+    public List<TopSellingProductResponse> getTopSellingProducts(LocalDate todayDate, int limit) {
+        List<TopSellingProductInfo> topSellingProducts = orderRepository.getTopSellingProducts(todayDate, limit);
+        return topSellingProducts.stream()
+                .map(TopSellingProductResponse::of)
                 .collect(Collectors.toList());
     }
 }
