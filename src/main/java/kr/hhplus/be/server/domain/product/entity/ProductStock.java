@@ -20,9 +20,14 @@ public class ProductStock extends BaseEntity {
 
     private int quantity;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Product product;
+
     @Builder
-    public ProductStock(int quantity) {
+    public ProductStock(int quantity, Product product) {
         this.quantity = quantity;
+        this.product = product;
     }
 
     public void deductStock(int quantity) {

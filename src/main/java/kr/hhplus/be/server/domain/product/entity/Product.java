@@ -21,8 +21,7 @@ public class Product extends BaseEntity {
 
     private int price;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_stock_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @OneToOne(mappedBy = "product")
     private ProductStock productStock;
 
     @Builder

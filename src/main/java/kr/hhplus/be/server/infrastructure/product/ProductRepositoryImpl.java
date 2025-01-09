@@ -20,7 +20,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public Product getProduct(Long productId) {
-        return productJpaRepository.findById(productId).orElse(null);
+    public Product getSellingProduct(Long productId) {
+        return productJpaRepository.findByIdAndStatus(productId, ProductStatus.SELLING);
     }
 }

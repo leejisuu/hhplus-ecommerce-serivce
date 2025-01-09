@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ProductJpaRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findAllByStatus(ProductStatus productStatus, Pageable pageable);
+
+    Product findByIdAndStatus(Long productId, ProductStatus productStatus);
 }

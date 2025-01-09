@@ -23,7 +23,7 @@ public class ProductService {
 
     public Page<ProductResponse> getSellingProducts(Pageable pageable) {
         Page<Product> productsPage = productRepository.getSellingProducts(ProductStatus.SELLING, pageable);
-        return productsPage.map(ProductResponse::of);
+        return productsPage.map(ProductResponse::from);
     }
 
     public void deductProductStocks(List<OrderDetailCommand> orderDetailCommands) {
@@ -37,18 +37,22 @@ public class ProductService {
         }
     }
 
-    public Long getTotalNetAmt(List<OrderDetailCommand> orderDetailCommands) {
-        Long totalNetAmt = 0L;
+    public int getNetAmt(List<OrderDetailCommand> orderDetailCommands) {
+        int netAmt = 0;
 
         for(OrderDetailCommand command : orderDetailCommands) {
-            Product product = productRepository.getProduct(command.productId());
+            Product product = productRepository.getSellingProduct(command.productId());
             if(product == null) {
                 throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
             }
 
-            totalNetAmt += ((long) product.getPrice() * command.quantity());
+            netAmt += product.getPrice() * command.quantity();
         }
 
-        return totalNetAmt;
+        return netAmt;
+    }
+
+    public Product getSellingProduct(Long productId) {
+        return productRepository.getSellingProduct(productId);
     }
 }

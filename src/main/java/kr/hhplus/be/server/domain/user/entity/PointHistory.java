@@ -25,16 +25,20 @@ public class PointHistory extends BaseCreatedAtEntity {
     @Column(name = "type")
     private PointType pointType;
 
+    private int amount;
+
     @Builder
-    public PointHistory(User user, PointType pointType) {
+    public PointHistory(User user, PointType pointType, int amount) {
         this.user = user;
         this.pointType = pointType;
+        this.amount = amount;
     }
 
-    public static PointHistory createChargePointHistory(User user) {
+    public static PointHistory create(User user, int amount) {
         return PointHistory.builder()
                 .user(user)
                 .pointType(PointType.CHARGE)
+                .amount(amount)
                 .build();
     }
 }
