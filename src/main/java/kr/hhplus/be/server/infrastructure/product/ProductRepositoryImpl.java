@@ -18,4 +18,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     public Page<Product> getSellingProducts(ProductStatus productStatus, Pageable pageable) {
         return productJpaRepository.findAllByStatus(productStatus, pageable);
     }
+
+    @Override
+    public Product getProduct(Long productId) {
+        return productJpaRepository.findById(productId).orElse(null);
+    }
 }

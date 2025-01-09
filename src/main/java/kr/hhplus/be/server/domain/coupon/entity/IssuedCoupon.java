@@ -5,6 +5,8 @@ import kr.hhplus.be.server.domain.common.BaseEntity;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
 import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
 import kr.hhplus.be.server.domain.user.entity.User;
+import kr.hhplus.be.server.support.exception.CustomException;
+import kr.hhplus.be.server.support.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,5 +64,24 @@ public class IssuedCoupon extends BaseEntity {
         this.validEndedAt = validEndedAt;
         this.usedAt = usedAt;
         this.status = status;
+    }
+
+    public void useCoupon() {
+        this.status = IssuedCouponStatus.USED;
+    }
+
+    public Long calculateDiscountAmt(Long totalNetAmt) {
+        Long discountAmt;
+
+        if(discountType.equals(DiscountType.PERCENTAGE)) {
+            discountAmt = totalNetAmt * this.discountAmt;
+        } else {
+            discountAmt = totalNetAmt - this.discountAmt;
+        }
+
+        if(discountAmt < 0) {
+            throw new CustomException(ErrorCode.COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT);
+        }
+        return discountAmt;
     }
 }

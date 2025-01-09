@@ -7,6 +7,8 @@ import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.interfaces.api.coupon.dto.IssuedCouponResponse;
+import kr.hhplus.be.server.support.exception.CustomException;
+import kr.hhplus.be.server.support.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,5 +35,14 @@ public class CouponService {
         Page<IssuedCoupon> userCouponsPage = issuedCouponRepository.getAvailableUserCoupons(userId, IssuedCouponStatus.UNUSED, currentTime, pageable);
 
         return userCouponsPage.map(IssuedCouponResponse::of);
+    }
+
+    public IssuedCoupon getIssuedCouponWithLock(Long couponId, Long userId, LocalDateTime currentTime) {
+        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(couponId, userId, currentTime);
+
+        if(issuedCoupon == null) {
+            throw new CustomException(ErrorCode.ISSUED_COUPON_NOT_FOUND);
+        }
+        return issuedCoupon;
     }
 }

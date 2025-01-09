@@ -1,11 +1,12 @@
 package kr.hhplus.be.server.interfaces.api.product.dto;
 
+import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 
 public record ProductResponse(
         Long id,
         String name,
-        int stock,
+        int quantity,
         int price
 ) {
     public static ProductResponse of(Product product) {

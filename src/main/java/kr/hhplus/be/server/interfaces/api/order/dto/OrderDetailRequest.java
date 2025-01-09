@@ -5,7 +5,7 @@ import lombok.Getter;
 
 public record OrderDetailRequest (
         Long productId,
-        int qantity
+        int quantity
 ) {
 }
 

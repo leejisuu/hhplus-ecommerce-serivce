@@ -2,6 +2,7 @@ package kr.hhplus.be.server.infrastructure.coupon;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.LockModeType;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -37,7 +38,7 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
                         qIssuedCoupon.user.id.eq(userId),
                         qIssuedCoupon.status.eq(issuedCouponStatus),
                         qIssuedCoupon.validStartedAt.loe(currentTime),
-                        qIssuedCoupon.validEndedAt.goe(currentTime)
+                        qIssuedCoupon.validEndedAt.gt(currentTime)
                 )
                 .offset(pageable.getOffset()) // offset : 데이터 조회 시 시작 지점 (페이지 번호 * 페이지 크기)
                 .limit(pageable.getPageSize()) // pageSize : 한 페이지에 포함될 데이터의 개수
@@ -57,10 +58,26 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
                         qIssuedCoupon.user.id.eq(userId),
                         qIssuedCoupon.status.eq(issuedCouponStatus),
                         qIssuedCoupon.validStartedAt.loe(currentTime),
-                        qIssuedCoupon.validEndedAt.goe(currentTime)
+                        qIssuedCoupon.validEndedAt.gt(currentTime)
                 );
 
         // PageableExecutionUtils를 사용하여 Page 객체 생성
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public IssuedCoupon getIssuedCouponWithLock(Long couponId, Long userId, LocalDateTime currentTime) {
+        QIssuedCoupon qIssuedCoupon = QIssuedCoupon.issuedCoupon;
+
+        return queryFactory
+                .selectFrom(qIssuedCoupon)
+                .where(qIssuedCoupon.coupon.id.eq(couponId),
+                        qIssuedCoupon.user.id.eq(userId),
+                        qIssuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
+                        qIssuedCoupon.validStartedAt.loe(currentTime),
+                        qIssuedCoupon.validEndedAt.gt(currentTime)
+                        )
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .fetchOne();
     }
 }

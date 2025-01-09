@@ -11,13 +11,21 @@ public enum ErrorCode {
 
     // 상품 재고
     INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "구매 개수가 보유 재고보다 클 수 없습니다."),
+    PRODUCT_STOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "상품 재고가 존재하지 않습니다."),
+
+    // 상품
+    PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "상품이 존재하지 않습니다."),
 
     // 쿠폰
     INSUFFICIENT_COUPON_QUANTITY(HttpStatus.BAD_REQUEST, "쿠폰이 모두 소진되었습니다."),
     ALREADY_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "이미 발급받은 쿠폰입니다."),
     DEACTIVATED_COUPON(HttpStatus.BAD_REQUEST, "발급 불가능한 쿠폰입니다."),
-    COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "쿠폰 유효기간이 만료되었습니다.")
+    COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "쿠폰 유효기간이 만료되었습니다."),
+    ISSUED_COUPON_NOT_FOUND(HttpStatus.BAD_REQUEST, "쿠폰이 존재하지 않습니다."),
+    COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT(HttpStatus.BAD_REQUEST,"쿠폰 할인 금액이 순수 구매 금액보다 클 수 없습니다.");
     ;
+
+
 
     private final HttpStatus status;
     private final String message;

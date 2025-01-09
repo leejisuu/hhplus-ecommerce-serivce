@@ -12,4 +12,6 @@ public interface IssuedCouponRepository {
     IssuedCoupon saveIssuedCoupon(IssuedCoupon issuedCoupon);
 
     Page<IssuedCoupon> getAvailableUserCoupons(Long userId, IssuedCouponStatus issuedCouponStatus, LocalDateTime currentTime, Pageable pageable);
+
+    IssuedCoupon getIssuedCouponWithLock(Long couponId, Long userId, LocalDateTime currentTime);
 }

@@ -41,4 +41,8 @@ public class UserService {
         return userRepository.getUser(userId);
     }
 
+    public User getUserWithLock(Long userId) {
+        return userRepository.getUserWithLock(userId);
+    }
+
 }
