@@ -22,7 +22,10 @@ public enum ErrorCode {
     DEACTIVATED_COUPON(HttpStatus.BAD_REQUEST, "발급 불가능한 쿠폰입니다."),
     COUPON_EXPIRED(HttpStatus.BAD_REQUEST, "쿠폰 유효기간이 만료되었습니다."),
     ISSUED_COUPON_NOT_FOUND(HttpStatus.BAD_REQUEST, "쿠폰이 존재하지 않습니다."),
-    COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT(HttpStatus.BAD_REQUEST,"쿠폰 할인 금액이 순수 구매 금액보다 클 수 없습니다.");
+    COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT(HttpStatus.BAD_REQUEST,"쿠폰 할인 금액이 순수 구매 금액보다 클 수 없습니다."),
+
+    // 주문
+    ORDER_NOT_FOUND(HttpStatus.BAD_REQUEST, "주문이 존재하지 않습니다.");
     ;
 
 

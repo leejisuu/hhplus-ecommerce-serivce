@@ -68,20 +68,22 @@ public class IssuedCoupon extends BaseEntity {
 
     public void useCoupon() {
         this.status = IssuedCouponStatus.USED;
+        this.usedAt = LocalDateTime.now();
     }
 
-    public Long calculateDiscountAmt(Long totalNetAmt) {
-        Long discountAmt;
+    public int calculateDiscountAmt(int netAmt) {
+        int discountAmt = 0;
 
         if(discountType.equals(DiscountType.PERCENTAGE)) {
-            discountAmt = totalNetAmt * this.discountAmt;
+            discountAmt = netAmt * this.discountAmt / 100;
         } else {
-            discountAmt = totalNetAmt - this.discountAmt;
+            discountAmt = this.discountAmt;
         }
 
-        if(discountAmt < 0) {
+        if(netAmt - discountAmt <= 0) {
             throw new CustomException(ErrorCode.COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT);
         }
+
         return discountAmt;
     }
 }
