@@ -32,7 +32,7 @@ public class UserService {
         // 유저가 보유한 포인트에 충전 요청 금액 합산
         user.addPoint(chargeAmt);
         // PointHistory 저장
-        pointHistoryRepository.save(PointHistory.createChargePointHistory(user));
+        pointHistoryRepository.save(PointHistory.create(user, chargeAmt));
 
         return UserPointResponse.from(user);
     }
