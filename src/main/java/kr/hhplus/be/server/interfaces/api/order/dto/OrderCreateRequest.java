@@ -1,12 +1,24 @@
 package kr.hhplus.be.server.interfaces.api.order.dto;
 
-import lombok.Getter;
+import kr.hhplus.be.server.application.order.dto.OrderCreateParam;
+import kr.hhplus.be.server.application.order.dto.OrderDetailParam;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Getter
-public class OrderCreateRequest {
-    private Long userId;
-    private List<OrderProductDetailRequest> products;
-    private Long couponId;
+public record OrderCreateRequest (
+         Long userId,
+         List<OrderDetailRequest> products,
+         Long couponId
+) {
+    public OrderCreateParam toParam() {
+        List<OrderDetailParam> orderDetailParams = this.products.stream()
+                .map(OrderDetailParam:: of)
+                .collect(Collectors.toList());
+
+        return new OrderCreateParam(userId, orderDetailParams, couponId);
+
+    }
 }
+

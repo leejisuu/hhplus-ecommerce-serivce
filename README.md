@@ -10,6 +10,7 @@
   * [시퀀스 다이어그램](docs/SequenceDiagram.md) 작성
 * [ERD](docs/ERD.md) 작성
 * [API 명세서](docs/ApiDocs.md) 작성 (Swagger-ui)
+* [단위 테스트 목록]()
 
 ---
 

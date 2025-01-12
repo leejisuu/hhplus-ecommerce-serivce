@@ -1,33 +1,39 @@
 package kr.hhplus.be.server.interfaces.api.coupon;
 
 import io.swagger.v3.oas.annotations.Operation;
+import kr.hhplus.be.server.application.coupon.CouponFacade;
+import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
-import kr.hhplus.be.server.interfaces.api.coupon.dto.CouponRequest;
-import kr.hhplus.be.server.interfaces.api.coupon.dto.CouponResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import kr.hhplus.be.server.interfaces.api.coupon.dto.CouponIssueRequest;
+import kr.hhplus.be.server.interfaces.api.coupon.dto.IssuedCouponResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("coupon")
+@RequestMapping("/api/v1/coupons")
 public class CouponController {
 
-    @Operation(summary = "Issue coupon", description = "사용자가 쿠폰을 발급받는다.")
-    @PostMapping("issue")
-    public ApiResponse<CouponResponse> issueCoupon(@RequestBody CouponRequest couponRequest) {
-        CouponResponse response = CouponResponse.builder()
-                .id(1L)
-                .name("선착순 쿠폰")
-                .discountType("PERCENTAGE")
-                .discountAmt(10)
-                .validStartAt(LocalDate.of(2025, 1, 1))
-                .validEndAt(LocalDate.of(2025, 2, 1))
-                .status("NOT USED")
-                .build();
+    private final CouponFacade couponFacade;
+    private final CouponService couponService;
 
-        return ApiResponse.ok(response);
+    @Operation(summary = "선착순 쿠폰 발급 API", description = "사용자가 쿠폰을 발급받는다.")
+    @PostMapping("issue")
+    public ApiResponse<IssuedCouponResponse> issueCoupon(@RequestBody CouponIssueRequest couponIssueRequest) {
+        LocalDateTime issuedAt = LocalDateTime.now();
+
+        return ApiResponse.ok(couponFacade.issueCoupon(couponIssueRequest.couponId(), couponIssueRequest.userId(), issuedAt));
+    }
+
+    @Operation(summary = "보유 쿠폰 조회 API", description = "유저가 보유한 쿠폰 목록을 반환한다.")
+    @PostMapping("/{userId}/available")
+    public ApiResponse<Page<IssuedCouponResponse>> getAvailableUserCoupons(@PathVariable Long userId, Pageable pageable) {
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        return ApiResponse.ok(couponService.getAvailableUserCoupons(userId, currentTime, pageable));
     }
 }

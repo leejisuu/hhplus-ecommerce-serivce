@@ -1,22 +1,32 @@
 package kr.hhplus.be.server.interfaces.api.product.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
+import kr.hhplus.be.server.domain.order.entity.OrderDetail;
+import kr.hhplus.be.server.domain.product.entity.Product;
 
-@Getter
-public class ProductResponse {
-    private Long id;
-    private String name;
-    private String status;
-    private int stock;
-    private int price;
+import static kr.hhplus.be.server.domain.product.entity.QProduct.product;
 
-    @Builder
-    public ProductResponse(Long id, String name, String status, int stock, int price) {
-        this.id = id;
-        this.name = name;
-        this.status = status;
-        this.stock = stock;
-        this.price = price;
+public record ProductResponse(
+        Long id,
+        String name,
+        int quantity,
+        int price
+) {
+    public static ProductResponse from(Product product) {
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getProductStock().getQuantity(),
+                product.getPrice()
+        );
+    }
+
+    public static ProductResponse from(OrderDetail orderDetail) {
+        return new ProductResponse(
+                orderDetail.getId(),
+                orderDetail.getProduct().getName(),
+                orderDetail.getQuantity(),
+                orderDetail.getPrice()
+        );
     }
 }

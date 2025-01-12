@@ -1,34 +1,38 @@
 package kr.hhplus.be.server.interfaces.api.order.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import kr.hhplus.be.server.domain.order.entity.Order;
+import kr.hhplus.be.server.domain.product.entity.Product;
+import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Getter
-public class OrderCreateResponse {
+public record OrderCreateResponse (
+        Long id,
+        String status,
+        int netAmt,
+        int discountAmt,
+        int totalAmt,
+        Long couponId,
+        List<ProductResponse> products
+) {
+    public static OrderCreateResponse of(Order order) {
 
-    private Long id;
-    private Long userId;
-    private String status;
-    private int netAmt;
-    private int discountAmt;
-    private int totalAmt;
-    private Long couponId;
-    private List<OrderProductDetailRequest> products;
-    private LocalDateTime createdAt;
+        List<ProductResponse> products = order.getOrderDetails().stream()
+                .map(ProductResponse::from)
+                .collect(Collectors.toList());
 
-    @Builder
-    public OrderCreateResponse(Long id, Long userId, String status, int netAmt, int discountAmt, int totalAmt, Long couponId, List<OrderProductDetailRequest> products, LocalDateTime createdAt) {
-        this.id = id;
-        this.userId = userId;
-        this.status = status;
-        this.netAmt = netAmt;
-        this.discountAmt = discountAmt;
-        this.totalAmt = totalAmt;
-        this.couponId = couponId;
-        this.products = products;
-        this.createdAt = createdAt;
+        return new OrderCreateResponse(
+                order.getId(),
+                order.getStatus().name(),
+                order.getNetAmt(),
+                order.getDiscountAmt(),
+                order.getTotalAmt(),
+                order.getIssuedCoupon().getId(),
+                products
+        );
     }
 }
+

@@ -1,17 +1,17 @@
 package kr.hhplus.be.server.interfaces.api.user.dto;
 
+import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
-public class UserPointResponse {
-
-    private Long id;
-    private int point;
-
-    @Builder
-    private UserPointResponse(Long id, int point) {
-        this.id = id;
-        this.point = point;
+public record UserPointResponse(
+        Long id,
+        int point
+) {
+    public static UserPointResponse from(User user) {
+        return new UserPointResponse(
+                user.getId(),
+                user.getPoint()
+        );
     }
 }
