@@ -2,13 +2,14 @@ package kr.hhplus.be.server.interfaces.api.payment.dto;
 
 import kr.hhplus.be.server.domain.payment.Payment;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record PaymentMakeResponse(
         Long id,
         Long orderId,
         String status,
-        int totalAmt,
+        BigDecimal totalAmt,
         LocalDateTime createdAt
 ) {
     public static PaymentMakeResponse from(Payment payment) {
