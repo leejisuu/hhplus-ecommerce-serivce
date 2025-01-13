@@ -1,9 +1,11 @@
 package kr.hhplus.be.server.domain.user;
 
+import kr.hhplus.be.server.domain.user.dto.info.UserInfo;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
+import kr.hhplus.be.server.domain.user.service.UserService;
 import kr.hhplus.be.server.interfaces.api.user.dto.UserPointChargeRequest;
-import kr.hhplus.be.server.interfaces.api.user.dto.UserPointResponse;
+import kr.hhplus.be.server.interfaces.api.user.dto.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -25,24 +26,32 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Test
-    void 포인트_충전시_충전_포인트_합산_메서드를_실행한다() {
+    void 포인트_충전_시_유저의_포인트가_정상적으로_합산된다() {
         // given
         Long userId = 1L;
-        int chargeAmt = 1000;
-        int point = 100;
+        int chargeAmount = 1000;
+        int point = 0;
 
-        UserPointChargeRequest request = new UserPointChargeRequest(userId, chargeAmt);
-        User user = new User("유저", point);
+        User user = createUser(point);
 
-        given(userRepository.getUserWithLock(userId))
+        given(userRepository.findByIdWithLock(userId))
                 .willReturn(user);
 
         // when
-        UserPointResponse response = userService.chargeUserPoint(request);
+        UserInfo userInfo = userService.addUserPoint(userId, chargeAmount);
 
         // then
-        assertThat(response.point()).isEqualTo(point + chargeAmt);
+        assertThat(userInfo)
+                .extracting("id", "name", "point")
+                .containsExactly(userId, user.getName(), point + chargeAmount);
 
-        verify(userRepository, times(1)).getUserWithLock(userId);
+        verify(userRepository, times(1)).findByIdWithLock(userId);
+    }
+
+    private static User createUser(int point) {
+        return User.builder()
+                .name("유저")
+                .point(point)
+                .build();
     }
 }
