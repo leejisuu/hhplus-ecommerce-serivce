@@ -1,15 +1,17 @@
 package kr.hhplus.be.server.interfaces.api.order.dto;
 
-import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
+import kr.hhplus.be.server.domain.order.dto.info.TopSellingProductInfo;
+
+import java.math.BigDecimal;
 
 public record TopSellingProductResponse(
         Long productId,
         String name,
         int quantity,
-        int price,
+        BigDecimal price,
         Long totalSales
 ) {
-    public static TopSellingProductResponse of(TopSellingProductInfo topSellingProductInfo) {
+    public static TopSellingProductResponse from(TopSellingProductInfo topSellingProductInfo) {
         return new TopSellingProductResponse(
                 topSellingProductInfo.productId(),
                 topSellingProductInfo.name(),

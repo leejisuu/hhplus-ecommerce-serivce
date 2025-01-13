@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
-import kr.hhplus.be.server.application.order.dto.OrderDetailParam;
-import kr.hhplus.be.server.domain.product.dto.OrderDetailCommand;
+import kr.hhplus.be.server.domain.order.dto.command.OrderDetailCommand;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
@@ -24,32 +23,6 @@ public class ProductService {
     public Page<ProductResponse> getSellingProducts(Pageable pageable) {
         Page<Product> productsPage = productRepository.getSellingProducts(ProductStatus.SELLING, pageable);
         return productsPage.map(ProductResponse::from);
-    }
-
-    public void deductProductStocks(List<OrderDetailCommand> orderDetailCommands) {
-        for(OrderDetailCommand command : orderDetailCommands) {
-            ProductStock productStock = productStockRepository.getProductStockWithLock(command.productId());
-            if(productStock == null) {
-                throw new CustomException(ErrorCode.PRODUCT_STOCK_NOT_FOUND);
-            }
-
-            productStock.deductStock(command.quantity());
-        }
-    }
-
-    public int getNetAmt(List<OrderDetailCommand> orderDetailCommands) {
-        int netAmt = 0;
-
-        for(OrderDetailCommand command : orderDetailCommands) {
-            Product product = productRepository.getSellingProduct(command.productId());
-            if(product == null) {
-                throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
-            }
-
-            netAmt += product.getPrice() * command.quantity();
-        }
-
-        return netAmt;
     }
 
     public Product getSellingProduct(Long productId) {

@@ -1,16 +1,15 @@
 package kr.hhplus.be.server.interfaces.api.product.dto;
 
-import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
 import kr.hhplus.be.server.domain.product.entity.Product;
 
-import static kr.hhplus.be.server.domain.product.entity.QProduct.product;
+import java.math.BigDecimal;
 
 public record ProductResponse(
         Long id,
         String name,
         int quantity,
-        int price
+        BigDecimal price
 ) {
     public static ProductResponse from(Product product) {
         return new ProductResponse(

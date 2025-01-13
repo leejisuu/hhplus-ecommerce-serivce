@@ -1,10 +1,12 @@
-package kr.hhplus.be.server.domain.order.dto;
+package kr.hhplus.be.server.domain.order.dto.info;
+
+import java.math.BigDecimal;
 
 public record TopSellingProductInfo(
         Long productId,
         String name,
         int quantity,
-        int price,
+        BigDecimal price,
         Long totalSales
 ) {
 }

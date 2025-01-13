@@ -5,6 +5,8 @@ import kr.hhplus.be.server.domain.common.BaseEntity;
 import kr.hhplus.be.server.domain.product.ProductStatus;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -19,13 +21,13 @@ public class Product extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    private int price;
+    private BigDecimal price;
 
     @OneToOne(mappedBy = "product")
     private ProductStock productStock;
 
     @Builder
-    public Product(String name, ProductStatus status, int price, ProductStock productStock) {
+    public Product(String name, ProductStatus status, BigDecimal price, ProductStock productStock) {
         this.name = name;
         this.status = status;
         this.price = price;
