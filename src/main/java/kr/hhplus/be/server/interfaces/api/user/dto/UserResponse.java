@@ -3,9 +3,11 @@ package kr.hhplus.be.server.interfaces.api.user.dto;
 import kr.hhplus.be.server.application.user.dto.result.UserResult;
 import kr.hhplus.be.server.domain.user.dto.info.UserInfo;
 
+import java.math.BigDecimal;
+
 public record UserResponse(
         Long id,
-        int point
+        BigDecimal point
 ) {
     public static UserResponse from(UserResult userResult) {
         return new UserResponse(

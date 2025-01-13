@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -17,7 +19,7 @@ public class UserService {
     private final PointHistoryRepository pointHistoryRepository;
 
     @Transactional
-    public UserInfo addUserPoint(Long userId, int amount) {
+    public UserInfo addUserPoint(Long userId, BigDecimal amount) {
         User user = userRepository.findByIdWithLock(userId);
         user.addPoint(amount);
 

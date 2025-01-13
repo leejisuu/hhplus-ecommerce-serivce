@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -23,28 +25,28 @@ public class User extends BaseEntity {
     private String name;
 
     @Column(name = "point", nullable = false)
-    private int point;
+    private BigDecimal point;
 
     @Builder
-    public User(String name, int point) {
+    public User(String name, BigDecimal point) {
         this.name = name;
         this.point = point;
     }
 
-    public void addPoint(int amount) {
-        if(amount <= 0) {
+    public void addPoint(BigDecimal amount) {
+        if(amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CustomException(ErrorCode.INVALID_POINT_AMOUNT);
         }
 
-        this.point += amount;
+        this.point.add(amount);
     }
 
-    public void deductPoint(int amount) {
-        if(this.point < amount) {
+    public void deductPoint(BigDecimal amount) {
+        if(this.point.compareTo(amount) < 0) {
             throw new CustomException(ErrorCode.INSUFFICIENT_POINT);
         }
 
-        this.point -= amount;
+        this.point.subtract(amount);
     }
 
 }
