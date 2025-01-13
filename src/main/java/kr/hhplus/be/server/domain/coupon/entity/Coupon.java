@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -29,7 +30,7 @@ public class Coupon extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private DiscountType discountType;
 
-    private int discountAmt;
+    private BigDecimal discountAmt;
 
     private int maxCapacity;
 
@@ -43,7 +44,7 @@ public class Coupon extends BaseEntity {
     private CouponStatus status;
 
     @Builder
-    public Coupon(String name, DiscountType discountType, int discountAmt, int maxCapacity, int remainCapacity, LocalDateTime validStartedAt, LocalDateTime validEndedAt, CouponStatus status) {
+    public Coupon(String name, DiscountType discountType, BigDecimal discountAmt, int maxCapacity, int remainCapacity, LocalDateTime validStartedAt, LocalDateTime validEndedAt, CouponStatus status) {
         this.name = name;
         this.discountType = discountType;
         this.discountAmt = discountAmt;

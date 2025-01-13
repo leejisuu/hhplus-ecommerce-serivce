@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -40,7 +41,7 @@ public class IssuedCoupon extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private DiscountType discountType;
 
-    private int discountAmt;
+    private BigDecimal discountAmt;
 
     private LocalDateTime issuedAt;
 
@@ -53,7 +54,7 @@ public class IssuedCoupon extends BaseEntity {
     private IssuedCouponStatus status;
 
     @Builder
-    public IssuedCoupon(User user, Coupon coupon, String name, DiscountType discountType, int discountAmt, LocalDateTime issuedAt, LocalDateTime validStartedAt, LocalDateTime validEndedAt, LocalDateTime usedAt, IssuedCouponStatus status) {
+    public IssuedCoupon(User user, Coupon coupon, String name, DiscountType discountType, BigDecimal discountAmt, LocalDateTime issuedAt, LocalDateTime validStartedAt, LocalDateTime validEndedAt, LocalDateTime usedAt, IssuedCouponStatus status) {
         this.user = user;
         this.coupon = coupon;
         this.name = name;
@@ -66,21 +67,21 @@ public class IssuedCoupon extends BaseEntity {
         this.status = status;
     }
 
-    public void useCoupon() {
+    public void useIssuedCoupon(LocalDateTime usedAt) {
         this.status = IssuedCouponStatus.USED;
-        this.usedAt = LocalDateTime.now();
+        this.usedAt = usedAt;
     }
 
-    public int calculateDiscountAmt(int netAmt) {
-        int discountAmt = 0;
+    public BigDecimal calculateDiscountAmt(BigDecimal netAmt) {
+        BigDecimal discountAmt;
 
         if(discountType.equals(DiscountType.PERCENTAGE)) {
-            discountAmt = netAmt * this.discountAmt / 100;
+            discountAmt = (netAmt.multiply(this.discountAmt)).divide(BigDecimal.valueOf(100));
         } else {
             discountAmt = this.discountAmt;
         }
 
-        if(netAmt - discountAmt <= 0) {
+        if(netAmt.subtract(discountAmt).compareTo(BigDecimal.ZERO) <= 0) {
             throw new CustomException(ErrorCode.COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT);
         }
 
