@@ -1,24 +1,22 @@
 package kr.hhplus.be.server.interfaces.api.order.dto;
 
-import kr.hhplus.be.server.application.order.dto.OrderCreateParam;
-import kr.hhplus.be.server.application.order.dto.OrderDetailParam;
+import kr.hhplus.be.server.application.order.dto.criteria.OrderCreateCriteria;
+import kr.hhplus.be.server.application.order.dto.criteria.OrderDetailCriteria;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public record OrderCreateRequest (
          Long userId,
-         List<OrderDetailRequest> products,
+         List<OrderDetailRequest> productRequests,
          Long couponId
 ) {
-    public OrderCreateParam toParam() {
-        List<OrderDetailParam> orderDetailParams = this.products.stream()
-                .map(OrderDetailParam:: of)
+    public OrderCreateCriteria toOrderCreateCriteria() {
+        List<OrderDetailCriteria> orderDetailCriteriaList = this.productRequests.stream()
+                .map(OrderDetailRequest::toCriteria)
                 .collect(Collectors.toList());
 
-        return new OrderCreateParam(userId, orderDetailParams, couponId);
-
+        return new OrderCreateCriteria(userId, orderDetailCriteriaList, couponId);
     }
 }
 

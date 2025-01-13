@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.hhplus.be.server.domain.order.OrderRepository;
 import kr.hhplus.be.server.domain.order.OrderStatus;
-import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
+import kr.hhplus.be.server.domain.order.dto.info.TopSellingProductInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.QOrder;
 import kr.hhplus.be.server.domain.order.entity.QOrderDetail;

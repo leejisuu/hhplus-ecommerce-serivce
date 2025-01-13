@@ -2,12 +2,13 @@ package kr.hhplus.be.server.domain.order.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
-import kr.hhplus.be.server.domain.product.dto.OrderDetailCommand;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,20 +30,20 @@ public class OrderDetail extends BaseEntity {
 
     private int quantity;
 
-    private int price;
+    private BigDecimal price;
 
     @Builder
-    public OrderDetail(Product product, int quantity, int price) {
+    public OrderDetail(Product product, int quantity, BigDecimal price) {
         this.product = product;
         this.quantity = quantity;
         this.price = price;
     }
 
-    public static OrderDetail from(OrderDetailCommand orderDetailCommand, Product product) {
-        return OrderDetail.builder()
-                .product(product)
-                .quantity(orderDetailCommand.quantity())
-                .price(product.getPrice())
-                .build();
+    public static OrderDetail create(Product product, int quantity, BigDecimal price) {
+        return new OrderDetail(product, quantity, price);
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }
