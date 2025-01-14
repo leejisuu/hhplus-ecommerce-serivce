@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.product.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
-import kr.hhplus.be.server.domain.product.ProductStatus;
+import kr.hhplus.be.server.domain.product.ProductSellingStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,21 +16,20 @@ public class Product extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    private ProductStatus status;
+    @Column(name = "selling_status", nullable = false)
+    private ProductSellingStatus sellingStatus;
 
+    @Column(nullable = false)
     private BigDecimal price;
 
-    @OneToOne(mappedBy = "product")
-    private ProductStock productStock;
-
     @Builder
-    public Product(String name, ProductStatus status, BigDecimal price, ProductStock productStock) {
+    private Product(String name, ProductSellingStatus sellingStatus, BigDecimal price) {
         this.name = name;
-        this.status = status;
+        this.sellingStatus = sellingStatus;
         this.price = price;
-        this.productStock = productStock;
     }
 }

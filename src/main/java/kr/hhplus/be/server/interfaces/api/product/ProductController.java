@@ -1,7 +1,9 @@
 package kr.hhplus.be.server.interfaces.api.product;
 
 import io.swagger.v3.oas.annotations.Operation;
+import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
 import kr.hhplus.be.server.domain.product.ProductService;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class ProductController {
     @Operation(summary = "상품 목록 조회 API", description = "판매중인 상품 목록을 조회한다.")
     @GetMapping("/selling")
     public ApiResponse<Page<ProductResponse>> getSellingProducts(Pageable pageable) {
-        return ApiResponse.ok(productService.getSellingProducts(pageable));
+        Page<ProductInfo> productInfoPage = productService.getSellingProducts(pageable);
+        return ApiResponse.ok(productInfoPage.map(ProductResponse::of));
     }
 }
