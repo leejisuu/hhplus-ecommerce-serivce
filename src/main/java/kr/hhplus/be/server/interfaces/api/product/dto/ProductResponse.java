@@ -1,31 +1,21 @@
 package kr.hhplus.be.server.interfaces.api.product.dto;
 
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 
 import java.math.BigDecimal;
 
 public record ProductResponse(
-        Long id,
         String name,
-        int quantity,
-        BigDecimal price
+        BigDecimal price,
+        int quantity
 ) {
-    public static ProductResponse from(Product product) {
+    public static ProductResponse of(ProductInfo productInfo) {
         return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getProductStock().getQuantity(),
-                product.getPrice()
-        );
-    }
-
-    public static ProductResponse from(OrderDetail orderDetail) {
-        return new ProductResponse(
-                orderDetail.getId(),
-                orderDetail.getProduct().getName(),
-                orderDetail.getQuantity(),
-                orderDetail.getPrice()
+                productInfo.name(),
+                productInfo.price(),
+                productInfo.quantity()
         );
     }
 }

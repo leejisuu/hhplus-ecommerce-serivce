@@ -18,19 +18,19 @@ public class ProductStock extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private int quantity;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Product product;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
     @Builder
-    public ProductStock(int quantity, Product product) {
+    private ProductStock(int quantity, Long productId) {
         this.quantity = quantity;
-        this.product = product;
+        this.productId = productId;
     }
 
-    public void deductStock(int quantity) {
+    public void deductQuantity(int quantity) {
         if(this.quantity - quantity < 0) {
             throw new CustomException(ErrorCode.INSUFFICIENT_STOCK);
         }

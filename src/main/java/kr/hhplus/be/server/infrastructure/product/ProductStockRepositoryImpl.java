@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.infrastructure.product;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.hhplus.be.server.domain.product.ProductStockRepository;
+import kr.hhplus.be.server.domain.product.entity.repository.ProductStockRepository;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.domain.product.entity.QProductStock;
 import lombok.RequiredArgsConstructor;
