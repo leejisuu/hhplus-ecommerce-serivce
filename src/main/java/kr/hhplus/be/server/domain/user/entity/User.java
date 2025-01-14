@@ -24,29 +24,9 @@ public class User extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "point", nullable = false)
-    private BigDecimal point;
-
     @Builder
-    public User(String name, BigDecimal point) {
+    private User(String name) {
         this.name = name;
-        this.point = point;
-    }
-
-    public void addPoint(BigDecimal amount) {
-        if(amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new CustomException(ErrorCode.INVALID_POINT_AMOUNT);
-        }
-
-        this.point.add(amount);
-    }
-
-    public void deductPoint(BigDecimal amount) {
-        if(this.point.compareTo(amount) < 0) {
-            throw new CustomException(ErrorCode.INSUFFICIENT_POINT);
-        }
-
-        this.point.subtract(amount);
     }
 
 }

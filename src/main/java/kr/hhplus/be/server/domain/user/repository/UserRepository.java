@@ -3,7 +3,7 @@ package kr.hhplus.be.server.domain.user.repository;
 import kr.hhplus.be.server.domain.user.entity.User;
 
 public interface UserRepository {
-    User findById(Long userId);
+    User findByUserIdOrThrow(Long userId);
 
-    User findByIdWithLock(Long userId);
+    User findByUserIdWithLock(Long userId);
 }
