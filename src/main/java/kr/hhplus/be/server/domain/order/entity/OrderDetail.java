@@ -20,30 +20,27 @@ public class OrderDetail extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Order order;
+    @Column(name = "orderId", nullable = false)
+    private Long orderId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Product product;
+    @Column(name = "productId", nullable = false)
+    private Long productId;
 
+    @Column(name = "quantity", nullable = false)
     private int quantity;
 
+    @Column(name = "price", nullable = false)
     private BigDecimal price;
 
     @Builder
-    public OrderDetail(Product product, int quantity, BigDecimal price) {
-        this.product = product;
+    private OrderDetail(Long orderId, Long productId, int quantity, BigDecimal price) {
+        this.orderId = orderId;
+        this.productId = productId;
         this.quantity = quantity;
         this.price = price;
     }
 
-    public static OrderDetail create(Product product, int quantity, BigDecimal price) {
-        return new OrderDetail(product, quantity, price);
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
+    public static OrderDetail create(Long orderId, Long productId, int quantity, BigDecimal price) {
+        return new OrderDetail(orderId, productId, quantity, price);
     }
 }
