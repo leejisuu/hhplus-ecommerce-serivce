@@ -25,29 +25,28 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
-    private final UserRepository userRepository;
 
     @Transactional
-    public IssuedCouponInfo issueCoupon(Long couponId, Long userId, LocalDateTime issuedAt) {
+    public IssuedCouponInfo issue(Long couponId, Long userId, LocalDateTime issuedAt) {
         // 비관적 락을 이용해서 쿠폰 마스터 정보를 조회한다.
-        Coupon coupon = couponRepository.getCouponWithLock(couponId);
+        Coupon coupon = couponRepository.findByCouponIdWithLock(couponId);
+        if(coupon == null) {
+            throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
+        }
 
-        // 유저 정보를 조회한다.
-        User user = userRepository.findById(userId);
-
-        // Coupon을 통해 유효성 체크와 IssuedCoupon를 생성하고 저장한다
-        IssuedCoupon issuedCoupon = issuedCouponRepository.saveIssuedCoupon(coupon.makeIssuedCoupon(user, issuedAt));
-        return IssuedCouponInfo.from(issuedCoupon);
+        // 유효성 체크 후 IssuedCoupon를 생성하고 저장한다
+        IssuedCoupon issuedCoupon = issuedCouponRepository.save(coupon.issue(userId, issuedAt));
+        return IssuedCouponInfo.of(issuedCoupon);
     }
 
     public Page<IssuedCouponInfo> getAvailableUserCoupons(Long userId, LocalDateTime currentTime, Pageable pageable) {
-        Page<IssuedCoupon> userCouponsPage = issuedCouponRepository.getAvailableUserCoupons(userId, IssuedCouponStatus.UNUSED, currentTime, pageable);
+        Page<IssuedCoupon> userCouponsPage = issuedCouponRepository.getAvailableUserCoupons(userId, currentTime, pageable);
 
-        return userCouponsPage.map(IssuedCouponInfo::from);
+        return userCouponsPage.map(IssuedCouponInfo::of);
     }
 
-    public IssuedCouponInfo getIssuedCouponWithLock(Long couponId, Long userId) {
-        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(couponId, userId);
-        return IssuedCouponInfo.from(issuedCoupon);
+    public IssuedCouponInfo getIssuedCouponWithLock(Long couponId, Long userId, LocalDateTime currentTime) {
+        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(couponId, userId, currentTime);
+        return IssuedCouponInfo.of(issuedCoupon);
     }
 }

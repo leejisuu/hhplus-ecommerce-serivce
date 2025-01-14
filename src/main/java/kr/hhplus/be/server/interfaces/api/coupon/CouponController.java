@@ -24,7 +24,7 @@ public class CouponController {
     @PostMapping("issue")
     public ApiResponse<IssuedCouponResponse> issueCoupon(@RequestBody CouponIssueRequest couponIssueRequest) {
         LocalDateTime issuedAt = LocalDateTime.now();
-        IssuedCouponInfo issuedCouponInfo = couponService.issueCoupon(couponIssueRequest.couponId(), couponIssueRequest.userId(), issuedAt);
+        IssuedCouponInfo issuedCouponInfo = couponService.issue(couponIssueRequest.couponId(), couponIssueRequest.userId(), issuedAt);
         return ApiResponse.ok(IssuedCouponResponse.from(issuedCouponInfo));
     }
 

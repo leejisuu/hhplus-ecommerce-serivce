@@ -15,15 +15,15 @@ public record IssuedCouponInfo(
         LocalDateTime validEndedAt,
         LocalDateTime usedAt
 ) {
-    public static IssuedCouponInfo from(IssuedCoupon issuedCoupon) {
+    public static IssuedCouponInfo of(IssuedCoupon issuedCoupon) {
         return new IssuedCouponInfo(
                 issuedCoupon.getId(),
-                issuedCoupon.getCoupon().getName(),
-                issuedCoupon.getCoupon().getDiscountType().name(),
-                issuedCoupon.getCoupon().getDiscountAmt(),
+                issuedCoupon.getName(),
+                issuedCoupon.getDiscountType().name(),
+                issuedCoupon.getDiscountAmt(),
                 issuedCoupon.getIssuedAt(),
-                issuedCoupon.getCoupon().getValidStartedAt(),
-                issuedCoupon.getCoupon().getValidEndedAt(),
+                issuedCoupon.getValidStartedAt(),
+                issuedCoupon.getValidEndedAt(),
                 issuedCoupon.getUsedAt()
         );
     }

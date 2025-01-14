@@ -24,19 +24,19 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public IssuedCoupon saveIssuedCoupon(IssuedCoupon issuedCoupon) {
+    public IssuedCoupon save(IssuedCoupon issuedCoupon) {
         return jpaRepository.save(issuedCoupon);
     }
 
     @Override
-    public Page<IssuedCoupon> getAvailableUserCoupons(Long userId, IssuedCouponStatus issuedCouponStatus, LocalDateTime currentTime, Pageable pageable) {
+    public Page<IssuedCoupon> getAvailableUserCoupons(Long userId, LocalDateTime currentTime, Pageable pageable) {
         QIssuedCoupon qIssuedCoupon = QIssuedCoupon.issuedCoupon;
 
         // IssuedCoupon 목록 조회
         List<IssuedCoupon> content = queryFactory.selectFrom(qIssuedCoupon)
                 .where(
                         qIssuedCoupon.user.id.eq(userId),
-                        qIssuedCoupon.status.eq(issuedCouponStatus),
+                        qIssuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
                         qIssuedCoupon.validStartedAt.loe(currentTime),
                         qIssuedCoupon.validEndedAt.gt(currentTime)
                 )
@@ -56,7 +56,7 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
                 .from(qIssuedCoupon)
                 .where(
                         qIssuedCoupon.user.id.eq(userId),
-                        qIssuedCoupon.status.eq(issuedCouponStatus),
+                        qIssuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
                         qIssuedCoupon.validStartedAt.loe(currentTime),
                         qIssuedCoupon.validEndedAt.gt(currentTime)
                 );

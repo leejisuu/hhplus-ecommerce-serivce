@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 
 public interface IssuedCouponRepository {
 
-    IssuedCoupon saveIssuedCoupon(IssuedCoupon issuedCoupon);
+    IssuedCoupon save(IssuedCoupon issuedCoupon);
 
-    Page<IssuedCoupon> getAvailableUserCoupons(Long userId, IssuedCouponStatus issuedCouponStatus, LocalDateTime currentTime, Pageable pageable);
+    Page<IssuedCoupon> getAvailableUserCoupons(Long userId, LocalDateTime currentTime, Pageable pageable);
 
-    IssuedCoupon getIssuedCouponWithLock(Long couponId, Long userId);
+    IssuedCoupon getIssuedCouponWithLock(Long couponId, Long userId, LocalDateTime currentTime);
 }
