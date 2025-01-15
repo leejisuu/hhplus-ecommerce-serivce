@@ -37,9 +37,9 @@ public class ProductRepositoryImpl implements ProductRepository {
                         productStock.quantity
                 ))
                 .from(product)
-                .join(product.id, productStock.productId)
+                .join(productStock).on(product.id.eq(productStock.productId)) // on() 절로 조인
                 .where(product.sellingStatus.eq(ProductSellingStatus.SELLING))
-                .orderBy(product.id)
+                .orderBy(product.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -47,7 +47,7 @@ public class ProductRepositoryImpl implements ProductRepository {
         JPAQuery<Long> countQuery = queryFactory
                 .select(product.count())
                 .from(product)
-                .join(product.id, productStock.productId)
+                .join(productStock).on(product.id.eq(productStock.productId)) // on() 절로 조인
                 .where(product.sellingStatus.eq(ProductSellingStatus.SELLING));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);

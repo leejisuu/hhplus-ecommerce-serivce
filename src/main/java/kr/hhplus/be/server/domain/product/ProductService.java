@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
-import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.repository.ProductRepository;
 import kr.hhplus.be.server.infrastructure.product.dto.ProductDTO;
 import lombok.RequiredArgsConstructor;
