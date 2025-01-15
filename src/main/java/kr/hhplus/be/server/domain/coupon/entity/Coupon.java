@@ -63,6 +63,19 @@ public class Coupon extends BaseEntity {
         this.status = status;
     }
 
+    public static Coupon create(String name, DiscountType discountType, BigDecimal discountAmt, int maxCapacity, int remainCapacity, LocalDateTime validStartedAt, LocalDateTime validEndedAt, CouponStatus status) {
+        return Coupon.builder()
+                .name(name)
+                .discountType(discountType)
+                .discountAmt(discountAmt)
+                .maxCapacity(maxCapacity)
+                .remainCapacity(remainCapacity)
+                .validStartedAt(validStartedAt)
+                .validEndedAt(validEndedAt)
+                .status(status)
+                .build();
+    }
+
     public IssuedCoupon issue(Long userId, LocalDateTime issuedAt) {
         // 쿠폰 마스터 상태가 "DEACTIVATEDE" 라면 예외 발생.
         if(this.status == CouponStatus.DEACTIVATED) {
