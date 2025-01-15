@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.api.order.dto;
+package kr.hhplus.be.server.interfaces.api.order.dto.request;
 
 import kr.hhplus.be.server.application.order.dto.criteria.OrderDetailCriteria;
 

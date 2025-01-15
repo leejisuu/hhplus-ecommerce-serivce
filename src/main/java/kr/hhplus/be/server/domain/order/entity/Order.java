@@ -29,26 +29,32 @@ public class Order extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @OneToMany
+    @JoinColumn(name = "order_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     // 순수 구매 금액 (각 상품 재고 곱하기 가격의 합)
-    @Column(name = "total_origin_price", nullable = false)
-    private BigDecimal totalOriginalPrice;
+    @Column(name = "total_origin_amt", nullable = false)
+    private BigDecimal totalOriginalAmt;
 
     @Builder
-    private Order(Long userId, OrderStatus status, BigDecimal totalOriginalPrice) {
+    public Order(Long userId, List<OrderDetail> orderDetails, OrderStatus status, BigDecimal totalOriginalAmt) {
         this.userId = userId;
+        this.orderDetails = orderDetails;
         this.status = status;
-        this.totalOriginalPrice = totalOriginalPrice;
+        this.totalOriginalAmt = totalOriginalAmt;
     }
 
-    public static Order create(Long userId, BigDecimal totalOriginalPrice) {
+    public static Order create(Long userId, List<OrderDetail> orderDetails, BigDecimal totalOriginalAmt) {
         return new Order(
                 userId,
+                orderDetails,
                 OrderStatus.PENDING,
-                totalOriginalPrice
+                totalOriginalAmt
         );
     }
 }

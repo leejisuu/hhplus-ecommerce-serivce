@@ -2,12 +2,12 @@ package kr.hhplus.be.server.interfaces.api.order;
 
 import io.swagger.v3.oas.annotations.Operation;
 import kr.hhplus.be.server.application.order.OrderApplicationService;
-import kr.hhplus.be.server.application.order.dto.result.OrderCreateResult;
+import kr.hhplus.be.server.application.order.dto.result.OrderResult;
 import kr.hhplus.be.server.domain.order.OrderService;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
-import kr.hhplus.be.server.interfaces.api.order.dto.OrderCreateRequest;
-import kr.hhplus.be.server.interfaces.api.order.dto.OrderCreateResponse;
-import kr.hhplus.be.server.interfaces.api.order.dto.TopSellingProductResponse;
+import kr.hhplus.be.server.interfaces.api.order.dto.request.OrderRequest;
+import kr.hhplus.be.server.interfaces.api.order.dto.response.OrderResponse;
+import kr.hhplus.be.server.interfaces.api.order.dto.response.TopSellingProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,11 +26,11 @@ public class OrderController {
 
     @Operation(summary = "주문 API", description = "주문을 생성한다.")
     @PostMapping("create")
-    public ApiResponse<OrderCreateResponse> createOrder(@RequestBody OrderCreateRequest request) {
+    public ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest request) {
         LocalDateTime currentTime = LocalDateTime.now();
 
-        OrderCreateResult orderCreateResult = orderApplicationService.createOrder(request.toOrderCreateCriteria(), currentTime);
-        return ApiResponse.ok(OrderCreateResponse.from(orderCreateResult));
+        OrderResult OrderResult = orderApplicationService.order(request.toCriteria(), currentTime);
+        return ApiResponse.ok(OrderResponse.from(OrderResult));
     }
 
     @Operation(summary = "상위 상품 목록 조회 API", description = "상위 인기 상품 목록을 조회한다.")

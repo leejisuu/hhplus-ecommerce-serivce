@@ -9,7 +9,7 @@ import java.util.List;
 public interface OrderRepository {
     List<TopSellingProductInfo> getTopSellingProducts(LocalDate todayDate, int limit);
 
-    Order createOrder(Order order);
+    Order save(Order order);
 
     Order getOrder(Long orderId);
 }
