@@ -2,6 +2,7 @@ package kr.hhplus.be.server.infrastructure.point;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.LockModeType;
+import kr.hhplus.be.server.domain.point.entity.QPoint;
 import kr.hhplus.be.server.domain.point.service.PointRepository;
 import kr.hhplus.be.server.domain.point.entity.Point;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class PointRepositoryImpl implements PointRepository {
 
     @Override
     public Point findByUserIdWithLock(Long userId) {
-        QPoint point = QPoint.point;
+        QPoint point = QPoint.point1;
 
         return queryFactory
                 .selectFrom(point)

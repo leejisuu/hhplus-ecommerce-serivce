@@ -41,7 +41,7 @@ public class Point extends BaseEntity {
             throw new CustomException(ErrorCode.INVALID_POINT_AMOUNT);
         }
 
-        this.point.add(amount);
+        this.point = this.point.add(amount);
     }
 
     public void deductPoint(BigDecimal amount) {
@@ -49,6 +49,6 @@ public class Point extends BaseEntity {
             throw new CustomException(ErrorCode.INSUFFICIENT_POINT);
         }
 
-        this.point.subtract(amount);
+        this.point = this.point.subtract(amount);
     }
 }
