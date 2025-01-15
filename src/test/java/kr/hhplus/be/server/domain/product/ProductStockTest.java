@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.product;
 
-import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.support.exception.CustomException;
 import kr.hhplus.be.server.support.exception.ErrorCode;
@@ -18,15 +17,8 @@ class ProductStockTest {
                 .quantity(1)
                 .build();
 
-        Product product = Product.builder()
-                .name("상품")
-                .status(ProductStatus.SELLING)
-                .price(1000)
-                .productStock(productStock)
-                .build();
-
         // when // then
-        assertThatThrownBy(() -> product.getProductStock().deductStock(2))
+        assertThatThrownBy(() -> productStock.deductQuantity(2))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.INSUFFICIENT_STOCK.getMessage());
 
@@ -38,18 +30,10 @@ class ProductStockTest {
         ProductStock productStock = ProductStock.builder()
                 .quantity(1)
                 .build();
-
-        Product product = Product.builder()
-                .name("상품")
-                .status(ProductStatus.SELLING)
-                .price(1000)
-                .productStock(productStock)
-                .build();
-
         // when
-        product.getProductStock().deductStock(1);
+        productStock.deductQuantity(1);
 
         // then
-        assertThat(product.getProductStock().getQuantity()).isEqualTo(0);
+        assertThat(productStock.getQuantity()).isEqualTo(0);
     }
 }
