@@ -6,16 +6,30 @@ import kr.hhplus.be.server.application.order.dto.criteria.OrderDetailCriteria;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record OrderRequest(
-         Long userId,
-         List<OrderDetailRequest> orderDetails
-) {
-    public OrderCriteria toCriteria() {
-        List<OrderDetailCriteria> orderDetailCriterias = this.orderDetails.stream()
-                .map(OrderDetailRequest::toCriteria)
-                .collect(Collectors.toList());
+public class OrderRequest {
 
-        return new OrderCriteria(userId, orderDetailCriterias);
+    public record Order(
+            Long userId,
+            List<OrderDetail> details
+    ) {
+
+        public OrderCriteria.Order toCriteria() {
+            List<OrderCriteria.OrderDetail> criteriaOrderDetails = details.stream()
+                    .map(orderDetail -> new OrderCriteria.OrderDetail(
+                            orderDetail.productId(),
+                            orderDetail.quantity()
+                    ))
+                    .collect(Collectors.toList());
+
+            return new OrderCriteria.Order(userId, criteriaOrderDetails);
+        }
+    }
+
+    public record OrderDetail(
+            Long productId,
+            int quantity
+    ) {
+
     }
 }
 

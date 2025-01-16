@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,10 +22,11 @@ public class OrderDetail extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "orderId", nullable = false)
-    private Long orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Order order;
 
-    @Column(name = "productId", nullable = false)
+    @Column(name = "product_id", nullable = false)
     private Long productId;
 
     @Column(name = "quantity", nullable = false)
@@ -33,14 +36,13 @@ public class OrderDetail extends BaseEntity {
     private BigDecimal price;
 
     @Builder
-    private OrderDetail(Long orderId, Long productId, int quantity, BigDecimal price) {
-        this.orderId = orderId;
+    private OrderDetail(Order order, Long productId, int quantity, BigDecimal price) {
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
     }
 
-    public static OrderDetail create(Long orderId, Long productId, int quantity, BigDecimal price) {
-        return new OrderDetail(orderId, productId, quantity, price);
+    public static OrderDetail create(Order order, Long productId, int quantity, BigDecimal price) {
+        return new OrderDetail(order, productId, quantity, price);
     }
 }

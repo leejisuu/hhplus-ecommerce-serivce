@@ -4,14 +4,18 @@ import kr.hhplus.be.server.domain.order.entity.Order;
 
 import java.math.BigDecimal;
 
-public record OrderInfo(
-        Long id,
-        BigDecimal totalOrginalAmt
-) {
-    public static OrderInfo of(Order order) {
-        return new OrderInfo(
-                order.getId(),
-                order.getTotalOriginalAmt()
-        );
+public class OrderInfo {
+
+    public record OrderDto(
+            Long id,
+            BigDecimal totalOriginalAmt
+    ) {
+        public static OrderInfo.OrderDto of(Order order) {
+
+            return new OrderInfo.OrderDto(
+                    order.getId(),
+                    order.getTotalOriginalAmt()
+            );
+        }
     }
 }

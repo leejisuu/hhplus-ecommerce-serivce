@@ -2,24 +2,20 @@ package kr.hhplus.be.server.domain.order.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
-import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
-import kr.hhplus.be.server.domain.order.OrderStatus;
-import kr.hhplus.be.server.domain.user.entity.User;
+import kr.hhplus.be.server.domain.order.enums.OrderStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "orders")
+@Table(name = "`order`")
 public class Order extends BaseEntity {
 
     @Id
@@ -28,10 +24,6 @@ public class Order extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
-
-    @OneToMany
-    @JoinColumn(name = "order_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -42,18 +34,16 @@ public class Order extends BaseEntity {
     private BigDecimal totalOriginalAmt;
 
     @Builder
-    public Order(Long userId, List<OrderDetail> orderDetails, OrderStatus status, BigDecimal totalOriginalAmt) {
+    public Order(Long userId, OrderStatus status, BigDecimal totalOriginalAmt) {
         this.userId = userId;
-        this.orderDetails = orderDetails;
         this.status = status;
         this.totalOriginalAmt = totalOriginalAmt;
     }
 
-    public static Order create(Long userId, List<OrderDetail> orderDetails, BigDecimal totalOriginalAmt) {
+    public static Order create(Long userId, BigDecimal totalOriginalAmt) {
         return new Order(
                 userId,
-                orderDetails,
-                OrderStatus.PENDING,
+                OrderStatus.COMPLETED,
                 totalOriginalAmt
         );
     }
