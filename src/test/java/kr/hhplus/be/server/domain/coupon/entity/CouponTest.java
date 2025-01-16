@@ -3,15 +3,15 @@ package kr.hhplus.be.server.domain.coupon.entity;
 import kr.hhplus.be.server.domain.coupon.enums.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
 import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
-import kr.hhplus.be.server.support.exception.CustomException;
-import kr.hhplus.be.server.support.exception.ErrorCode;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class CouponTest {
