@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.product.entity.repository;
+package kr.hhplus.be.server.domain.product.repository;
 
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 

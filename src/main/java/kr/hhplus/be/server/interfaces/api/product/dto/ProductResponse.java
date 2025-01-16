@@ -6,16 +6,41 @@ import kr.hhplus.be.server.domain.product.entity.Product;
 
 import java.math.BigDecimal;
 
-public record ProductResponse(
-        String name,
-        BigDecimal price,
-        int quantity
-) {
-    public static ProductResponse of(ProductInfo productInfo) {
-        return new ProductResponse(
-                productInfo.name(),
-                productInfo.price(),
-                productInfo.quantity()
-        );
+public class ProductResponse {
+
+    public record Stock(
+            Long id,
+            String name,
+            BigDecimal price,
+            int quantity
+    ) {
+        public static ProductResponse.Stock of(ProductInfo.Stock productInfo) {
+            return new ProductResponse.Stock (
+                    productInfo.id(),
+                    productInfo.name(),
+                    productInfo.price(),
+                    productInfo.quantity()
+            );
+        }
+
+    }
+
+    public record TopSelling(
+            Long productId,
+            String name,
+            int quantity,
+            BigDecimal price,
+            Long totalSales
+    ) {
+        public static ProductResponse.TopSelling of(ProductInfo.TopSelling topSelling) {
+            return new ProductResponse.TopSelling (
+                    topSelling.productId(),
+                    topSelling.name(),
+                    topSelling.quantity(),
+                    topSelling.price(),
+                    topSelling.totalSales()
+            );
+        }
+
     }
 }

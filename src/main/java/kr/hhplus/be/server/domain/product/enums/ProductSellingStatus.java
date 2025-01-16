@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.product;
+package kr.hhplus.be.server.domain.product.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
