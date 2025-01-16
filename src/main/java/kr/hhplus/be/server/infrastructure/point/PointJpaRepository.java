@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.infrastructure.point;
 
 import kr.hhplus.be.server.domain.point.entity.Point;
-import kr.hhplus.be.server.support.exception.CustomException;
-import kr.hhplus.be.server.support.exception.ErrorCode;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

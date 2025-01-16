@@ -3,7 +3,7 @@ package kr.hhplus.be.server.infrastructure.point;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.LockModeType;
 import kr.hhplus.be.server.domain.point.entity.QPoint;
-import kr.hhplus.be.server.domain.point.service.PointRepository;
+import kr.hhplus.be.server.domain.point.repository.PointRepository;
 import kr.hhplus.be.server.domain.point.entity.Point;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

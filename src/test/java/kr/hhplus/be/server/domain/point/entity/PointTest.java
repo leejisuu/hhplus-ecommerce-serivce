@@ -1,20 +1,19 @@
-package kr.hhplus.be.server.domain.point;
+package kr.hhplus.be.server.domain.point.entity;
 
 import kr.hhplus.be.server.domain.point.entity.Point;
-import kr.hhplus.be.server.domain.user.entity.User;
-import kr.hhplus.be.server.support.exception.CustomException;
-import kr.hhplus.be.server.support.exception.ErrorCode;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class PointTest {
 
     @Test
-    void 충전_요청_금액이_0원_이하면_CustomError가_발생한다() {
+    void 충전_요청_금액이_0원_이하면_CustomException_INVALID_CHARGE_POINT_AMOUNT가_발생한다() {
         // given
         BigDecimal currentPoint = BigDecimal.ZERO;
         BigDecimal chargePoint = BigDecimal.ZERO;
@@ -23,7 +22,7 @@ class PointTest {
         // when // then
         assertThatThrownBy(() -> point.addPoint(chargePoint))
                 .isInstanceOf(CustomException.class)
-                .hasMessage(ErrorCode.INVALID_POINT_AMOUNT.getMessage());
+                .hasMessage(ErrorCode.INVALID_CHARGE_POINT_AMOUNT.getMessage());
     }
 
     @Test
@@ -41,7 +40,20 @@ class PointTest {
     }
 
     @Test
-    void 사용_요청_금액이_보유_잔액보다_크면_CustomError가_발생한다() {
+    void 사용_요청_금액이_0원_이하면_CustomException_INVALID_USE_POINT_AMOUNT가_발생한다() {
+        // given
+        BigDecimal currentPoint = BigDecimal.valueOf(1000);
+        BigDecimal userPoint = BigDecimal.ZERO;
+        Point point = createPoint(currentPoint);
+
+        // when // then
+        assertThatThrownBy(() -> point.deductPoint(userPoint))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.INVALID_USE_POINT_AMOUNT.getMessage());
+    }
+
+    @Test
+    void 사용_요청_금액이_보유_잔액보다_크면_CustomException_INSUFFICIENT_POINT가_발생한다() {
         // given
         BigDecimal currentPoint = BigDecimal.valueOf(1000);
         BigDecimal userPoint = BigDecimal.valueOf(1001);
