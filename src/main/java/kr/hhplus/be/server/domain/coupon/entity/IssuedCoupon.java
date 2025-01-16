@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
 import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
-import kr.hhplus.be.server.domain.user.entity.User;
-import kr.hhplus.be.server.support.exception.CustomException;
-import kr.hhplus.be.server.support.exception.ErrorCode;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "issued_coupon", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "coupon_id"})
-})
+@Table(name = "issued_coupon")
 public class IssuedCoupon extends BaseEntity {
 
     @Id
@@ -55,6 +52,7 @@ public class IssuedCoupon extends BaseEntity {
     @Column(name = "used_at")
     private LocalDateTime usedAt;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private IssuedCouponStatus status;
 
@@ -73,12 +71,7 @@ public class IssuedCoupon extends BaseEntity {
         this.status = status;
     }
 
-    public void use(LocalDateTime usedAt) {
-        this.status = IssuedCouponStatus.USED;
-        this.usedAt = usedAt;
-    }
-
-    public BigDecimal calculateDiscountAmt(BigDecimal totalOriginalPrice) {
+    public BigDecimal use(BigDecimal totalOriginalPrice, LocalDateTime usedAt) {
         BigDecimal discountAmt;
 
         if(discountType.equals(DiscountType.PERCENTAGE)) {
@@ -90,6 +83,9 @@ public class IssuedCoupon extends BaseEntity {
         if(totalOriginalPrice.subtract(discountAmt).compareTo(BigDecimal.ZERO) <= 0) {
             throw new CustomException(ErrorCode.COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT);
         }
+
+        this.status = IssuedCouponStatus.USED;
+        this.usedAt = usedAt;
 
         return discountAmt;
     }

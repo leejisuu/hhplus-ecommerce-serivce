@@ -16,7 +16,7 @@ public class CouponRepositoryImpl implements CouponRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Coupon findByCouponIdWithLock(Long couponId) {
+    public Coupon findByIdWithLock(Long couponId) {
         QCoupon coupon = QCoupon.coupon;
 
         return queryFactory
@@ -24,5 +24,10 @@ public class CouponRepositoryImpl implements CouponRepository {
                 .where(coupon.id.eq(couponId))
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne();
+    }
+
+    @Override
+    public void save(Coupon coupon) {
+        couponJpaRepository.save(coupon);
     }
 }

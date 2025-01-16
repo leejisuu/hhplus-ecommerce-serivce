@@ -5,9 +5,8 @@ import kr.hhplus.be.server.domain.common.BaseEntity;
 import kr.hhplus.be.server.domain.coupon.enums.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
 import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
-import kr.hhplus.be.server.domain.user.entity.User;
-import kr.hhplus.be.server.support.exception.CustomException;
-import kr.hhplus.be.server.support.exception.ErrorCode;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +24,7 @@ public class Coupon extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "discount_type", nullable = false)
@@ -38,7 +37,7 @@ public class Coupon extends BaseEntity {
     @Column(name = "max_capacity", nullable = false)
     private int maxCapacity;
 
-    @Column(name = "remainCapacity", nullable = false)
+    @Column(name = "remain_capacity", nullable = false)
     private int remainCapacity;
 
     @Column(name = "valid_started_at", nullable = false)
@@ -93,7 +92,7 @@ public class Coupon extends BaseEntity {
         }
 
         // 쿠폰 잔여 개수 1개 차감
-        this.remainCapacity--;
+        this.remainCapacity = this.remainCapacity - 1;
 
         return IssuedCoupon.builder()
                 .couponId(this.id)
