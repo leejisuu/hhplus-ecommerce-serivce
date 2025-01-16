@@ -2,68 +2,49 @@ package kr.hhplus.be.server.domain.order.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
-import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
-import kr.hhplus.be.server.domain.order.OrderStatus;
-import kr.hhplus.be.server.domain.user.entity.User;
+import kr.hhplus.be.server.domain.order.enums.OrderStatus;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "orders")
+@Table(name = "`order`")
 public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    @Column(name = "net_amt")
-    private int netAmt;
+    // 순수 구매 금액 (각 상품 재고 곱하기 가격의 합)
+    @Column(name = "total_origin_amt", nullable = false)
+    private BigDecimal totalOriginalAmt;
 
-    @Column(name = "discount_amt")
-    private int discountAmt;
-
-    @Column(name = "total_amt")
-    private int totalAmt;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name ="issued_coupon_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private IssuedCoupon issuedCoupon;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDetail> orderDetails = new ArrayList<>();
-
-    public Order(User user, OrderStatus status, int netAmt, int discountAmt, int totalAmt, IssuedCoupon issuedCoupon, List<OrderDetail> orderDetails) {
-        this.user = user;
+    @Builder
+    public Order(Long userId, OrderStatus status, BigDecimal totalOriginalAmt) {
+        this.userId = userId;
         this.status = status;
-        this.netAmt = netAmt;
-        this.discountAmt = discountAmt;
-        this.totalAmt = totalAmt;
-        this.issuedCoupon = issuedCoupon;
-        this.orderDetails = orderDetails;
+        this.totalOriginalAmt = totalOriginalAmt;
     }
 
-    public static Order create(User user,  int netAmt, int  discountAmt, IssuedCoupon issuedCoupon, List<OrderDetail> orderDetails) {
+    public static Order create(Long userId, BigDecimal totalOriginalAmt) {
         return new Order(
-                user,
+                userId,
                 OrderStatus.COMPLETED,
-                netAmt,
-                discountAmt,
-                netAmt - discountAmt,
-                issuedCoupon,
-                orderDetails
+                totalOriginalAmt
         );
     }
 }

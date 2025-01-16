@@ -2,12 +2,15 @@ package kr.hhplus.be.server.domain.order.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
-import kr.hhplus.be.server.domain.product.dto.OrderDetailCommand;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,26 +26,23 @@ public class OrderDetail extends BaseEntity {
     @JoinColumn(name = "order_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Order order;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Product product;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
+    @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    private int price;
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;
 
     @Builder
-    public OrderDetail(Product product, int quantity, int price) {
-        this.product = product;
+    private OrderDetail(Order order, Long productId, int quantity, BigDecimal price) {
+        this.productId = productId;
         this.quantity = quantity;
         this.price = price;
     }
 
-    public static OrderDetail from(OrderDetailCommand orderDetailCommand, Product product) {
-        return OrderDetail.builder()
-                .product(product)
-                .quantity(orderDetailCommand.quantity())
-                .price(product.getPrice())
-                .build();
+    public static OrderDetail create(Order order, Long productId, int quantity, BigDecimal price) {
+        return new OrderDetail(order, productId, quantity, price);
     }
 }

@@ -7,8 +7,4 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CouponJpaRepository extends JpaRepository<Coupon, Long> {
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query(value= "select c from coupon where c.id = :couponId", nativeQuery = true)
-    Coupon findByIdWithLock(Long couponId);
 }

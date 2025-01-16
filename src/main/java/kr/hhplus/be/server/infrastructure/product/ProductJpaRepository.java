@@ -1,14 +1,12 @@
 package kr.hhplus.be.server.infrastructure.product;
 
 import kr.hhplus.be.server.domain.product.entity.Product;
-import kr.hhplus.be.server.domain.product.ProductStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import kr.hhplus.be.server.domain.product.enums.ProductSellingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 public interface ProductJpaRepository extends JpaRepository<Product, Long> {
 
-    Page<Product> findAllByStatus(ProductStatus productStatus, Pageable pageable);
-
-    Product findByIdAndStatus(Long productId, ProductStatus productStatus);
+    List<Product> findAllByIdInAndSellingStatus(List<Long> ids, ProductSellingStatus sellingStatus);
 }

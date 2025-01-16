@@ -5,14 +5,14 @@ import kr.hhplus.be.server.domain.common.BaseEntity;
 import kr.hhplus.be.server.domain.coupon.enums.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
 import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
-import kr.hhplus.be.server.domain.user.entity.User;
-import kr.hhplus.be.server.support.exception.CustomException;
-import kr.hhplus.be.server.support.exception.ErrorCode;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -24,26 +24,34 @@ public class Coupon extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "discount_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private DiscountType discountType;
 
-    private int discountAmt;
+    @Column(name = "discount_amt", nullable = false)
+    private BigDecimal discountAmt;
 
+    @Column(name = "max_capacity", nullable = false)
     private int maxCapacity;
 
+    @Column(name = "remain_capacity", nullable = false)
     private int remainCapacity;
 
+    @Column(name = "valid_started_at", nullable = false)
     private LocalDateTime validStartedAt;
 
+    @Column(name = "valid_ended_at", nullable = false)
     private LocalDateTime validEndedAt;
 
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private CouponStatus status;
 
     @Builder
-    public Coupon(String name, DiscountType discountType, int discountAmt, int maxCapacity, int remainCapacity, LocalDateTime validStartedAt, LocalDateTime validEndedAt, CouponStatus status) {
+    private Coupon(String name, DiscountType discountType, BigDecimal discountAmt, int maxCapacity, int remainCapacity, LocalDateTime validStartedAt, LocalDateTime validEndedAt, CouponStatus status) {
         this.name = name;
         this.discountType = discountType;
         this.discountAmt = discountAmt;
@@ -54,8 +62,21 @@ public class Coupon extends BaseEntity {
         this.status = status;
     }
 
-    public IssuedCoupon makeIssuedCoupon(User user, LocalDateTime issuedAt) {
-        // 쿠폰 상태가 "DEACTIVATEDE" 라면 예외 발생.
+    public static Coupon create(String name, DiscountType discountType, BigDecimal discountAmt, int maxCapacity, int remainCapacity, LocalDateTime validStartedAt, LocalDateTime validEndedAt, CouponStatus status) {
+        return Coupon.builder()
+                .name(name)
+                .discountType(discountType)
+                .discountAmt(discountAmt)
+                .maxCapacity(maxCapacity)
+                .remainCapacity(remainCapacity)
+                .validStartedAt(validStartedAt)
+                .validEndedAt(validEndedAt)
+                .status(status)
+                .build();
+    }
+
+    public IssuedCoupon issue(Long userId, LocalDateTime issuedAt) {
+        // 쿠폰 마스터 상태가 "DEACTIVATEDE" 라면 예외 발생.
         if(this.status == CouponStatus.DEACTIVATED) {
             throw new CustomException(ErrorCode.DEACTIVATED_COUPON);
         }
@@ -71,11 +92,11 @@ public class Coupon extends BaseEntity {
         }
 
         // 쿠폰 잔여 개수 1개 차감
-        this.remainCapacity--;
+        this.remainCapacity = this.remainCapacity - 1;
 
         return IssuedCoupon.builder()
-                .user(user)
-                .coupon(this)
+                .couponId(this.id)
+                .userId(userId)
                 .name(this.name)
                 .discountType(this.discountType)
                 .discountAmt(this.discountAmt)

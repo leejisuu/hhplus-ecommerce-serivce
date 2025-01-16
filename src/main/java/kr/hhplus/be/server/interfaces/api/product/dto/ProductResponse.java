@@ -1,32 +1,46 @@
 package kr.hhplus.be.server.interfaces.api.product.dto;
 
-import kr.hhplus.be.server.domain.order.dto.TopSellingProductInfo;
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 
-import static kr.hhplus.be.server.domain.product.entity.QProduct.product;
+import java.math.BigDecimal;
 
-public record ProductResponse(
-        Long id,
-        String name,
-        int quantity,
-        int price
-) {
-    public static ProductResponse from(Product product) {
-        return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getProductStock().getQuantity(),
-                product.getPrice()
-        );
+public class ProductResponse {
+
+    public record Stock(
+            Long id,
+            String name,
+            BigDecimal price,
+            int quantity
+    ) {
+        public static ProductResponse.Stock of(ProductInfo.Stock productInfo) {
+            return new ProductResponse.Stock (
+                    productInfo.id(),
+                    productInfo.name(),
+                    productInfo.price(),
+                    productInfo.quantity()
+            );
+        }
+
     }
 
-    public static ProductResponse from(OrderDetail orderDetail) {
-        return new ProductResponse(
-                orderDetail.getId(),
-                orderDetail.getProduct().getName(),
-                orderDetail.getQuantity(),
-                orderDetail.getPrice()
-        );
+    public record TopSelling(
+            Long productId,
+            String name,
+            int quantity,
+            BigDecimal price,
+            Long totalSales
+    ) {
+        public static ProductResponse.TopSelling of(ProductInfo.TopSelling topSelling) {
+            return new ProductResponse.TopSelling (
+                    topSelling.productId(),
+                    topSelling.name(),
+                    topSelling.quantity(),
+                    topSelling.price(),
+                    topSelling.totalSales()
+            );
+        }
+
     }
 }
