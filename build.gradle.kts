@@ -73,9 +73,7 @@ sourceSets {
 }
 
 // 테스트 환경 설정
-/*
 tasks.withType<Test> {
     useJUnitPlatform()
     systemProperty("user.timezone", "UTC")
 }
-*/
