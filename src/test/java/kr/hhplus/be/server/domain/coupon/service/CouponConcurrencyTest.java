@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
-import kr.hhplus.be.server.DatabaseCleanup;
 import kr.hhplus.be.server.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -9,7 +8,6 @@ import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.infrastructure.coupon.CouponJpaRepository;
 import kr.hhplus.be.server.infrastructure.coupon.IssuedCouponJpaRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,14 +30,6 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
 
     @Autowired
     IssuedCouponJpaRepository issuedCouponJpaRepository;
-
-    @Autowired
-    DatabaseCleanup databaseCleanup;
-
-    @BeforeEach
-    void databaseCleanup() {
-        databaseCleanup.execute();
-    }
 
     @Test
     public void 동시에_동일한_선착순_쿠폰에_대해_40명이_발급했을_때_30명만_성공한다() throws InterruptedException {

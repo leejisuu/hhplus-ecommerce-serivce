@@ -9,6 +9,7 @@ import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
@@ -45,6 +46,8 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
                 .limit(pageable.getPageSize()) // pageSize : 한 페이지에 포함될 데이터의 개수
                 .fetch();
 
+        System.out.println(content.size()+"" );
+
         JPAQuery<Long> countQuery = queryFactory.select(issuedCoupon.count())
                 .from(issuedCoupon)
                 .where(
@@ -54,7 +57,7 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
                         issuedCoupon.validEndedAt.gt(currentTime)
                 );
 
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+        return new PageImpl<>(content, pageable, countQuery.fetchCount());
     }
 
     @Override
