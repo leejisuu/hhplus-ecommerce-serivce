@@ -26,11 +26,15 @@ public class OrderService {
 
     @Transactional
     public OrderInfo.OrderDto order(OrderCommand.Order orderCommand) {
-        BigDecimal totalOrignalPrice = orderCommand.details().stream()
-                .map(detail -> BigDecimal.valueOf(detail.quantity()).multiply(detail.price()))
+        if(orderCommand.details().isEmpty()) {
+            throw new CustomException(ErrorCode.ORDER_DETAILS_NOT_EXISTS);
+        }
+
+        BigDecimal totalOriginalAmt = orderCommand.details().stream()
+                .map(detail -> new BigDecimal(detail.quantity()).multiply(detail.price()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Order order = orderRepository.save(Order.create(orderCommand.userId(), totalOrignalPrice));
+        Order order = orderRepository.save(Order.create(orderCommand.userId(), totalOriginalAmt));
 
         List<OrderDetail> orderDetails = orderCommand.details().stream()
                 .map(orderDetail -> OrderDetail.create(
