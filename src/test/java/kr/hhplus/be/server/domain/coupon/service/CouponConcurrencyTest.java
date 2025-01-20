@@ -40,7 +40,7 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
         LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 00, 00, 00);
         LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 31, 23, 59, 59);
 
-        Coupon couponInfo = Coupon.create("선착순 쿠폰", DiscountType.FIXED_AMOUNT, BigDecimal.valueOf(1000), maxCapacity, maxCapacity, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
+        Coupon couponInfo = Coupon.create("선착순 쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), maxCapacity, maxCapacity, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
         Coupon savedCoupon = couponJpaRepository.save(couponInfo);
 
         int threadCount = 40;
@@ -84,7 +84,7 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
         LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 00, 00, 00);
         LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 31, 23, 59, 59);
 
-        Coupon couponInfo = Coupon.create("선착순 쿠폰", DiscountType.FIXED_AMOUNT, BigDecimal.valueOf(1000), maxCapacity, maxCapacity, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
+        Coupon couponInfo = Coupon.create("선착순 쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), maxCapacity, maxCapacity, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
         Coupon savedCoupon = couponJpaRepository.save(couponInfo);
 
         int threadCount = 5;

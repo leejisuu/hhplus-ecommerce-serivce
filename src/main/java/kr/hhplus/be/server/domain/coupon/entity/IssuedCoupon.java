@@ -75,7 +75,7 @@ public class IssuedCoupon extends BaseEntity {
         BigDecimal discountAmt;
 
         if(discountType.equals(DiscountType.PERCENTAGE)) {
-            discountAmt = (totalOriginalPrice.multiply(this.discountAmt)).divide(BigDecimal.valueOf(100));
+            discountAmt = (totalOriginalPrice.multiply(this.discountAmt)).divide(new BigDecimal(100));
         } else {
             discountAmt = this.discountAmt;
         }

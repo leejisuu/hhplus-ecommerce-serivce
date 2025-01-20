@@ -31,7 +31,7 @@ class IssuedCouponTest {
                 .couponId(couponId)
                 .name("쿠폰")
                 .discountType(DiscountType.FIXED_AMOUNT)
-                .discountAmt(BigDecimal.valueOf(5000))
+                .discountAmt(new BigDecimal(5000))
                 .issuedAt(issuedAt)
                 .validStartedAt(validStartedAt)
                 .validEndedAt(validEndedAt)
@@ -39,7 +39,7 @@ class IssuedCouponTest {
                 .status(IssuedCouponStatus.UNUSED)
                 .build();
 
-        BigDecimal totalOriginAmt = BigDecimal.valueOf(10000);
+        BigDecimal totalOriginAmt = new BigDecimal(10000);
 
         // When
         BigDecimal discountAmt = issuedCoupon.use(totalOriginAmt, currentTime);
@@ -66,7 +66,7 @@ class IssuedCouponTest {
                 .couponId(couponId)
                 .name("쿠폰")
                 .discountType(DiscountType.PERCENTAGE)
-                .discountAmt(BigDecimal.valueOf(10))
+                .discountAmt(new BigDecimal(10))
                 .issuedAt(issuedAt)
                 .validStartedAt(validStartedAt)
                 .validEndedAt(validEndedAt)
@@ -75,13 +75,13 @@ class IssuedCouponTest {
                 .build();
 
 
-        BigDecimal totalOriginAmt = BigDecimal.valueOf(10000);
+        BigDecimal totalOriginAmt = new BigDecimal(10000);
 
         // When
         BigDecimal discountAmt = issuedCoupon.use(totalOriginAmt, currentTime);
 
         // Then
-        assertThat(discountAmt).isEqualTo((totalOriginAmt.multiply(issuedCoupon.getDiscountAmt())).divide(BigDecimal.valueOf(100)));
+        assertThat(discountAmt).isEqualTo((totalOriginAmt.multiply(issuedCoupon.getDiscountAmt())).divide(new BigDecimal(100)));
         assertThat(issuedCoupon.getStatus()).isEqualTo(IssuedCouponStatus.USED);
         assertThat(issuedCoupon.getUsedAt()).isEqualTo(currentTime);
     }
@@ -102,7 +102,7 @@ class IssuedCouponTest {
                 .couponId(couponId)
                 .name("쿠폰")
                 .discountType(DiscountType.FIXED_AMOUNT)
-                .discountAmt(BigDecimal.valueOf(1000))
+                .discountAmt(new BigDecimal(1000))
                 .issuedAt(issuedAt)
                 .validStartedAt(validStartedAt)
                 .validEndedAt(validEndedAt)
@@ -110,7 +110,7 @@ class IssuedCouponTest {
                 .status(IssuedCouponStatus.UNUSED)
                 .build();
 
-        BigDecimal totalOriginAmt = BigDecimal.valueOf(1000);
+        BigDecimal totalOriginAmt = new BigDecimal(1000);
 
         // when // then
         assertThatThrownBy(() -> issuedCoupon.use(totalOriginAmt, currentTime))
@@ -134,7 +134,7 @@ class IssuedCouponTest {
                 .couponId(couponId)
                 .name("쿠폰")
                 .discountType(DiscountType.FIXED_AMOUNT)
-                .discountAmt(BigDecimal.valueOf(5000))
+                .discountAmt(new BigDecimal(5000))
                 .issuedAt(issuedAt)
                 .validStartedAt(validStartedAt)
                 .validEndedAt(validEndedAt)
@@ -142,7 +142,7 @@ class IssuedCouponTest {
                 .status(IssuedCouponStatus.UNUSED)
                 .build();
 
-        BigDecimal totalOriginAmt = BigDecimal.valueOf(10000);
+        BigDecimal totalOriginAmt = new BigDecimal(10000);
 
         // When
         issuedCoupon.use(totalOriginAmt, currentTime);

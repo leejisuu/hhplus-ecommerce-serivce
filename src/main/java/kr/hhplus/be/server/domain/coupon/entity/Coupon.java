@@ -82,7 +82,7 @@ public class Coupon extends BaseEntity {
         }
 
         // 쿠폰의 유효 기간이 만료 됐다면 예외 발생.
-        if(!issuedAt.isBefore(this.validEndedAt) || issuedAt.isEqual(this.validStartedAt)) {
+        if(issuedAt.isBefore(this.validStartedAt) || !issuedAt.isBefore(this.validEndedAt)) {
             throw new CustomException(ErrorCode.COUPON_EXPIRED);
         }
 
