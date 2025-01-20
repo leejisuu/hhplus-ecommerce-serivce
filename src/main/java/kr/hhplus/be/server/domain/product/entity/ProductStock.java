@@ -31,6 +31,10 @@ public class ProductStock extends BaseEntity {
         this.quantity = quantity;
     }
 
+    public static ProductStock create(Long productId, int quantity) {
+        return new ProductStock(productId, quantity);
+    }
+
     public void deductQuantity(int quantity) {
         if(this.quantity - quantity < 0) {
             throw new CustomException(ErrorCode.INSUFFICIENT_STOCK);
