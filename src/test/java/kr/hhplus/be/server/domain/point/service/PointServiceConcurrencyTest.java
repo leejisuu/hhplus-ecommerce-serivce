@@ -24,7 +24,7 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
     void 동일한_유저가_포인트_충전을_동시에_신청해도_포인트가_모두_합산된다() throws InterruptedException {
         // given
         Long userId = 1L;
-        BigDecimal amount = BigDecimal.valueOf(1000);
+        BigDecimal amount = new BigDecimal(1000);
 
         PointInfo.PointDto currentPoint = pointService.getPoint(userId);
 
@@ -55,7 +55,7 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
         // then
         PointInfo.PointDto chargedPoint = pointService.getPoint(userId);
 
-        Assertions.assertThat(chargedPoint.point().compareTo(currentPoint.point().add(amount.multiply(BigDecimal.valueOf(threadCount))))).isEqualTo(0);
+        Assertions.assertThat(chargedPoint.point().compareTo(currentPoint.point().add(amount.multiply(new BigDecimal(threadCount))))).isEqualTo(0);
 
     }
 
@@ -65,10 +65,10 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
         Long userId = 1L;
         List<BigDecimal> amounts = Arrays.asList(
                 BigDecimal.ZERO,
-                BigDecimal.valueOf(200),
-                BigDecimal.valueOf(50),
+                new BigDecimal(200),
+                new BigDecimal(50),
                 BigDecimal.ZERO,
-                BigDecimal.valueOf(150)
+                new BigDecimal(150)
         );
 
         PointInfo.PointDto currentPoint = pointService.getPoint(userId);

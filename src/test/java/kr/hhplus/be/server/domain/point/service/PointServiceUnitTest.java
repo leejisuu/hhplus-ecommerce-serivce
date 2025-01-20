@@ -42,7 +42,7 @@ class PointServiceUnitTest {
         @Test
         void 유저_아이디로_포인트를_조회한다() {
             // given
-            BigDecimal currentPoint = BigDecimal.valueOf(100);
+            BigDecimal currentPoint = new BigDecimal(100);
             Point init = createPoint(currentPoint);
 
             given(pointRepository.findByUserIdOrThrow(userId)).willReturn(init);
@@ -54,6 +54,8 @@ class PointServiceUnitTest {
             assertThat(point)
                     .extracting("userId", "point")
                     .containsExactly(init.getUserId(), init.getPoint());
+
+            verify(pointRepository, times(1)).findByUserIdOrThrow(userId);
         }
 
         @Test
@@ -65,6 +67,8 @@ class PointServiceUnitTest {
             assertThatThrownBy(() -> pointService.getPoint(userId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.POINT_NOT_FOUND.getMessage());
+
+            verify(pointRepository, times(1)).findByUserIdOrThrow(userId);
         }
     }
 
@@ -85,13 +89,16 @@ class PointServiceUnitTest {
             assertThatThrownBy(() -> pointService.charge(userId, chargePoint))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.INVALID_CHARGE_POINT_AMOUNT.getMessage());
+
+            verify(pointRepository, times(1)).findByUserIdWithLock(userId);
+
         }
 
         @Test
         void 포인트_충전_시_충전_요청_포인트가_1원_이상이면_정상적으로_합산된다() {
             // given
             BigDecimal currentPoint = BigDecimal.ZERO;
-            BigDecimal chargePoint = BigDecimal.valueOf(100);
+            BigDecimal chargePoint = new BigDecimal(100);
 
             Point point = createPoint(currentPoint);
 
@@ -112,7 +119,7 @@ class PointServiceUnitTest {
         void 포인트_충전_시_포인트_충전_이력을_저장한다() {
             // given
             BigDecimal currentPoint = BigDecimal.ZERO;
-            BigDecimal chargePoint = BigDecimal.valueOf(100);
+            BigDecimal chargePoint = new BigDecimal(100);
 
             Point point = createPoint(currentPoint);
 
@@ -122,6 +129,7 @@ class PointServiceUnitTest {
             // when
             pointService.charge(userId, chargePoint);
 
+            verify(pointRepository, times(1)).findByUserIdWithLock(userId);
             verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
         }
     }
@@ -168,8 +176,8 @@ class PointServiceUnitTest {
         @Test
         void 포인트_사용_시_포인트_사용_이력을_저장한다() {
             // given
-            BigDecimal currentPoint = BigDecimal.valueOf(1000);
-            BigDecimal userPoint = BigDecimal.valueOf(100);
+            BigDecimal currentPoint = new BigDecimal(1000);
+            BigDecimal userPoint = new BigDecimal(100);
 
             Point point = createPoint(currentPoint);
 
@@ -180,6 +188,7 @@ class PointServiceUnitTest {
             pointService.use(userId, userPoint);
 
             // then
+            verify(pointRepository, times(1)).findByUserIdWithLock(userId);
             verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
         }
     }

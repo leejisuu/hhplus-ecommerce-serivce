@@ -27,7 +27,7 @@ public class PointServiceIntegrationTest extends IntegrationTestSupport {
         void 유저_아이디로_포인트를_조회한다() {
             // given
             Long userId = 1L;
-            BigDecimal point = BigDecimal.valueOf(2500);
+            BigDecimal point = new BigDecimal(2500);
 
             // when
             PointInfo.PointDto currentPoint = pointService.getPoint(userId);
@@ -67,7 +67,7 @@ public class PointServiceIntegrationTest extends IntegrationTestSupport {
         void 포인트를_충전_요청_시_보유_포인트에서_충전_요청_포인트를_합산하여_저장한다() {
             // given
             Long userId = 1L;
-            BigDecimal amount = BigDecimal.valueOf(1000);
+            BigDecimal amount = new BigDecimal(1000);
             PointInfo.PointDto currentPoint = pointService.getPoint(userId);
 
             // when
@@ -112,7 +112,7 @@ public class PointServiceIntegrationTest extends IntegrationTestSupport {
         void 포인트를_사용_요청_시_보유_포인트에서_사용_요청_포인트를_차감하여_저장한다() {
             // given
             Long userId = 1L;
-            BigDecimal amount = BigDecimal.valueOf(1000);
+            BigDecimal amount = new BigDecimal(1000);
 
             PointInfo.PointDto currentPoint = pointService.getPoint(userId);
 
