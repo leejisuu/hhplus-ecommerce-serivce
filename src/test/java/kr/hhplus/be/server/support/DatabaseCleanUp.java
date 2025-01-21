@@ -1,4 +1,4 @@
-package kr.hhplus.be.server;
+package kr.hhplus.be.server.support;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
