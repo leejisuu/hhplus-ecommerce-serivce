@@ -44,11 +44,13 @@ public class ProductInfo {
 
     public record ProductDto(
             Long id,
+            String name,
             BigDecimal price
     ) {
         public static ProductInfo.ProductDto of(Product product) {
             return new ProductInfo.ProductDto(
                     product.getId(),
+                    product.getName(),
                     product.getPrice()
             );
         }
