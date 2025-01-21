@@ -64,7 +64,7 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
 
         return queryFactory
                 .selectFrom(issuedCoupon)
-                .where(issuedCoupon.userId.eq(issuedCouponId),
+                .where(issuedCoupon.id.eq(issuedCouponId),
                         issuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
                         issuedCoupon.validStartedAt.loe(currentTime),
                         issuedCoupon.validEndedAt.gt(currentTime)
