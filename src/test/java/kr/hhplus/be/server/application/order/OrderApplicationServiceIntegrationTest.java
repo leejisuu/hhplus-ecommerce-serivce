@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.application.order;
 
-import kr.hhplus.be.server.IntegrationTestSupport;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.result.OrderResult;
 import kr.hhplus.be.server.domain.order.service.OrderService;
@@ -19,9 +19,6 @@ public class OrderApplicationServiceIntegrationTest extends IntegrationTestSuppo
 
     @Autowired
     private OrderApplicationService orderApplicationService;
-
-    @Autowired
-    OrderService orderService;
 
     @Test
     void 주문_싱품의_상품_마스터_정보가_판매종료_이거나_존재하지_않는다면_예외를_발생한다() {
