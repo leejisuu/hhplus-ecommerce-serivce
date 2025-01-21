@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.order;
+package kr.hhplus.be.server.domain.order.service;
 
 import kr.hhplus.be.server.domain.order.dto.command.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.info.OrderInfo;
@@ -6,7 +6,6 @@ import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
 import kr.hhplus.be.server.domain.order.repository.OrderDetailRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
-import kr.hhplus.be.server.domain.order.service.OrderService;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import org.assertj.core.api.Assertions;

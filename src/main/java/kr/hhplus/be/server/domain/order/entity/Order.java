@@ -30,7 +30,7 @@ public class Order extends BaseEntity {
     private OrderStatus status;
 
     // 순수 구매 금액 (각 상품 재고 곱하기 가격의 합)
-    @Column(name = "total_origin_amt", nullable = false)
+    @Column(name = "total_original_amt", nullable = false)
     private BigDecimal totalOriginalAmt;
 
     @Builder
