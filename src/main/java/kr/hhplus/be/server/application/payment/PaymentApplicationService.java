@@ -27,19 +27,14 @@ public class PaymentApplicationService {
     @Transactional
     public PaymentResult.Payment payment(Long userId, Long orderId, Long issuedCouponId, LocalDateTime currentTime) {
         OrderInfo.OrderDto order = orderService.getOrder(orderId);
-        BigDecimal discountAmt = BigDecimal.ZERO;
-        if(issuedCouponId != null) {
-            discountAmt = couponService.useIssuedCoupon(issuedCouponId, order.totalOriginalAmt(), currentTime);
-        }
+        BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, order.totalOriginalAmt(), currentTime);
         PaymentInfo.PaymentDto payment = paymentService.payment(orderId, order.totalOriginalAmt(), discountAmt, issuedCouponId);
-
         try {
             pointService.use(userId, payment.finalPaymentAmt());
-            paymentService.failPayment(payment.id());
+            payment = paymentService.complete(payment.id());
         } catch (CustomException e) {
-            paymentService.completePayment(payment.id());
+            payment = paymentService.fail(payment.id());
         }
-
         return PaymentResult.Payment.of(payment);
     }
 }
