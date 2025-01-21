@@ -48,6 +48,10 @@ public class CouponService {
 
     @Transactional
     public BigDecimal useIssuedCoupon(Long issuedCouponId, BigDecimal totalOriginalAmt, LocalDateTime currentTime) {
+        if(issuedCouponId == null) {
+            return BigDecimal.ZERO;
+        }
+
         IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(issuedCouponId, currentTime);
         if(issuedCoupon == null) {
             throw new CustomException(ErrorCode.ISSUED_COUPON_NOT_FOUND);

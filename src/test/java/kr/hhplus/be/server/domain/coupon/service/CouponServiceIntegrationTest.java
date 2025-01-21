@@ -133,4 +133,71 @@ public class CouponServiceIntegrationTest extends IntegrationTestSupport {
         }
     }
 
+    @Nested
+    @DisplayName("쿠폰 사용 테스트")
+    class UseCouponTest {
+
+        @Test
+        void 쿠폰_사용_시_쿠폰_번호_정보가_없다면_할인금액_BigDecimal_ZERO을_반환한다() {
+            // given
+            Long issuedCouponId= null;
+            BigDecimal totalOriginalAmt = new BigDecimal(3000);
+            LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
+
+            // when
+            BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, totalOriginalAmt, currentTime);
+
+            // then
+            assertThat(discountAmt).isEqualTo(BigDecimal.ZERO);
+        }
+
+        @Test
+        void 발급받은_쿠폰_정보가_없다면_CustomException_ISSUED_COUPON_NOT_FOUND_예외를_발생한다() {
+            // given
+            Long issuedCouponId= 5L;
+            BigDecimal totalOriginalAmt = new BigDecimal(3000);
+            LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
+
+            // when // then
+            assertThatThrownBy(() -> couponService.useIssuedCoupon(issuedCouponId, totalOriginalAmt, currentTime))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.ISSUED_COUPON_NOT_FOUND.getMessage());
+        }
+
+        /*@Test
+        void 정액_쿠폰_할인_금액을_계산해서_반환한다() {
+            // given
+            Long issuedCouponId= 5L;
+            BigDecimal totalOriginalAmt = new BigDecimal(30000);
+
+            LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
+
+            // when
+            BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, totalOriginalAmt, currentTime);
+
+            // then
+            assertThat(discountAmt).isEqualTo(BigDecimal.ZERO);
+        }
+
+        @Test
+        void 정률_쿠폰_할인_금액을_계산해서_반환한다() {
+            // given
+            Long issuedCouponId= 5L;
+            BigDecimal totalOriginalAmt = new BigDecimal(30000);
+            LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
+
+            // when
+
+            // then
+        }
+
+        @Test
+        void 쿠폰_사용_시_쿠폰상태가_USED로_변경되고_usedAt이_현재_시간이_된다() {
+            // given
+
+            // when
+
+            // then
+        }*/
+    }
 }

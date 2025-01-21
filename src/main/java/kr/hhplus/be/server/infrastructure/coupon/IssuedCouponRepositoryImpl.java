@@ -46,8 +46,6 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
                 .limit(pageable.getPageSize()) // pageSize : 한 페이지에 포함될 데이터의 개수
                 .fetch();
 
-        System.out.println(content.size()+"" );
-
         JPAQuery<Long> countQuery = queryFactory.select(issuedCoupon.count())
                 .from(issuedCoupon)
                 .where(

@@ -153,16 +153,30 @@ class CouponUnitServiceTest {
     @DisplayName("쿠폰 사용 단위 테스트")
     class useCouponTest {
         @Test
+        void 쿠폰_사용_시_쿠폰_번호_파라미터가_없다면_할인금액은_BigDecimal_ZERO를_반환한다() {
+            // given
+            Long isseudCouponId = null;
+            BigDecimal totalOriginalAmt = new BigDecimal(3000);
+            LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
+
+            // when
+            BigDecimal discountAmt = couponService.useIssuedCoupon(isseudCouponId, totalOriginalAmt, currentTime);
+
+            // then
+            assertThat(discountAmt).isEqualTo(BigDecimal.ZERO);
+        }
+
+        @Test
         void 쿠폰_사용_시_발급_받은_쿠폰의_정보가_없다면_예외를_발생한다() {
             // given
             Long issuedCouponId = 1L;
-            BigDecimal totalOriginAmt = new BigDecimal(50000);
+            BigDecimal totalOriginalAmt = new BigDecimal(50000);
             LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
 
             given(issuedCouponRepository.getIssuedCouponWithLock(issuedCouponId, currentTime)).willReturn(null);
 
             // when // then
-            assertThatThrownBy(() -> couponService.useIssuedCoupon(issuedCouponId, totalOriginAmt, currentTime))
+            assertThatThrownBy(() -> couponService.useIssuedCoupon(issuedCouponId, totalOriginalAmt, currentTime))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.ISSUED_COUPON_NOT_FOUND.getMessage());
         }
@@ -172,7 +186,7 @@ class CouponUnitServiceTest {
             // given
             Long userId = 1L;
             Long issuedCouponId = 1L;
-            BigDecimal totalOriginAmt = new BigDecimal(3000);
+            BigDecimal totalOriginalAmt = new BigDecimal(3000);
             LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
 
             Coupon mockCoupon = Coupon.create("생일 쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(3000), 3, 3,
@@ -182,7 +196,7 @@ class CouponUnitServiceTest {
             given(issuedCouponRepository.getIssuedCouponWithLock(issuedCouponId, currentTime)).willReturn(mockIssuedCoupon);
 
             // when
-            assertThatThrownBy(() -> couponService.useIssuedCoupon(issuedCouponId, totalOriginAmt, currentTime))
+            assertThatThrownBy(() -> couponService.useIssuedCoupon(issuedCouponId, totalOriginalAmt, currentTime))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT.getMessage());
         }
@@ -192,7 +206,7 @@ class CouponUnitServiceTest {
             // given
             Long userId = 1L;
             Long issuedCouponId = 8L;
-            BigDecimal totalOriginAmt = new BigDecimal(50000L);
+            BigDecimal totalOriginalAmt = new BigDecimal(50000L);
             LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
 
             Coupon mockCoupon = Coupon.create("'블랙프라이데이 쿠폰'", DiscountType.PERCENTAGE, new BigDecimal(30), 3, 3,
@@ -202,10 +216,10 @@ class CouponUnitServiceTest {
             given(issuedCouponRepository.getIssuedCouponWithLock(issuedCouponId, currentTime)).willReturn(mockIssuedCoupon);
 
             // when
-            BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, totalOriginAmt, currentTime);
+            BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, totalOriginalAmt, currentTime);
 
             // then
-            assertThat(discountAmt.compareTo((totalOriginAmt.multiply(mockCoupon.getDiscountAmt())).divide(new BigDecimal(100)))).isEqualTo(0);
+            assertThat(discountAmt.compareTo((totalOriginalAmt.multiply(mockCoupon.getDiscountAmt())).divide(new BigDecimal(100)))).isEqualTo(0);
 
         }
 
@@ -214,7 +228,7 @@ class CouponUnitServiceTest {
             // given
             Long userId = 1L;
             Long issuedCouponId = 1L;
-            BigDecimal totalOriginAmt = new BigDecimal(50000L);
+            BigDecimal totalOriginalAmt = new BigDecimal(50000L);
             LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
 
             Coupon mockCoupon = Coupon.create("생일 쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(3000), 3, 3,
@@ -224,7 +238,7 @@ class CouponUnitServiceTest {
             given(issuedCouponRepository.getIssuedCouponWithLock(issuedCouponId, currentTime)).willReturn(mockIssuedCoupon);
 
             // when
-            BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, totalOriginAmt, currentTime);
+            BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, totalOriginalAmt, currentTime);
 
             // then
             assertThat(discountAmt.compareTo(mockCoupon.getDiscountAmt())).isEqualTo(0);

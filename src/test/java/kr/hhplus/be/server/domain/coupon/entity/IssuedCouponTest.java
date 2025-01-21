@@ -39,10 +39,10 @@ class IssuedCouponTest {
                 .status(IssuedCouponStatus.UNUSED)
                 .build();
 
-        BigDecimal totalOriginAmt = new BigDecimal(10000);
+        BigDecimal totalOriginalAmt = new BigDecimal(10000);
 
         // When
-        BigDecimal discountAmt = issuedCoupon.use(totalOriginAmt, currentTime);
+        BigDecimal discountAmt = issuedCoupon.use(totalOriginalAmt, currentTime);
 
         // Then
         assertThat(discountAmt).isEqualTo(issuedCoupon.getDiscountAmt());
@@ -75,13 +75,13 @@ class IssuedCouponTest {
                 .build();
 
 
-        BigDecimal totalOriginAmt = new BigDecimal(10000);
+        BigDecimal totalOriginalAmt = new BigDecimal(10000);
 
         // When
-        BigDecimal discountAmt = issuedCoupon.use(totalOriginAmt, currentTime);
+        BigDecimal discountAmt = issuedCoupon.use(totalOriginalAmt, currentTime);
 
         // Then
-        assertThat(discountAmt).isEqualTo((totalOriginAmt.multiply(issuedCoupon.getDiscountAmt())).divide(new BigDecimal(100)));
+        assertThat(discountAmt).isEqualTo((totalOriginalAmt.multiply(issuedCoupon.getDiscountAmt())).divide(new BigDecimal(100)));
         assertThat(issuedCoupon.getStatus()).isEqualTo(IssuedCouponStatus.USED);
         assertThat(issuedCoupon.getUsedAt()).isEqualTo(currentTime);
     }
@@ -110,10 +110,10 @@ class IssuedCouponTest {
                 .status(IssuedCouponStatus.UNUSED)
                 .build();
 
-        BigDecimal totalOriginAmt = new BigDecimal(1000);
+        BigDecimal totalOriginalAmt = new BigDecimal(1000);
 
         // when // then
-        assertThatThrownBy(() -> issuedCoupon.use(totalOriginAmt, currentTime))
+        assertThatThrownBy(() -> issuedCoupon.use(totalOriginalAmt, currentTime))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT.getMessage());
     }
@@ -142,10 +142,10 @@ class IssuedCouponTest {
                 .status(IssuedCouponStatus.UNUSED)
                 .build();
 
-        BigDecimal totalOriginAmt = new BigDecimal(10000);
+        BigDecimal totalOriginalAmt = new BigDecimal(10000);
 
         // When
-        issuedCoupon.use(totalOriginAmt, currentTime);
+        issuedCoupon.use(totalOriginalAmt, currentTime);
 
         // Then
         assertThat(issuedCoupon.getStatus()).isEqualTo(IssuedCouponStatus.USED);

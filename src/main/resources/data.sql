@@ -1,11 +1,11 @@
-INSERT INTO user (id, name, created_at, updated_at) VALUES
+INSERT INTO `user` (id, name, created_at, updated_at) VALUES
  (1, '이항해', NOW(), NOW()),
  (2, '김항해', NOW(), NOW()),
  (3, '박항해', NOW(), NOW()),
  (4, '최항해', NOW(), NOW()),
  (5, '서항해', NOW(), NOW());
 
-insert into point (id, user_id, point, created_at, updated_at) values
+INSERT INTO point (id, user_id, point, created_at, updated_at) VALUES
 (1, 1, 2500, NOW(), NOW()),
 (2, 2, 0, NOW(), NOW()),
 (3, 3, 50000, NOW(), NOW()),
@@ -54,4 +54,14 @@ INSERT INTO issued_coupon (id, coupon_id, user_id, coupon_name, discount_type, d
 (3, 2, 4, 'S 브랜드 할인 쿠폰', 'PERCENTAGE', 10, '2025-01-10 00:00:00', '2025-01-10 00:00:00', '2025-02-28 23:59:59', '2025-01-17 10:00:00', 'USED', NOW(), NOW()),
 (4, 8, 1, '블랙프라이데이 쿠폰', 'PERCENTAGE', 30, '2025-01-10 00:00:00', '2025-01-05 00:00:00', '2025-01-10 00:00:01', null, 'UNUSED', NOW(), NOW());
 
+INSERT INTO `order` (id, user_id, status, total_original_amt, created_at, updated_at) VALUES
+(1, 3, 'COMPLETED', 31400, NOW(), NOW()),
+(2, 1, 'COMPLETED', 2000, NOW(), NOW());
 
+
+INSERT INTO order_detail (id, order_id, product_id, quantity, price, created_at, updated_at) VALUES
+(1, 1, 8, 3, 11400, NOW(), NOW()),
+(2, 1, 9, 4, 20000, NOW(), NOW());
+
+INSERT INTO payment (id, order_id, status, total_original_amt, discount_amt, final_payment_amt, issued_coupon_id, created_at, updated_at) VALUES
+(1, 1, 'IN_PROGRESS', 31400, 3140, 30960, 2, NOW(), NOW())
