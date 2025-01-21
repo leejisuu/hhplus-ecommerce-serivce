@@ -59,12 +59,4 @@ public class Payment extends BaseEntity {
                 .issuedCouponId(issuedCouponId)
                 .build();
     }
-
-    public void fail() {
-        this.status = PaymentStatus.FAILED;
-    }
-
-    public void complete() {
-        this.status = PaymentStatus.COMPLETED;
-    }
 }

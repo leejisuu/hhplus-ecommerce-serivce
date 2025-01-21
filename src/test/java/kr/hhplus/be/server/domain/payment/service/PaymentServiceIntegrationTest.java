@@ -1,10 +1,8 @@
 package kr.hhplus.be.server.domain.payment.service;
 
-import kr.hhplus.be.server.IntegrationTestSupport;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.payment.dto.info.PaymentInfo;
-import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.enums.PaymentStatus;
-import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +13,6 @@ public class PaymentServiceIntegrationTest extends IntegrationTestSupport {
 
     @Autowired
     private PaymentService paymentService;
-
-    @Autowired
-    private PaymentRepository paymentRepository;
 
     @Test
     void 할인쿠폰_없이_결제_생성_시_할인금액을_0원으로_하여_결제를_생성한다() {
@@ -71,33 +66,5 @@ public class PaymentServiceIntegrationTest extends IntegrationTestSupport {
         Assertions.assertThat(payment)
                 .extracting("orderId", "status", "totalOriginalAmt", "discountAmt", "finalPaymentAmt")
                 .containsExactly(orderId, PaymentStatus.IN_PROGRESS.name(), totalOriginalAmt, discountAmt, finalPaymentAmt);
-    }
-
-    @Test
-    void 결제_정보를_조회하여_결제_상태를_FAILD로_변경한다() {
-        // given
-        Long paymentId = 1L;
-
-        // when
-        paymentService.fail(paymentId);
-
-        // then
-        Payment payment = paymentRepository.findById(paymentId);
-
-        Assertions.assertThat(payment.getStatus().name()).isEqualTo(PaymentStatus.FAILED.name());
-    }
-
-    @Test
-    void 결제_정보를_조회하여_결제_상태를_COMPLETED로_변경한다() {
-        // given
-        Long paymentId = 1L;
-
-        // when
-        paymentService.complete(1L);
-
-        // then
-        Payment payment = paymentRepository.findById(paymentId);
-
-        Assertions.assertThat(payment.getStatus().name()).isEqualTo(PaymentStatus.COMPLETED.name());
     }
 }

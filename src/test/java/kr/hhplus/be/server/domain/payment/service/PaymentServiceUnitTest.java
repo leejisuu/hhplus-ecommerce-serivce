@@ -2,7 +2,6 @@ package kr.hhplus.be.server.domain.payment.service;
 
 import kr.hhplus.be.server.domain.payment.dto.info.PaymentInfo;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
-import kr.hhplus.be.server.domain.payment.enums.PaymentStatus;
 import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,45 +47,5 @@ public class PaymentServiceUnitTest {
                 .containsExactly(orderId, mockPayment.getStatus().name(), mockPayment.getTotalOriginalAmt(), mockPayment.getDiscountAmt(), mockPayment.getFinalPaymentAmt());
 
         verify(paymentRepository, times(1)).save(any(Payment.class));
-    }
-
-    @Test
-    void 결제_완료_시_결제_상태를_COMPLETED로_변경한다() {
-        // given
-        Long paymentId = 1L;
-        Long orderId = 1L;
-        BigDecimal totalOriginalAmt = new BigDecimal(10000);
-        BigDecimal discountAmt = new BigDecimal(2000);
-        Long issuedCouponId = 1L;
-
-        Payment mockPayment = Payment.create(orderId, totalOriginalAmt, discountAmt, issuedCouponId);
-
-        given(paymentRepository.findById(paymentId)).willReturn(mockPayment);
-
-        // when
-        paymentService.complete(paymentId);
-
-        // then
-        assertThat(mockPayment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
-    }
-
-    @Test
-    void 결제_완료_시_결제_상태를_FAILED로_변경한다() {
-        // given
-        Long paymentId = 1L;
-        Long orderId = 1L;
-        BigDecimal totalOriginalAmt = new BigDecimal(10000);
-        BigDecimal discountAmt = new BigDecimal(2000);
-        Long issuedCouponId = 1L;
-
-        Payment mockPayment = Payment.create(orderId, totalOriginalAmt, discountAmt, issuedCouponId);
-
-        given(paymentRepository.findById(paymentId)).willReturn(mockPayment);
-
-        // when
-        paymentService.fail(paymentId);
-
-        // then
-        assertThat(mockPayment.getStatus()).isEqualTo(PaymentStatus.FAILED);
     }
 }

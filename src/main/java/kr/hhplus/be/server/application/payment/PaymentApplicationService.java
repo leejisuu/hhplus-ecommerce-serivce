@@ -29,12 +29,7 @@ public class PaymentApplicationService {
         OrderInfo.OrderDto order = orderService.getOrder(orderId);
         BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, order.totalOriginalAmt(), currentTime);
         PaymentInfo.PaymentDto payment = paymentService.payment(orderId, order.totalOriginalAmt(), discountAmt, issuedCouponId);
-        try {
-            pointService.use(userId, payment.finalPaymentAmt());
-            payment = paymentService.complete(payment.id());
-        } catch (CustomException e) {
-            payment = paymentService.fail(payment.id());
-        }
+        pointService.use(userId, payment.finalPaymentAmt());
         return PaymentResult.Payment.of(payment);
     }
 }
