@@ -30,8 +30,9 @@ public class OrderApplicationService {
     public OrderResult.Order order(OrderCriteria.Order criteria) {
         List<Long> productIds = criteria.details().stream().map(OrderCriteria.OrderDetail::productId).collect(Collectors.toList());
         List<ProductInfo.ProductDto> products = productService.getProducts(productIds);
+        OrderCommand.Order orderCommand = convertToOrderCommand(criteria, products);
         productStockService.deductQuantity(criteria.toStockCommand());
-        OrderInfo.OrderDto order = orderService.order(convertToOrderCommand(criteria, products));
+        OrderInfo.OrderDto order = orderService.order(orderCommand);
 
         dataPlatformClient.sendData(order);
 

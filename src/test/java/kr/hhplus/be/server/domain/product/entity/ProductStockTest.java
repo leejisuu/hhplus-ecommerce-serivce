@@ -12,11 +12,10 @@ class ProductStockTest {
     @Test
     void 구매_개수가_보유_재고보다_많으면_CustomException_INSUFFICIENT_STOCK을_발생한다() {
         // given
+        Long productId = 1L;
         int hasStock = 1;
         int buyStock = 2;
-        ProductStock productStock = ProductStock.builder()
-                .quantity(hasStock)
-                .build();
+        ProductStock productStock = ProductStock.create(productId, hasStock);
 
         // when // then
         assertThatThrownBy(() -> productStock.deductQuantity(buyStock))
@@ -28,12 +27,11 @@ class ProductStockTest {
     @Test
     void 구매_개수가_보유_재고와_같거나_적으면_재고를_차감한다() {
         // given
+        Long productId = 1L;
         int hasStock = 1;
         int buyStock = 1;
 
-        ProductStock productStock = ProductStock.builder()
-                .quantity(hasStock)
-                .build();
+        ProductStock productStock = ProductStock.create(productId, hasStock);
         // when
         productStock.deductQuantity(buyStock);
 

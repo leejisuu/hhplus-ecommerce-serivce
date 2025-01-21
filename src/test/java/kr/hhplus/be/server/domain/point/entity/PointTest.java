@@ -42,7 +42,7 @@ class PointTest {
     @Test
     void 사용_요청_금액이_0원_이하면_CustomException_INVALID_USE_POINT_AMOUNT가_발생한다() {
         // given
-        BigDecimal currentPoint = BigDecimal.valueOf(1000);
+        BigDecimal currentPoint = new BigDecimal(1000);
         BigDecimal userPoint = BigDecimal.ZERO;
         Point point = createPoint(currentPoint);
 
@@ -55,8 +55,8 @@ class PointTest {
     @Test
     void 사용_요청_금액이_보유_잔액보다_크면_CustomException_INSUFFICIENT_POINT가_발생한다() {
         // given
-        BigDecimal currentPoint = BigDecimal.valueOf(1000);
-        BigDecimal userPoint = BigDecimal.valueOf(1001);
+        BigDecimal currentPoint = new BigDecimal(1000);
+        BigDecimal userPoint = new BigDecimal(1001);
         Point point = createPoint(currentPoint);
 
         // when // then
@@ -68,8 +68,8 @@ class PointTest {
     @Test
     void 사용_요청_금액이_보유_잔액_이하면_포인트가_차감된다() {
         // given
-        BigDecimal currentPoint = BigDecimal.valueOf(1000);
-        BigDecimal userPoint = BigDecimal.valueOf(1000);
+        BigDecimal currentPoint = new BigDecimal(1000);
+        BigDecimal userPoint = new BigDecimal(1000);
         Point point = createPoint(currentPoint);
 
         // when

@@ -4,8 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.shaded.com.google.common.base.CaseFormat;
@@ -13,9 +12,9 @@ import org.testcontainers.shaded.com.google.common.base.CaseFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 @ActiveProfiles("test")
-public class DatabaseCleanup implements InitializingBean {
+public class DatabaseCleanUp {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -23,7 +22,7 @@ public class DatabaseCleanup implements InitializingBean {
     private List<String> tableNames;
 
     @PostConstruct
-    public void afterPropertiesSet() {
+    public void init() {
         tableNames = entityManager.getMetamodel().getEntities().stream()
                 .filter(e -> e.getJavaType().getAnnotation(Entity.class) != null)
                 .map(e -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, e.getName()))

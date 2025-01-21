@@ -7,5 +7,5 @@ public interface PaymentRepository {
 
     Payment save(Payment payment);
 
-    Payment findByPaymentId(Long paymentId);
+    Payment findById(Long paymentId);
 }

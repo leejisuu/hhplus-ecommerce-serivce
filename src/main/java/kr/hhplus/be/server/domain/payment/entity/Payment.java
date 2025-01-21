@@ -36,7 +36,7 @@ public class Payment extends BaseEntity {
     @Column(name = "final_payment_amt", nullable = false)
     private BigDecimal finalPaymentAmt;
 
-    @Column(name = "issued_coupon_id", nullable = false)
+    @Column(name = "issued_coupon_id")
     private Long issuedCouponId;
 
     @Builder
@@ -58,13 +58,5 @@ public class Payment extends BaseEntity {
                 .finalPaymentAmt(totalOriginalAmt.subtract(discountAmt))
                 .issuedCouponId(issuedCouponId)
                 .build();
-    }
-
-    public void failPayment() {
-        this.status = PaymentStatus.FAILED;
-    }
-
-    public void completePayment() {
-        this.status = PaymentStatus.COMPLETED;
     }
 }

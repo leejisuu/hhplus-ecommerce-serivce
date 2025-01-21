@@ -24,7 +24,7 @@ class CouponTest {
         LocalDateTime issuedAt = LocalDateTime.of(2025, 1, 2, 10, 0, 0);
         LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 10, 0, 0);
         LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 3, 10, 0, 0);
-        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, BigDecimal.valueOf(1000), 30, 30, validStartedAt, validEndedAt, CouponStatus.DEACTIVATED);
+        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), 30, 30, validStartedAt, validEndedAt, CouponStatus.DEACTIVATED);
 
         // when // then
         assertThatThrownBy(() -> coupon.issue(userId, issuedAt))
@@ -38,7 +38,7 @@ class CouponTest {
         LocalDateTime issuedAt = LocalDateTime.of(2025, 1, 3, 10, 0, 0);
         LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 10, 0, 0);
         LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 3, 10, 0, 0);
-        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, BigDecimal.valueOf(1000), 30, 30, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
+        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), 30, 30, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
 
         // when // then
         Assertions.assertThatThrownBy(() -> coupon.issue(userId, issuedAt))
@@ -52,7 +52,7 @@ class CouponTest {
         LocalDateTime issuedAt = LocalDateTime.of(2025, 1, 2, 10, 0, 0);
         LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 10, 0, 0);
         LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 3, 10, 0, 0);
-        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, BigDecimal.valueOf(1000), 30, 0, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
+        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), 30, 0, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
 
         // when // then
         Assertions.assertThatThrownBy(() -> coupon.issue(userId, issuedAt))
@@ -66,7 +66,7 @@ class CouponTest {
         LocalDateTime issuedAt = LocalDateTime.of(2025, 1, 2, 10, 0, 0);
         LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 10, 0, 0);
         LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 3, 10, 0, 0);
-        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, BigDecimal.valueOf(1000), 30, 1, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
+        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), 30, 1, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
 
         // when
         coupon.issue(userId, issuedAt);
@@ -81,7 +81,7 @@ class CouponTest {
         LocalDateTime issuedAt = LocalDateTime.of(2025, 1, 2, 10, 0, 0);
         LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 10, 0, 0);
         LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 3, 10, 0, 0);
-        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, BigDecimal.valueOf(1000), 30, 1, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
+        Coupon coupon = Coupon.create("쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), 30, 1, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
 
         // when
         IssuedCoupon issuedCoupon = coupon.issue(userId, issuedAt);

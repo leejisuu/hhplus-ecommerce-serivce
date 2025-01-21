@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.infrastructure.product.dto;
 
+import lombok.Builder;
+
 import java.math.BigDecimal;
 
 public record TopSellingProductDto(
@@ -9,4 +11,6 @@ public record TopSellingProductDto(
         BigDecimal price,
         Long totalSales
 ) {
+    @Builder
+    public TopSellingProductDto {}
 }

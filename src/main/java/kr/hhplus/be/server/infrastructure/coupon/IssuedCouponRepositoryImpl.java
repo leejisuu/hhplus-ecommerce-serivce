@@ -9,6 +9,7 @@ import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
@@ -54,7 +55,7 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
                         issuedCoupon.validEndedAt.gt(currentTime)
                 );
 
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+        return new PageImpl<>(content, pageable, countQuery.fetchCount());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
 
         return queryFactory
                 .selectFrom(issuedCoupon)
-                .where(issuedCoupon.userId.eq(issuedCouponId),
+                .where(issuedCoupon.id.eq(issuedCouponId),
                         issuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
                         issuedCoupon.validStartedAt.loe(currentTime),
                         issuedCoupon.validEndedAt.gt(currentTime)

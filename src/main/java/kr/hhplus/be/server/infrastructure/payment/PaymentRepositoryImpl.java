@@ -17,7 +17,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public Payment findByPaymentId(Long paymentId) {
+    public Payment findById(Long paymentId) {
         return paymentJpaRepository.findById(paymentId).orElse(null);
     }
 }
