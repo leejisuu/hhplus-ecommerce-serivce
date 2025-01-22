@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.point.service;
 
-import kr.hhplus.be.server.IntegrationTestSupport;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.point.dto.info.PointInfo;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import org.assertj.core.api.Assertions;

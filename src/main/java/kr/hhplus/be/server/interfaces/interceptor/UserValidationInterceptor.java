@@ -35,7 +35,7 @@ public class UserValidationInterceptor implements HandlerInterceptor {
         }
 
         try {
-            userRepository.findByUserIdOrThrow(userId);
+            userRepository.findById(userId);
         } catch (CustomException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "존재하지 않는 유저입니다.");
             return false;
