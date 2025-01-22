@@ -32,6 +32,7 @@ public enum ErrorCode {
     // 주문
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "주문이 존재하지 않습니다."),
     ORDER_DETAILS_NOT_EXISTS(HttpStatus.BAD_REQUEST, "주문 상세 목록이 비어있습니다."),
+    ALREADY_PAID_ORDER(HttpStatus.BAD_REQUEST, "이미 결제 완료된 주문건입니다."),
 
     // 유저
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다.");

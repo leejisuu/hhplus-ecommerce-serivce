@@ -4,6 +4,7 @@ import kr.hhplus.be.server.domain.order.dto.command.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.info.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
+import kr.hhplus.be.server.domain.order.enums.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderDetailRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
@@ -109,14 +110,14 @@ public class OrderServiceUnitTest {
             // given
             Long orderId = 1L;
 
-            given(orderRepository.findById(orderId)).willReturn(null);
+            given(orderRepository.findByIdWithLock(orderId)).willThrow(new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
             // when // then
-            Assertions.assertThatThrownBy(() -> orderService.getOrder(orderId))
+            Assertions.assertThatThrownBy(() -> orderService.getOrderWithLock(orderId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
 
-            verify(orderRepository, times(1)).findById(orderId);
+            verify(orderRepository, times(1)).findByIdWithLock(orderId);
         }
 
         @Test
@@ -127,16 +128,37 @@ public class OrderServiceUnitTest {
             BigDecimal totalOriginalAmt = new BigDecimal("15000");
             Order mockOrder = Order.create(userId, totalOriginalAmt);
 
-            given(orderRepository.findById(orderId)).willReturn(mockOrder);
+            given(orderRepository.findByIdWithLock(orderId)).willReturn(mockOrder);
 
             // when
-            OrderInfo.OrderDto order = orderService.getOrder(orderId);
+            OrderInfo.OrderDto order = orderService.getOrderWithLock(orderId);
 
             // then
             assertThat(order.totalOriginalAmt().compareTo(totalOriginalAmt)).isEqualTo(0);
 
-            verify(orderRepository, times(1)).findById(orderId);
+            verify(orderRepository, times(1)).findByIdWithLock(orderId);
 
+        }
+    }
+
+    @Nested
+    @DisplayName("주문 상태 변경 단위 테스트")
+    class UpdateOrderStatus {
+        @Test
+        void 주문_상태를_PAID로_변경한다() {
+            // given
+            Long userId = 3L;
+            Long orderId = 1L;
+            BigDecimal totalOriginalAmt = new BigDecimal("15000");
+            Order mockOrder = Order.create(orderId, totalOriginalAmt);
+
+            given(orderRepository.findByIdWithLock(orderId)).willReturn(mockOrder);
+
+            // when
+            orderService.completePayment(orderId);
+
+            // then
+            Assertions.assertThat(mockOrder.getStatus().name()).isEqualTo(OrderStatus.PAID.name());
         }
     }
 }

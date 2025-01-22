@@ -45,7 +45,7 @@ class PointServiceUnitTest {
             BigDecimal currentPoint = new BigDecimal(100);
             Point init = createPoint(currentPoint);
 
-            given(pointRepository.findByUserIdOrThrow(userId)).willReturn(init);
+            given(pointRepository.findByUserId(userId)).willReturn(init);
 
             // when
             PointInfo.PointDto point = pointService.getPoint(userId);
@@ -55,20 +55,20 @@ class PointServiceUnitTest {
                     .extracting("userId", "point")
                     .containsExactly(init.getUserId(), init.getPoint());
 
-            verify(pointRepository, times(1)).findByUserIdOrThrow(userId);
+            verify(pointRepository, times(1)).findByUserId(userId);
         }
 
         @Test
         void 유저_아이디로_포인트_조회_시_포인트_정보가_없으면_CustomException_POINT_NOT_FOUND가_발생한다() {
             // given
-            given(pointRepository.findByUserIdOrThrow(userId)).willThrow(new CustomException(ErrorCode.POINT_NOT_FOUND));
+            given(pointRepository.findByUserId(userId)).willThrow(new CustomException(ErrorCode.POINT_NOT_FOUND));
 
             // when // then
             assertThatThrownBy(() -> pointService.getPoint(userId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.POINT_NOT_FOUND.getMessage());
 
-            verify(pointRepository, times(1)).findByUserIdOrThrow(userId);
+            verify(pointRepository, times(1)).findByUserId(userId);
         }
     }
 
