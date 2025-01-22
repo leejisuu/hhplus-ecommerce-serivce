@@ -5,11 +5,11 @@ import kr.hhplus.be.server.domain.order.dto.info.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
+import kr.hhplus.be.server.domain.order.enums.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderDetailRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
-import kr.hhplus.be.server.interfaces.api.order.dto.request.OrderDetailRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,12 +50,27 @@ public class OrderService {
         return OrderInfo.OrderDto.of(order);
     }
 
-    public OrderInfo.OrderDto getOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId);
+    @Transactional
+    public OrderInfo.OrderDto getOrderWithLock(Long orderId) {
+        Order order = orderRepository.findByIdWithLock(orderId);
         if(order == null) {
             throw new CustomException(ErrorCode.ORDER_NOT_FOUND);
         }
 
         return OrderInfo.OrderDto.of(order);
+    }
+
+    @Transactional
+    public void completePayment(Long orderId) {
+        Order order = orderRepository.findByIdWithLock(orderId);
+        if(order == null) {
+            throw new CustomException(ErrorCode.ORDER_NOT_FOUND);
+        }
+
+        if(order.getStatus().name().equals(OrderStatus.PAID.name())) {
+            throw new CustomException(ErrorCode.ALREADY_PAID_ORDER);
+        }
+
+        order.completePayment();
     }
 }

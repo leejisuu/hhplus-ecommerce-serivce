@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.payment.service;
 
-import kr.hhplus.be.server.support.IntegrationTestSupport;
+import kr.hhplus.be.server.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.payment.dto.info.PaymentInfo;
 import kr.hhplus.be.server.domain.payment.enums.PaymentStatus;
 import org.assertj.core.api.Assertions;
@@ -29,7 +29,7 @@ public class PaymentServiceIntegrationTest extends IntegrationTestSupport {
         // then
         Assertions.assertThat(payment)
                 .extracting("orderId", "status", "totalOriginalAmt", "discountAmt", "finalPaymentAmt")
-                .containsExactly(orderId, PaymentStatus.IN_PROGRESS.name(), totalOriginalAmt, discountAmt, finalPaymentAmt);
+                .containsExactly(orderId, PaymentStatus.COMPLETED.name(), totalOriginalAmt, discountAmt, finalPaymentAmt);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class PaymentServiceIntegrationTest extends IntegrationTestSupport {
         // then
         Assertions.assertThat(payment)
                 .extracting("orderId", "status", "totalOriginalAmt", "discountAmt", "finalPaymentAmt")
-                .containsExactly(orderId, PaymentStatus.IN_PROGRESS.name(), totalOriginalAmt, discountAmt, finalPaymentAmt);
+                .containsExactly(orderId, PaymentStatus.COMPLETED.name(), totalOriginalAmt, discountAmt, finalPaymentAmt);
     }
 
     @Test
@@ -65,6 +65,6 @@ public class PaymentServiceIntegrationTest extends IntegrationTestSupport {
         // then
         Assertions.assertThat(payment)
                 .extracting("orderId", "status", "totalOriginalAmt", "discountAmt", "finalPaymentAmt")
-                .containsExactly(orderId, PaymentStatus.IN_PROGRESS.name(), totalOriginalAmt, discountAmt, finalPaymentAmt);
+                .containsExactly(orderId, PaymentStatus.COMPLETED.name(), totalOriginalAmt, discountAmt, finalPaymentAmt);
     }
 }

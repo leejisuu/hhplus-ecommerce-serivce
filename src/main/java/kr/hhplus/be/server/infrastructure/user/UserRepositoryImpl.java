@@ -2,6 +2,8 @@ package kr.hhplus.be.server.infrastructure.user;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.LockModeType;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import kr.hhplus.be.server.domain.user.entity.QUser;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import kr.hhplus.be.server.domain.user.entity.User;
@@ -16,7 +18,7 @@ public class UserRepositoryImpl implements UserRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public User findByUserIdWithLock(Long userId) {
+    public User findByIdWithLock(Long userId) {
         QUser user = QUser.user;
 
         return queryFactory
@@ -27,7 +29,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findByUserIdOrThrow(Long userId) {
-        return userJpaRepository.findByUserIdOrThrow(userId);
+    public User findById(Long userId) {
+        return userJpaRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }

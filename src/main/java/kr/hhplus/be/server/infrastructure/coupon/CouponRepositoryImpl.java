@@ -25,9 +25,4 @@ public class CouponRepositoryImpl implements CouponRepository {
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne();
     }
-
-    @Override
-    public void save(Coupon coupon) {
-        couponJpaRepository.save(coupon);
-    }
 }

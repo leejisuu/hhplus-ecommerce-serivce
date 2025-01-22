@@ -2,7 +2,6 @@ package kr.hhplus.be.server.domain.payment.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.common.BaseEntity;
-import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.payment.enums.PaymentStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -52,7 +51,7 @@ public class Payment extends BaseEntity {
     public static Payment create(Long orderId, BigDecimal totalOriginalAmt, BigDecimal discountAmt, Long issuedCouponId) {
         return Payment.builder()
                 .orderId(orderId)
-                .status(PaymentStatus.IN_PROGRESS)
+                .status(PaymentStatus.COMPLETED)
                 .totalOriginalAmt(totalOriginalAmt)
                 .discountAmt(discountAmt)
                 .finalPaymentAmt(totalOriginalAmt.subtract(discountAmt))
