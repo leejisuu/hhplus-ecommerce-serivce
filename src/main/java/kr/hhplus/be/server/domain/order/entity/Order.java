@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -46,5 +44,9 @@ public class Order extends BaseEntity {
                 OrderStatus.COMPLETED,
                 totalOriginalAmt
         );
+    }
+
+    public void completePayment() {
+        this.status = OrderStatus.PAID;
     }
 }
