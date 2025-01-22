@@ -1,6 +1,9 @@
 package kr.hhplus.be.server.application.payment;
 
-import kr.hhplus.be.server.support.IntegrationTestSupport;
+import kr.hhplus.be.server.domain.order.entity.Order;
+import kr.hhplus.be.server.domain.order.enums.OrderStatus;
+import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.IntegrationTestSupport;
 import kr.hhplus.be.server.application.payment.dto.result.PaymentResult;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
@@ -18,6 +21,9 @@ public class PaymentApplicationServiceIntegrationTest extends IntegrationTestSup
 
     @Autowired
     private PaymentApplicationService paymentApplicationService;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Test
     void 주문_정보가_없으면_CustomException_ORDER_NOT_FOUND_예외를_발생한다() {
@@ -45,6 +51,20 @@ public class PaymentApplicationServiceIntegrationTest extends IntegrationTestSup
         assertThatThrownBy(() -> paymentApplicationService.payment(userId, orderId, issuedCouponId, currentTime))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.ISSUED_COUPON_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 결제_시_포인트가_부족하면_CustomException_INSUFFICIENT_POINT_예외를_발생한다() {
+        // given
+        Long userId = 1L;
+        Long orderId = 1L;
+        Long issuedCouponId = null;
+        LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 10, 0, 0);
+
+        // when // then
+        assertThatThrownBy(() -> paymentApplicationService.payment(userId, orderId, issuedCouponId, currentTime))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.INSUFFICIENT_POINT.getMessage());
     }
 
     @Test
@@ -90,17 +110,27 @@ public class PaymentApplicationServiceIntegrationTest extends IntegrationTestSup
     }
 
     @Test
-    void 결제_시_포인트가_부족하면_CustomException_INSUFFICIENT_POINT_예외를_발생한다() {
+    void 결제_완료_후_주문의_상태를_PAID로_변경한다() {
         // given
-        Long userId = 1L;
+        Long userId = 3L;
         Long orderId = 1L;
-        Long issuedCouponId = null;
+        Long issuedCouponId = 5L;
+        BigDecimal totalOriginalAmt = setScaleFromInt(31400);
+        BigDecimal discountAmt = setScaleFromInt(5000);
+        BigDecimal finalPaymentAmt = totalOriginalAmt.subtract(discountAmt);
         LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 10, 0, 0);
 
-        // when // then
-        assertThatThrownBy(() -> paymentApplicationService.payment(userId, orderId, issuedCouponId, currentTime))
-                .isInstanceOf(CustomException.class)
-                .hasMessage(ErrorCode.INSUFFICIENT_POINT.getMessage());
+        // when
+        PaymentResult.Payment payment = paymentApplicationService.payment(userId, orderId, issuedCouponId, currentTime);
+
+        // then
+        assertThat(payment.orderId()).isEqualTo(orderId);
+        assertThat(payment.totalOriginalAmt().compareTo(totalOriginalAmt)).isEqualTo(0);
+        assertThat(payment.discountAmt().compareTo(discountAmt)).isEqualTo(0);
+        assertThat(payment.finalPaymentAmt().compareTo(finalPaymentAmt)).isEqualTo(0);
+
+        Order order = orderRepository.findById(orderId);
+        assertThat(order.getStatus().name()).isEqualTo(OrderStatus.PAID.name());
     }
 
     private static BigDecimal setScaleFromInt(int value) {
