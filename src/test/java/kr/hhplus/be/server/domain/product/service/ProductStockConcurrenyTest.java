@@ -4,16 +4,15 @@ import kr.hhplus.be.server.domain.product.dto.StockCommand;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.domain.product.repository.ProductStockRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
-import kr.hhplus.be.server.support.IntegrationTestSupport;
+import kr.hhplus.be.server.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,17 +38,17 @@ public class ProductStockConcurrenyTest extends IntegrationTestSupport {
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
-        AtomicReference<BigDecimal> successCnt = new AtomicReference<>(BigDecimal.ZERO);
-        AtomicReference<BigDecimal> failCnt = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicInteger successCnt = new AtomicInteger(0);
+        AtomicInteger failCnt = new AtomicInteger(0);
 
         // when
         for(int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
                     productStockService.deductQuantity(stockCommand);
-                    successCnt.updateAndGet(value -> value.add(BigDecimal.ONE));
+                    successCnt.incrementAndGet();
                 } catch (CustomException e) {
-                    failCnt.updateAndGet(value -> value.add(BigDecimal.ONE));
+                    failCnt.incrementAndGet();
                 } finally {
                     countDownLatch.countDown();
                 }
@@ -62,8 +61,8 @@ public class ProductStockConcurrenyTest extends IntegrationTestSupport {
         // then
         ProductStock stock = productStockRepository.getProductStockWithLock(9L);
         assertThat(stock.getQuantity()).isEqualTo(0);
-        assertThat(successCnt.get().compareTo(new BigDecimal(5))).isEqualTo(0);
-        assertThat(failCnt.get().compareTo(new BigDecimal(1))).isEqualTo(0);
+        assertThat(successCnt.get()).isEqualTo(5);
+        assertThat(failCnt.get()).isEqualTo(1);
     }
 
     @Test
@@ -80,17 +79,17 @@ public class ProductStockConcurrenyTest extends IntegrationTestSupport {
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
-        AtomicReference<BigDecimal> successCnt = new AtomicReference<>(BigDecimal.ZERO);
-        AtomicReference<BigDecimal> failCnt = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicInteger successCnt = new AtomicInteger(0);
+        AtomicInteger failCnt = new AtomicInteger(0);
 
         // when
         for(int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
                     productStockService.deductQuantity(stockCommand);
-                    successCnt.updateAndGet(value -> value.add(BigDecimal.ONE));
+                    successCnt.incrementAndGet();
                 } catch (CustomException e) {
-                    failCnt.updateAndGet(value -> value.add(BigDecimal.ONE));
+                    failCnt.incrementAndGet();
                 } finally {
                     countDownLatch.countDown();
                 }
@@ -103,7 +102,7 @@ public class ProductStockConcurrenyTest extends IntegrationTestSupport {
         // then
         ProductStock stock = productStockRepository.getProductStockWithLock(9L);
         assertThat(stock.getQuantity()).isEqualTo(0);
-        assertThat(successCnt.get().compareTo(new BigDecimal(5))).isEqualTo(0);
-        assertThat(failCnt.get().compareTo(new BigDecimal(0))).isEqualTo(0);
+        assertThat(successCnt.get()).isEqualTo(5);
+        assertThat(failCnt.get()).isEqualTo(0);
     }
 }

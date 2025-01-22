@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.product.service;
 
-import kr.hhplus.be.server.support.IntegrationTestSupport;
+import kr.hhplus.be.server.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class ProductServiceIntegrationTest extends IntegrationTestSupport {
                         tuple(5L, "오렌지 초콜릿", setScaleFromInt(3500), 800),
                         tuple(7L, "블루베리 쿠키", setScaleFromInt(4500), 300),
                         tuple(8L, "초코칩 쿠키", setScaleFromInt(3800), 700),
-                        tuple(9L, "카라멜 마카롱", setScaleFromInt(5000), 120)
+                        tuple(9L, "카라멜 마카롱", setScaleFromInt(5000), 5)
                 );
     }
 

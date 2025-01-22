@@ -6,5 +6,5 @@ public interface PointRepository {
 
     Point findByUserIdWithLock(Long userId);
 
-    Point findByUserIdOrThrow(Long userId);
+    Point findByUserId(Long userId);
 }

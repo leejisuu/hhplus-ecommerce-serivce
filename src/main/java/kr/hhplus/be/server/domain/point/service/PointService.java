@@ -30,7 +30,7 @@ public class PointService {
     }
 
     public PointInfo.PointDto getPoint(Long userId) {
-        return PointInfo.PointDto.of(pointRepository.findByUserIdOrThrow(userId));
+        return PointInfo.PointDto.of(pointRepository.findByUserId(userId));
     }
 
     @Transactional

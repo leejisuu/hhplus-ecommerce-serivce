@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.point.service;
 
-import kr.hhplus.be.server.support.IntegrationTestSupport;
+import kr.hhplus.be.server.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.point.dto.info.PointInfo;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import org.assertj.core.api.Assertions;
@@ -79,7 +79,7 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
-        AtomicReference<BigDecimal> successCnt = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicReference<BigDecimal> successAmt = new AtomicReference<>(BigDecimal.ZERO);
 
         // when
         for(int i = 0; i < threadCount; i++) {
@@ -88,7 +88,7 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
                 try {
                     startLatch.await();
                     pointService.charge(userId, amount);
-                    successCnt.updateAndGet(v -> v.add(amount));
+                    successAmt.updateAndGet(v -> v.add(amount));
                 } catch (CustomException | InterruptedException e) {
 
                 } finally {
@@ -104,7 +104,7 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
         // then
         PointInfo.PointDto chargedPoint = pointService.getPoint(userId);
 
-        Assertions.assertThat(chargedPoint.point().compareTo(currentPoint.point().add(successCnt.get()))).isEqualTo(0);
+        Assertions.assertThat(chargedPoint.point().compareTo(currentPoint.point().add(successAmt.get()))).isEqualTo(0);
 
     }
 }

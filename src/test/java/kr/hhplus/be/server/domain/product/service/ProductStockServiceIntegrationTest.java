@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.product.service;
 
-import kr.hhplus.be.server.support.IntegrationTestSupport;
+import kr.hhplus.be.server.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.product.dto.StockCommand;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.domain.product.repository.ProductStockRepository;
