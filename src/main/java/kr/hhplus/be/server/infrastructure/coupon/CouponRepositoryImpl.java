@@ -5,6 +5,8 @@ import jakarta.persistence.LockModeType;
 import kr.hhplus.be.server.domain.coupon.entity.QCoupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
+import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -24,5 +26,10 @@ public class CouponRepositoryImpl implements CouponRepository {
                 .where(coupon.id.eq(couponId))
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne();
+    }
+
+    @Override
+    public Coupon findById(Long couponId) {
+        return couponJpaRepository.findById(couponId).orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
     }
 }

@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -76,5 +75,19 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     @Override
     public IssuedCoupon findByCouponIdAndUserId(Long couponId, Long userId) {
         return issuedCouponJpaRepository.findByCouponIdAndUserId(couponId, userId);
+    }
+
+    @Override
+    public IssuedCoupon getIssuedCoupon(Long issuedCouponId, LocalDateTime currentTime) {
+        QIssuedCoupon issuedCoupon = QIssuedCoupon.issuedCoupon;
+
+        return queryFactory
+                .selectFrom(issuedCoupon)
+                .where(issuedCoupon.id.eq(issuedCouponId),
+                        issuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
+                        issuedCoupon.validStartedAt.loe(currentTime),
+                        issuedCoupon.validEndedAt.gt(currentTime)
+                )
+                .fetchOne();
     }
 }

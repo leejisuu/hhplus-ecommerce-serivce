@@ -15,4 +15,6 @@ public interface IssuedCouponRepository {
     IssuedCoupon getIssuedCouponWithLock(Long issuedCouponId, LocalDateTime currentTime);
 
     IssuedCoupon findByCouponIdAndUserId(Long couponId, Long userId);
+
+    IssuedCoupon getIssuedCoupon(Long issuedCouponId, LocalDateTime currentTime);
 }

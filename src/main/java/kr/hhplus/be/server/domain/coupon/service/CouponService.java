@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
+import kr.hhplus.be.server.infrastructure.redisson.RedissonLock;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -11,22 +12,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class CouponService {
 
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
 
-    @Transactional
+    @RedissonLock(key = "'Coupon:couponId:' + #couponId")
     public IssuedCouponInfo.Coupon issue(Long couponId, Long userId, LocalDateTime issuedAt) {
-        Coupon coupon = couponRepository.findByIdWithLock(couponId);
+        Coupon coupon = couponRepository.findById(couponId);
         if(coupon == null) {
             throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
         }
@@ -46,13 +45,12 @@ public class CouponService {
         return userCouponsPage.map(IssuedCouponInfo.Coupon::of);
     }
 
-    @Transactional
     public BigDecimal useIssuedCoupon(Long issuedCouponId, BigDecimal totalOriginalAmt, LocalDateTime currentTime) {
         if(issuedCouponId == null) {
             return BigDecimal.ZERO;
         }
 
-        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(issuedCouponId, currentTime);
+        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCoupon(issuedCouponId, currentTime);
         if(issuedCoupon == null) {
             throw new CustomException(ErrorCode.ISSUED_COUPON_NOT_FOUND);
         }
