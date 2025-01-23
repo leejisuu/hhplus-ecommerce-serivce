@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
+import kr.hhplus.be.server.infrastructure.redisson.RedissonLock;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -17,16 +18,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class CouponService {
 
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
 
-    @Transactional
+    @RedissonLock(key = "'Coupon:couponId:' + #couponId")
     public IssuedCouponInfo.Coupon issue(Long couponId, Long userId, LocalDateTime issuedAt) {
-        Coupon coupon = couponRepository.findByIdWithLock(couponId);
+        Coupon coupon = couponRepository.findById(couponId);
         if(coupon == null) {
             throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
         }

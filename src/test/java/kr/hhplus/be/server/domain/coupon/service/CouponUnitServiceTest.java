@@ -53,7 +53,7 @@ class CouponUnitServiceTest {
             Long userId = 1L;
             LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 1 ,0 ,0);
 
-            given(couponRepository.findByIdWithLock(couponId)).willReturn(null);
+            given(couponRepository.findById(couponId)).willReturn(null);
 
             // when // then
             assertThatThrownBy(() -> couponService.issue(couponId, userId, currentTime))
@@ -72,7 +72,7 @@ class CouponUnitServiceTest {
                     LocalDateTime.of(2025, 1, 1, 0 ,0 ,0), LocalDateTime.of(2025, 1, 31, 23 ,59 ,59), CouponStatus.ACTIVE);
             IssuedCoupon issuedCoupon = coupon.issue(userId, currentTime);
 
-            given(couponRepository.findByIdWithLock(couponId)).willReturn(coupon);
+            given(couponRepository.findById(couponId)).willReturn(coupon);
             given(issuedCouponRepository.findByCouponIdAndUserId(couponId, userId)).willReturn(issuedCoupon);
 
             // when // then
@@ -92,7 +92,7 @@ class CouponUnitServiceTest {
                     LocalDateTime.of(2025, 1, 1, 0 ,0 ,0), LocalDateTime.of(2025, 1, 31, 23 ,59 ,59), CouponStatus.ACTIVE);
             IssuedCoupon mockIssuedCoupon = mockCoupon.issue(userId, currentTime);
 
-            given(couponRepository.findByIdWithLock(couponId)).willReturn(mockCoupon);
+            given(couponRepository.findById(couponId)).willReturn(mockCoupon);
             given(issuedCouponRepository.findByCouponIdAndUserId(couponId, userId)).willReturn(null);
             given(issuedCouponRepository.save(any(IssuedCoupon.class))).willReturn(mockIssuedCoupon);
 

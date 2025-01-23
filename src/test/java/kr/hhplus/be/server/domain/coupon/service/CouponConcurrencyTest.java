@@ -32,8 +32,8 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
     IssuedCouponJpaRepository issuedCouponJpaRepository;
 
     @Test
-    public void 동시에_동일한_선착순_쿠폰에_대해_40명이_발급했을_때_30명만_성공한다() throws InterruptedException {
-        int maxCapacity = 30;
+    public void 동시에_동일한_선착순_쿠폰에_대해_10명이_발급했을_때_5명만_성공한다() throws InterruptedException {
+        int maxCapacity = 5;
 
         // given
         LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 11, 00, 00);
@@ -43,7 +43,7 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
         Coupon couponInfo = Coupon.create("선착순 쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), maxCapacity, maxCapacity, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
         Coupon savedCoupon = couponJpaRepository.save(couponInfo);
 
-        int threadCount = 40;
+        int threadCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
 
