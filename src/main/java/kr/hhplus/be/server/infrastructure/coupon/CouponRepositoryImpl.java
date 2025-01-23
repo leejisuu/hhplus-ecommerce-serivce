@@ -25,4 +25,14 @@ public class CouponRepositoryImpl implements CouponRepository {
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne();
     }
+
+    @Override
+    public Coupon findById(Long couponId) {
+        QCoupon coupon = QCoupon.coupon;
+
+        return queryFactory
+                .selectFrom(coupon)
+                .where(coupon.id.eq(couponId))
+                .fetchOne();
+    }
 }

@@ -50,6 +50,9 @@ public class Coupon extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CouponStatus status;
 
+    @Version
+    private Integer version;
+
     @Builder
     private Coupon(String name, DiscountType discountType, BigDecimal discountAmt, int maxCapacity, int remainCapacity, LocalDateTime validStartedAt, LocalDateTime validEndedAt, CouponStatus status) {
         this.name = name;
