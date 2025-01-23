@@ -7,6 +7,7 @@ import kr.hhplus.be.server.domain.order.service.OrderService;
 import kr.hhplus.be.server.domain.payment.dto.info.PaymentInfo;
 import kr.hhplus.be.server.domain.payment.service.PaymentService;
 import kr.hhplus.be.server.domain.point.service.PointService;
+import kr.hhplus.be.server.infrastructure.redisson.RedissonLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +24,9 @@ public class PaymentApplicationService {
     private final PointService pointService;
     private final CouponService couponService;
 
-    @Transactional
+    @RedissonLock(key = "'Payment:userId-orderId:' + #userId + '-' + #orderId")
     public PaymentResult.Payment payment(Long userId, Long orderId, Long issuedCouponId, LocalDateTime currentTime) {
-        OrderInfo.OrderDto order = orderService.getOrderWithLock(orderId);
+        OrderInfo.OrderDto order = orderService.getOrder(orderId);
         BigDecimal discountAmt = couponService.useIssuedCoupon(issuedCouponId, order.totalOriginalAmt(), currentTime);
         PaymentInfo.PaymentDto payment = paymentService.payment(orderId, order.totalOriginalAmt(), discountAmt, issuedCouponId);
         pointService.use(userId, payment.finalPaymentAmt());

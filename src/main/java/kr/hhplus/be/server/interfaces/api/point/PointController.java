@@ -17,7 +17,7 @@ public class PointController {
 
     @Operation(summary = "잔액 조회 API", description = "유저의 보유 잔액을 반환한다.")
     @GetMapping("/{userId}")
-    public ApiResponse<PointResponse.Point> getUserPoint(@PathVariable Long userId) {
+    public ApiResponse<PointResponse.Point> getUserPoint(@PathVariable("userId") Long userId) {
         return ApiResponse.ok(PointResponse.Point.of(pointService.getPoint(userId)));
     }
 

@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.point.service;
 
+import kr.hhplus.be.server.infrastructure.redisson.RedissonLock;
 import kr.hhplus.be.server.domain.point.dto.info.PointInfo;
 import kr.hhplus.be.server.domain.point.entity.Point;
 import kr.hhplus.be.server.domain.point.entity.PointHistory;
@@ -7,21 +8,19 @@ import kr.hhplus.be.server.domain.point.repository.PointHistoryRepository;
 import kr.hhplus.be.server.domain.point.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class PointService {
 
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
 
-    @Transactional
+    @RedissonLock(key = "'Point:userId:' + #userId")
     public PointInfo.PointDto charge(Long userId, BigDecimal amount) {
-        Point point = pointRepository.findByUserIdWithLock(userId);
+        Point point = pointRepository.findByUserId(userId);
         point.addPoint(amount);
 
         pointHistoryRepository.save(PointHistory.createChargePointHistory(point.getId(), amount));
@@ -33,9 +32,8 @@ public class PointService {
         return PointInfo.PointDto.of(pointRepository.findByUserId(userId));
     }
 
-    @Transactional
     public PointInfo.PointDto use(Long userId, BigDecimal amount) {
-        Point point = pointRepository.findByUserIdWithLock(userId);
+        Point point = pointRepository.findByUserId(userId);
         point.deductPoint(amount);
 
         pointHistoryRepository.save(PointHistory.createUsePointHistory(point.getId(), amount));

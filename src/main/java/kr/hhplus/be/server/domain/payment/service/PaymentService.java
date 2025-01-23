@@ -16,7 +16,6 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    @Transactional
     public PaymentInfo.PaymentDto payment(Long orderId, BigDecimal totalOriginalAmt, BigDecimal discountAmt, Long issuedCouponId) {
         Payment payment = Payment.create(orderId, totalOriginalAmt, discountAmt, issuedCouponId);
         return PaymentInfo.PaymentDto.of(paymentRepository.save(payment));
