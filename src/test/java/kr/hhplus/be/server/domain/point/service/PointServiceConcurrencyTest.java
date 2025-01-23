@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.point.service;
 
+import kr.hhplus.be.server.infrastructure.point.PointJpaRepository;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.point.dto.info.PointInfo;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
@@ -19,6 +20,10 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
 
     @Autowired
     private PointService pointService;
+
+    @Autowired
+    private PointJpaRepository pointJpaRepository;
+
 
     @Test
     void 동일한_유저가_포인트_충전을_동시에_신청해도_포인트가_모두_합산된다() throws InterruptedException {
@@ -51,6 +56,8 @@ public class PointServiceConcurrencyTest extends IntegrationTestSupport {
         startLatch.countDown();  // 모든 쓰레드 동시에 시작
         endLatch.await();  // 모든 쓰레드가 종료될 때까지 대기
         executorService.shutdown();
+
+        System.out.println();
 
         // then
         PointInfo.PointDto chargedPoint = pointService.getPoint(userId);

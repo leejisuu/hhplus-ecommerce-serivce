@@ -19,13 +19,7 @@ public class PointRepositoryImpl implements PointRepository {
 
     @Override
     public Point findByUserIdWithLock(Long userId) {
-        QPoint point = QPoint.point1;
-
-        return queryFactory
-                .selectFrom(point)
-                .where(point.userId.eq(userId))
-                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
-                .fetchOne();
+        return pointJpaRepository.findByUserId(userId).orElseThrow(() -> new CustomException(ErrorCode.POINT_NOT_FOUND));
     }
 
     public Point findByUserId(Long userId) {

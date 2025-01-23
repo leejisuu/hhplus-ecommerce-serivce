@@ -26,6 +26,9 @@ public class Point extends BaseEntity {
     @Column(name = "point", nullable = false)
     private BigDecimal point;
 
+    @Version
+    private Integer version;
+
     @Builder
     private Point(Long userId, BigDecimal point) {
         this.userId = userId;
