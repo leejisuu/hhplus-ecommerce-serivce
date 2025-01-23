@@ -24,6 +24,14 @@ spring:
           default_storage: NORMALIZE_UTC
         jdbc:
           time_zone: UTC
+  sql:
+    init:
+      mode: always
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 
 springdoc:
   swagger-ui:
