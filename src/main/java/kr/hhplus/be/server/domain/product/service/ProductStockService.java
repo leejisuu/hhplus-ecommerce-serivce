@@ -6,7 +6,6 @@ import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -14,9 +13,8 @@ public class ProductStockService {
 
     private final ProductStockRepository productStockRepository;
 
-    @Transactional
     public void deductQuantity(Long productId, Integer quantity) {
-        ProductStock productStock = productStockRepository.getProductStockWithLock(productId);
+        ProductStock productStock = productStockRepository.getProductStock(productId);
         if(productStock == null) {
             throw new CustomException(ErrorCode.PRODUCT_STOCK_NOT_FOUND);
         }

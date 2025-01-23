@@ -25,7 +25,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
     private ProductStockRepository productStockRepository;
 
     @Test
-    void 동시에_여러_유저가_재고_5개인_상품을_1개씩_구매하면_6번째_구매자는_주문_실패한다() throws InterruptedException {
+    void 동시에_재고가_5개인_상품을_1개씩_6번_구매하면_6번째_주문은_실패한다() throws InterruptedException {
         // given
         Long userId = 3L;
         List<OrderCriteria.OrderDetail> orderDetailsCriteria = List.of(
