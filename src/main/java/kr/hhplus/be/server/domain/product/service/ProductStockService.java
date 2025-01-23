@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.product.service;
 
-import kr.hhplus.be.server.domain.product.dto.StockCommand;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.domain.product.repository.ProductStockRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
@@ -16,14 +15,12 @@ public class ProductStockService {
     private final ProductStockRepository productStockRepository;
 
     @Transactional
-    public void deductQuantity(StockCommand.OrderDetails command) {
-        for (StockCommand.OrderDetail orderDetail : command.details()) {
-            ProductStock productStock = productStockRepository.getProductStockWithLock(orderDetail.productId());
-            if(productStock == null) {
-                throw new CustomException(ErrorCode.PRODUCT_STOCK_NOT_FOUND);
-            }
-
-            productStock.deductQuantity(orderDetail.quantity());
+    public void deductQuantity(Long productId, Integer quantity) {
+        ProductStock productStock = productStockRepository.getProductStockWithLock(productId);
+        if(productStock == null) {
+            throw new CustomException(ErrorCode.PRODUCT_STOCK_NOT_FOUND);
         }
+
+        productStock.deductQuantity(quantity);
     }
 }

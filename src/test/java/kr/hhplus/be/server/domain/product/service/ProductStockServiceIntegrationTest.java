@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.product.service;
 
 import kr.hhplus.be.server.support.IntegrationTestSupport;
-import kr.hhplus.be.server.domain.product.dto.StockCommand;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.domain.product.repository.ProductStockRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
@@ -11,8 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 public class ProductStockServiceIntegrationTest extends IntegrationTestSupport {
 
@@ -28,42 +25,23 @@ public class ProductStockServiceIntegrationTest extends IntegrationTestSupport {
         @Test
         void 재고_차감_시_재고_정보가_없으면_예외를_발생한다() {
             // given
-            Long productId1 = 1L;
-            Long productId2 = 3L;
-            Long productId3 = 11L;
-
-            // given
-            List<StockCommand.OrderDetail> stocks = List.of(
-                    new StockCommand.OrderDetail(productId1, 10),
-                    new StockCommand.OrderDetail(productId2, 3),
-                    new StockCommand.OrderDetail(productId3, 2)
-            );
-
-            StockCommand.OrderDetails stockCommand = new StockCommand.OrderDetails(stocks);
+            Long productId = 11L;
+            int quantity = 1;
 
             // when // then
-            Assertions.assertThatThrownBy(() -> productStockService.deductQuantity(stockCommand))
+            Assertions.assertThatThrownBy(() -> productStockService.deductQuantity(productId, quantity))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.PRODUCT_STOCK_NOT_FOUND.getMessage());
         }
 
         @Test
         void 재고_차감_시_구매_개수가_보유_재고_보다_크면_예외를_발생한다() {
-            Long productId1 = 1L;
-            Long productId2 = 3L;
-            Long productId3 = 4L;
-
             // given
-            List<StockCommand.OrderDetail> stocks = List.of(
-                    new StockCommand.OrderDetail(productId1, 1),
-                    new StockCommand.OrderDetail(productId2, 3),
-                    new StockCommand.OrderDetail(productId3, 1501)
-            );
-
-            StockCommand.OrderDetails stockCommand = new StockCommand.OrderDetails(stocks);
+            Long productId = 4L;
+            int quantity = 1501;
 
             // when // then
-            Assertions.assertThatThrownBy(() -> productStockService.deductQuantity(stockCommand))
+            Assertions.assertThatThrownBy(() -> productStockService.deductQuantity(productId, quantity))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.INSUFFICIENT_STOCK.getMessage());
         }
@@ -71,46 +49,21 @@ public class ProductStockServiceIntegrationTest extends IntegrationTestSupport {
         @Test
         void 재고를_치감한다() {
             // given
-            Long productId1 = 1L;
-            Long productId2 = 3L;
-            Long productId3 = 4L;
+            Long productId = 1L;
+            int quantity = 1;
 
-            int stock1 = 9999;
-            int stock2 = 500;
-            int stock3 = 1500;
+            ProductStock originalStock = productStockRepository.getProductStockWithLock(productId);
 
-            int quantity1 = 1;
-            int quantity2 = 500;
-            int quantity3 = 1499;
-
-            // given
-            List<StockCommand.OrderDetail> stocks = List.of(
-                    new StockCommand.OrderDetail(productId1, quantity1),
-                    new StockCommand.OrderDetail(productId2, quantity2),
-                    new StockCommand.OrderDetail(productId3, quantity3)
-            );
-
-            StockCommand.OrderDetails stockCommand = new StockCommand.OrderDetails(stocks);
 
             // when
-            productStockService.deductQuantity(stockCommand);
+            productStockService.deductQuantity(productId, quantity);
 
-            ProductStock productStock1 = productStockRepository.getProductStockWithLock(productId1);
-            ProductStock productStock2 = productStockRepository.getProductStockWithLock(productId2);
-            ProductStock productStock3 = productStockRepository.getProductStockWithLock(productId3);
+            ProductStock productStock = productStockRepository.getProductStockWithLock(productId);
 
             // then
-           Assertions.assertThat(productStock1)
+           Assertions.assertThat(productStock)
                    .extracting("productId", "quantity")
-                   .containsExactly(productId1, stock1 - quantity1);
-
-            Assertions.assertThat(productStock2)
-                    .extracting("productId", "quantity")
-                    .containsExactly(productId2, stock2 - quantity2);
-
-            Assertions.assertThat(productStock3)
-                    .extracting("productId", "quantity")
-                    .containsExactly(productId3, stock3 - quantity3);
+                   .containsExactly(productId, originalStock.getQuantity() - quantity);
         }
     }
 }
