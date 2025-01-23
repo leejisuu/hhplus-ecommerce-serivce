@@ -52,13 +52,12 @@ public class ProductStockServiceIntegrationTest extends IntegrationTestSupport {
             Long productId = 1L;
             int quantity = 1;
 
-            ProductStock originalStock = productStockRepository.getProductStockWithLock(productId);
-
+            ProductStock originalStock = productStockRepository.getProductStock(productId);
 
             // when
             productStockService.deductQuantity(productId, quantity);
 
-            ProductStock productStock = productStockRepository.getProductStockWithLock(productId);
+            ProductStock productStock = productStockRepository.getProductStock(productId);
 
             // then
            Assertions.assertThat(productStock)

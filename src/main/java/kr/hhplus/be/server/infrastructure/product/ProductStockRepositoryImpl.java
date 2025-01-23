@@ -17,6 +17,7 @@ import java.util.List;
 @Repository
 public class ProductStockRepositoryImpl implements ProductStockRepository {
 
+    private final ProductStockJpaRepository productStockJpaRepository;
     private final JPAQueryFactory queryFactory;
 
     @Transactional
@@ -34,5 +35,25 @@ public class ProductStockRepositoryImpl implements ProductStockRepository {
                 )
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne();
+    }
+
+    @Override
+    public ProductStock getProductStock(Long productId) {
+        QProduct product = QProduct.product;
+        QProductStock productStock = QProductStock.productStock;
+
+        return queryFactory
+                .select(productStock)
+                .from(productStock)
+                .join(product).on(productStock.productId.eq(product.id)) // productStock과 product를 조인
+                .where(product.id.eq(productId),
+                        product.sellingStatus.eq(ProductSellingStatus.SELLING)
+                )
+                .fetchOne();
+    }
+
+    @Override
+    public ProductStock save(ProductStock productStock) {
+        return productStockJpaRepository.save(productStock);
     }
 }

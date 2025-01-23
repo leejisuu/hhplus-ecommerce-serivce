@@ -36,14 +36,14 @@ public class ProductStockServiceUnitTest {
             Long productId = 11L;
             int quantity = 1;
 
-            given(productStockRepository.getProductStockWithLock(productId)).willReturn(null);
+            given(productStockRepository.getProductStock(productId)).willReturn(null);
 
             // when // then
             Assertions.assertThatThrownBy(() -> productStockService.deductQuantity(productId, quantity))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.PRODUCT_STOCK_NOT_FOUND.getMessage());
 
-            verify(productStockRepository, times(1)).getProductStockWithLock(productId);
+            verify(productStockRepository, times(1)).getProductStock(productId);
         }
 
         @Test
@@ -54,14 +54,14 @@ public class ProductStockServiceUnitTest {
 
             ProductStock productStock = ProductStock.create(productId, 1500);
 
-            given(productStockRepository.getProductStockWithLock(productId)).willReturn(productStock);
+            given(productStockRepository.getProductStock(productId)).willReturn(productStock);
 
             // when // then
             Assertions.assertThatThrownBy(() -> productStockService.deductQuantity(productId, quantity))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.INSUFFICIENT_STOCK.getMessage());
 
-            verify(productStockRepository, times(1)).getProductStockWithLock(productId);
+            verify(productStockRepository, times(1)).getProductStock(productId);
         }
 
         @Test
@@ -72,13 +72,13 @@ public class ProductStockServiceUnitTest {
 
             ProductStock productStock = ProductStock.create(productId, 9999);
 
-            given(productStockRepository.getProductStockWithLock(productId)).willReturn(productStock);
+            given(productStockRepository.getProductStock(productId)).willReturn(productStock);
 
             // when
             productStockService.deductQuantity(productId, quantity);
 
             // then
-            verify(productStockRepository, times(1)).getProductStockWithLock(productId);
+            verify(productStockRepository, times(1)).getProductStock(productId);
         }
     }
 }
