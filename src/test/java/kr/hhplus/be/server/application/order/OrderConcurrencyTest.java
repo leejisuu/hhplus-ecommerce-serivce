@@ -25,7 +25,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
     private ProductStockRepository productStockRepository;
 
     @Test
-    void 동시에_여러_유저가_재고_5개인_상품을_1개씩_구매하면_6번째_구매자는_주문_실패한다() throws InterruptedException {
+    void 동시에_재고가_5개인_상품을_1개씩_6번_구매하면_6번째_주문은_실패한다() throws InterruptedException {
         // given
         Long userId = 3L;
         List<OrderCriteria.OrderDetail> orderDetailsCriteria = List.of(
@@ -61,7 +61,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
         executorService.shutdown();
 
         // then
-        ProductStock stock = productStockRepository.getProductStockWithLock(9L);
+        ProductStock stock = productStockRepository.getProductStock(9L);
         assertThat(stock.getQuantity()).isEqualTo(0);
         assertThat(successCnt.get()).isEqualTo(5);
         assertThat(failCnt.get()).isEqualTo(1);
@@ -104,7 +104,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
         executorService.shutdown();
 
         // then
-        ProductStock stock = productStockRepository.getProductStockWithLock(9L);
+        ProductStock stock = productStockRepository.getProductStock(9L);
         assertThat(stock.getQuantity()).isEqualTo(0);
         assertThat(successCnt.get()).isEqualTo(5);
         assertThat(failCnt.get()).isEqualTo(0);
@@ -150,7 +150,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
         executorService.shutdown();
 
         // then
-        ProductStock stock = productStockRepository.getProductStockWithLock(7L);
+        ProductStock stock = productStockRepository.getProductStock(7L);
         assertThat(stock.getQuantity()).isEqualTo(0);
         assertThat(successCnt.get()).isEqualTo(3);
         assertThat(failCnt.get()).isEqualTo(1);

@@ -25,6 +25,9 @@ public class ProductStock extends BaseEntity {
     @Column(nullable = false)
     private int quantity;
 
+    @Version
+    private Integer version;
+
     @Builder
     private ProductStock(Long productId, int quantity) {
         this.productId = productId;

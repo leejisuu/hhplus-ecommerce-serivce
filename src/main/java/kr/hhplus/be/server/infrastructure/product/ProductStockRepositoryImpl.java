@@ -3,23 +3,26 @@ package kr.hhplus.be.server.infrastructure.product;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.LockModeType;
 import kr.hhplus.be.server.domain.product.entity.QProduct;
+import kr.hhplus.be.server.domain.product.entity.QProductStock;
 import kr.hhplus.be.server.domain.product.enums.ProductSellingStatus;
 import kr.hhplus.be.server.domain.product.repository.ProductStockRepository;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
-import kr.hhplus.be.server.domain.product.entity.QProductStock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
 public class ProductStockRepositoryImpl implements ProductStockRepository {
 
+    private final ProductStockJpaRepository productStockJpaRepository;
     private final JPAQueryFactory queryFactory;
 
-    @Transactional
+    @Override
+    public ProductStock getProductStock(Long productId) {
+        return productStockJpaRepository.findByProductId(productId);
+    }
+
     @Override
     public ProductStock getProductStockWithLock(Long productId) {
         QProduct product = QProduct.product;
