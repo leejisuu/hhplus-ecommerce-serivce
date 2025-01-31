@@ -34,6 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     // DB
     runtimeOnly("com.mysql:mysql-connector-j")
@@ -43,6 +44,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
+    testImplementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Swagger UI
@@ -56,6 +58,10 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta") // QueryDSL JPA 모듈 (Jakarta API 지원)
     annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
+    // Redisson
+    implementation("org.redisson:redisson-spring-boot-starter:3.22.0")
+
 }
 
 // QueryDSL Q 클래스 생성 디렉토리 설정

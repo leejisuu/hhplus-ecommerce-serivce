@@ -3,7 +3,7 @@ package kr.hhplus.be.server.application.payment;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.enums.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
-import kr.hhplus.be.server.IntegrationTestSupport;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.application.payment.dto.result.PaymentResult;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;

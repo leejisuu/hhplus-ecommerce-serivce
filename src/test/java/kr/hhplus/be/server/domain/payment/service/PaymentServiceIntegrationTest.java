@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.payment.service;
 
-import kr.hhplus.be.server.IntegrationTestSupport;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.payment.dto.info.PaymentInfo;
 import kr.hhplus.be.server.domain.payment.enums.PaymentStatus;
 import org.assertj.core.api.Assertions;

@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.application.order;
 
-import kr.hhplus.be.server.IntegrationTestSupport;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.result.OrderResult;
 import kr.hhplus.be.server.domain.support.exception.CustomException;

@@ -4,7 +4,7 @@ import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.domain.product.repository.ProductStockRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
-import kr.hhplus.be.server.IntegrationTestSupport;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +25,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
     private ProductStockRepository productStockRepository;
 
     @Test
-    void 동시에_여러_유저가_재고_5개인_상품을_1개씩_구매하면_6번째_구매자는_주문_실패한다() throws InterruptedException {
+    void 동시에_재고가_5개인_상품을_1개씩_6번_구매하면_6번째_주문은_실패한다() throws InterruptedException {
         // given
         Long userId = 3L;
         List<OrderCriteria.OrderDetail> orderDetailsCriteria = List.of(

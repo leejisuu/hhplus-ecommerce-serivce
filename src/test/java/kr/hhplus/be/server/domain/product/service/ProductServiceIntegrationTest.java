@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.product.service;
 
-import kr.hhplus.be.server.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

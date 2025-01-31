@@ -24,7 +24,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
 
-    @Transactional
     public OrderInfo.OrderDto order(OrderCommand.Order orderCommand) {
         if(orderCommand.details().isEmpty()) {
             throw new CustomException(ErrorCode.ORDER_DETAILS_NOT_EXISTS);
@@ -50,7 +49,6 @@ public class OrderService {
         return OrderInfo.OrderDto.of(order);
     }
 
-    @Transactional
     public OrderInfo.OrderDto getOrderWithLock(Long orderId) {
         Order order = orderRepository.findByIdWithLock(orderId);
         if(order == null) {
@@ -60,7 +58,6 @@ public class OrderService {
         return OrderInfo.OrderDto.of(order);
     }
 
-    @Transactional
     public void completePayment(Long orderId) {
         Order order = orderRepository.findByIdWithLock(orderId);
         if(order == null) {
