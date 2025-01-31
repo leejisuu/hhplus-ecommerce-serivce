@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
-import kr.hhplus.be.server.infrastructure.redisson.RedissonLock;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -8,6 +7,7 @@ import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
+import kr.hhplus.be.server.support.distributedlock.redisson.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +24,8 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
 
-    @RedissonLock(key = "'Coupon:couponId:' + #couponId")
+    @DistributedLock(key = "'Coupon:couponId:' + #couponId")
+    @Transactional
     public IssuedCouponInfo.Coupon issue(Long couponId, Long userId, LocalDateTime issuedAt) {
         Coupon coupon = couponRepository.findById(couponId);
         if(coupon == null) {
