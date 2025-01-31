@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.redisson;
+package kr.hhplus.be.server.support.config.redisson;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
