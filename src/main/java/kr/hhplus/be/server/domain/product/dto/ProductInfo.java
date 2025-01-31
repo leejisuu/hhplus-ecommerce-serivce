@@ -27,17 +27,15 @@ public class ProductInfo {
     public record TopSelling(
             Long productId,
             String name,
-            int quantity,
             BigDecimal price,
-            Long totalSales
+            int totalQuantity
     ) {
         public static ProductInfo.TopSelling of(TopSellingProductDto topSellingProductDto) {
             return new ProductInfo.TopSelling(
-                    topSellingProductDto.productId(),
-                    topSellingProductDto.name(),
-                    topSellingProductDto.quantity(),
-                    topSellingProductDto.price(),
-                    topSellingProductDto.totalSales()
+                    topSellingProductDto.getProductId(),
+                    topSellingProductDto.getName(),
+                    topSellingProductDto.getPrice(),
+                    topSellingProductDto.getTotalQuantity()
             );
         }
     }

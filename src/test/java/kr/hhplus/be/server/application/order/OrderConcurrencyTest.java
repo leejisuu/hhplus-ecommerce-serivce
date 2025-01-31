@@ -61,7 +61,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
         executorService.shutdown();
 
         // then
-        ProductStock stock = productStockRepository.getProductStockWithLock(9L);
+        ProductStock stock = productStockRepository.getProductStock(9L);
         assertThat(stock.getQuantity()).isEqualTo(0);
         assertThat(successCnt.get()).isEqualTo(5);
         assertThat(failCnt.get()).isEqualTo(1);
@@ -104,7 +104,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
         executorService.shutdown();
 
         // then
-        ProductStock stock = productStockRepository.getProductStockWithLock(9L);
+        ProductStock stock = productStockRepository.getProductStock(9L);
         assertThat(stock.getQuantity()).isEqualTo(0);
         assertThat(successCnt.get()).isEqualTo(5);
         assertThat(failCnt.get()).isEqualTo(0);
@@ -150,7 +150,7 @@ public class OrderConcurrencyTest extends IntegrationTestSupport {
         executorService.shutdown();
 
         // then
-        ProductStock stock = productStockRepository.getProductStockWithLock(7L);
+        ProductStock stock = productStockRepository.getProductStock(7L);
         assertThat(stock.getQuantity()).isEqualTo(0);
         assertThat(successCnt.get()).isEqualTo(3);
         assertThat(failCnt.get()).isEqualTo(1);

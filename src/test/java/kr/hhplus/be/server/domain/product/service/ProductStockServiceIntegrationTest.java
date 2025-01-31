@@ -95,9 +95,9 @@ public class ProductStockServiceIntegrationTest extends IntegrationTestSupport {
             // when
             productStockService.deductQuantity(stockCommand);
 
-            ProductStock productStock1 = productStockRepository.getProductStockWithLock(productId1);
-            ProductStock productStock2 = productStockRepository.getProductStockWithLock(productId2);
-            ProductStock productStock3 = productStockRepository.getProductStockWithLock(productId3);
+            ProductStock productStock1 = productStockRepository.getProductStock(productId1);
+            ProductStock productStock2 = productStockRepository.getProductStock(productId2);
+            ProductStock productStock3 = productStockRepository.getProductStock(productId3);
 
             // then
            Assertions.assertThat(productStock1)

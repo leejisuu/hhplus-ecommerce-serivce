@@ -2,7 +2,7 @@ package kr.hhplus.be.server.application.order;
 
 import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.result.OrderResult;
-import kr.hhplus.be.server.infrastructure.redisson.RedissonLock;
+import kr.hhplus.be.server.support.distributedlock.redisson.DistributedLock;
 import kr.hhplus.be.server.domain.dataplatform.DataPlatformClient;
 import kr.hhplus.be.server.domain.order.service.OrderService;
 import kr.hhplus.be.server.domain.order.dto.info.OrderInfo;
@@ -22,7 +22,7 @@ public class OrderApplicationService {
     private final ProductStockService productStockService;
     private final DataPlatformClient dataPlatformClient;
 
-    @RedissonLock(key ="'Order:userId:' + #userId")
+    @DistributedLock(key ="'Order:productIds:' + #criteria.getProductIds()")
     public OrderResult.Order order(OrderCriteria.Order criteria) {
         List<ProductInfo.ProductDto> products = productService.getProducts(criteria.getProductIds());
         productStockService.deductQuantity(criteria.toStockCommand());

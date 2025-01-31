@@ -66,11 +66,11 @@ public class ProductServiceUnitTest {
         int limit = 5;
 
         List<TopSellingProductDto> mockTopSellings = List.of(
-                new TopSellingProductDto(1L, "레몬 사탕", 9999, BigDecimal.valueOf(2500), 15000L),
-                new TopSellingProductDto(3L, "청포도 젤리", 500, BigDecimal.valueOf(3200), 7000L),
-                new TopSellingProductDto(4L, "콜라 젤리", 1500, BigDecimal.valueOf(2800), 6500L),
-                new TopSellingProductDto(5L, "오렌지 초콜릿", 800, BigDecimal.valueOf(3500), 5000L),
-                new TopSellingProductDto(7L, "블루베리 쿠키", 300, BigDecimal.valueOf(4500), 3000L)
+                new TopSellingProductDto(1L, "레몬 사탕", BigDecimal.valueOf(2500), 15000),
+                new TopSellingProductDto(3L, "청포도 젤리", BigDecimal.valueOf(3200), 7000),
+                new TopSellingProductDto(4L, "콜라 젤리", BigDecimal.valueOf(2800), 6500),
+                new TopSellingProductDto(5L, "오렌지 초콜릿", BigDecimal.valueOf(3500), 5000),
+                new TopSellingProductDto(7L, "블루베리 쿠키", BigDecimal.valueOf(4500), 3000)
                 );
 
         given(productRepository.getTopSellingProducts(todayDate, limit)).willReturn(mockTopSellings);
