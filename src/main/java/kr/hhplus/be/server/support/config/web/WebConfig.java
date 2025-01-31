@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config;
+package kr.hhplus.be.server.support.config.web;
 
 import kr.hhplus.be.server.interfaces.interceptor.UserValidationInterceptor;
 import lombok.RequiredArgsConstructor;
