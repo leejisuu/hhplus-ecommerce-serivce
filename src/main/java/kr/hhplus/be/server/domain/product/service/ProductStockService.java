@@ -7,8 +7,6 @@ import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -16,7 +14,6 @@ public class ProductStockService {
 
     private final ProductStockRepository productStockRepository;
 
-    @Transactional
     public void deductQuantity(StockCommand.OrderDetails command) {
         for (StockCommand.OrderDetail orderDetail : command.details()) {
             ProductStock productStock = productStockRepository.getProductStock(orderDetail.productId());
