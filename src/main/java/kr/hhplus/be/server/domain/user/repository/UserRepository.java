@@ -4,6 +4,4 @@ import kr.hhplus.be.server.domain.user.entity.User;
 
 public interface UserRepository {
     User findById(Long userId);
-
-    User findByIdWithLock(Long userId);
 }
