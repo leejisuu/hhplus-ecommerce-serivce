@@ -11,6 +11,7 @@ import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.service.ProductStockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class OrderApplicationService {
     private final DataPlatformClient dataPlatformClient;
 
     @DistributedLock(key ="'Order:productIds:' + #criteria.getProductIds()")
+    @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
         List<ProductInfo.ProductDto> products = productService.getProducts(criteria.getProductIds());
         productStockService.deductQuantity(criteria.toStockCommand());

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.infrastructure.point.order;
+package kr.hhplus.be.server.infrastructure.order;
 
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
 import kr.hhplus.be.server.domain.order.repository.OrderDetailRepository;
