@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,6 +64,25 @@ public class ProductServiceIntegrationTest extends IntegrationTestSupport {
                         tuple(5L, setScaleFromInt(3500))
                 );
     }
+
+    @Test
+    void 인기_상품을_조회한다() {
+        // given
+        LocalDate date = LocalDate.of(2025, 2, 1);
+
+        // when
+        List<ProductInfo.TopSelling> products = productService.getTopSellingProducts(date, 5);
+
+        // then
+        assertThat(products).hasSize(2);
+        assertThat(products)
+                .extracting("productId", "name", "price", "totalQuantity")
+                .containsExactly(
+                        tuple(9L, "카라멜 마카롱", setScaleFromInt(5000), 10),
+                        tuple(8L, "초코칩 쿠키", setScaleFromInt(3800), 3)
+                );
+    }
+
 
     private static BigDecimal setScaleFromInt(int value) {
         return new BigDecimal(value).setScale(2, RoundingMode.HALF_UP);

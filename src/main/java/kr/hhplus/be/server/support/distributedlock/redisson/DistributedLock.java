@@ -1,11 +1,11 @@
-package kr.hhplus.be.server.infrastructure.redisson;
+package kr.hhplus.be.server.support.distributedlock.redisson;
 
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RedissonLock {
+public @interface DistributedLock {
 
     /**
      * 락의 이름

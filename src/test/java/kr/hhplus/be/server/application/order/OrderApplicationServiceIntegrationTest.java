@@ -34,7 +34,7 @@ public class OrderApplicationServiceIntegrationTest extends IntegrationTestSuppo
         // when // then
         assertThatThrownBy(() -> orderApplicationService.order(orderCriteria))
                 .isInstanceOf(CustomException.class)
-                .hasMessage(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+                .hasMessage(ErrorCode.PRODUCT_STOCK_NOT_FOUND.getMessage());
     }
 
     @Test

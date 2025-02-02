@@ -63,7 +63,9 @@ INSERT INTO `order` (id, user_id, status, total_original_amt, created_at, update
 
 INSERT INTO order_detail (id, order_id, product_id, quantity, price, created_at, updated_at) VALUES
 (1, 1, 8, 3, 11400, NOW(), NOW()),
-(2, 1, 9, 4, 20000, NOW(), NOW());
+(2, 1, 9, 4, 20000, NOW(), NOW()),
+(3, 2, 9, 6, 30000, NOW(), NOW());
+
 
 INSERT INTO payment (id, order_id, status, total_original_amt, discount_amt, final_payment_amt, issued_coupon_id, created_at, updated_at) VALUES
 (1, 1, 'IN_PROGRESS', 31400, 3140, 30960, 2, NOW(), NOW())

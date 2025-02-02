@@ -1,8 +1,5 @@
 package kr.hhplus.be.server.infrastructure.order;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.LockModeType;
-import kr.hhplus.be.server.domain.order.entity.QOrder;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
@@ -14,27 +11,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
 
-    private final OrderJpaRepository jpaRepository;
-    private final JPAQueryFactory queryFactory;
+    private final OrderJpaRepository orderJpaRepository;
 
     @Override
     public Order save(Order order) {
-        return jpaRepository.save(order);
+        return orderJpaRepository.save(order);
     }
 
     @Override
     public Order findById(Long orderId) {
-        return jpaRepository.findById(orderId).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+        return orderJpaRepository.findById(orderId).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
     }
 
     @Override
     public Order findByIdWithLock(Long orderId) {
-        QOrder order = QOrder.order;
-
-        return queryFactory
-                .selectFrom(order)
-                .where(order.id.eq(orderId))
-                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
-                .fetchOne();
+        return orderJpaRepository.findByIdWithLock(orderId);
     }
 }

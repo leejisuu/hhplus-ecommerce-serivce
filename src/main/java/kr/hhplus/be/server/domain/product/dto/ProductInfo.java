@@ -1,8 +1,6 @@
 package kr.hhplus.be.server.domain.product.dto;
 
 import kr.hhplus.be.server.domain.product.entity.Product;
-import kr.hhplus.be.server.infrastructure.product.dto.StockDto;
-import kr.hhplus.be.server.infrastructure.product.dto.TopSellingProductDto;
 
 import java.math.BigDecimal;
 
@@ -27,17 +25,15 @@ public class ProductInfo {
     public record TopSelling(
             Long productId,
             String name,
-            int quantity,
             BigDecimal price,
-            Long totalSales
+            int totalQuantity
     ) {
         public static ProductInfo.TopSelling of(TopSellingProductDto topSellingProductDto) {
             return new ProductInfo.TopSelling(
-                    topSellingProductDto.productId(),
-                    topSellingProductDto.name(),
-                    topSellingProductDto.quantity(),
-                    topSellingProductDto.price(),
-                    topSellingProductDto.totalSales()
+                    topSellingProductDto.getProductId(),
+                    topSellingProductDto.getName(),
+                    topSellingProductDto.getPrice(),
+                    topSellingProductDto.getTotalQuantity()
             );
         }
     }

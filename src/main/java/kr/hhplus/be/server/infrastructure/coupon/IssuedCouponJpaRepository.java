@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface IssuedCouponJpaRepository extends JpaRepository<IssuedCoupon, Long> {
+public interface IssuedCouponJpaRepository extends JpaRepository<IssuedCoupon, Long>, IssuedCouponCustomRepository {
 
     IssuedCoupon findByCouponIdAndUserId(Long couponId, Long userid);
 

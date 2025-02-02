@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.infrastructure.redisson;
+package kr.hhplus.be.server.support.distributedlock.redisson;
 
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;

@@ -16,10 +16,4 @@ public class UserService {
     public UserInfo.UserDto getUser(Long userId) {
         return UserInfo.UserDto.of(userRepository.findById(userId));
     }
-
-    @Transactional
-    public UserInfo.UserDto getUserWithLock(Long userId) {
-        return UserInfo.UserDto.of(userRepository.findByIdWithLock(userId));
-    }
-
 }
