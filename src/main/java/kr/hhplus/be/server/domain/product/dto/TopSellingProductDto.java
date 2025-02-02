@@ -1,6 +1,5 @@
-package kr.hhplus.be.server.infrastructure.product.dto;
+package kr.hhplus.be.server.domain.product.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.infrastructure.product.dto;
+package kr.hhplus.be.server.domain.product.dto;
 
 import java.math.BigDecimal;
 

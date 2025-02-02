@@ -4,8 +4,8 @@ import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.enums.ProductSellingStatus;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
-import kr.hhplus.be.server.infrastructure.product.dto.StockDto;
-import kr.hhplus.be.server.infrastructure.product.dto.TopSellingProductDto;
+import kr.hhplus.be.server.domain.product.dto.StockDto;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +23,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
