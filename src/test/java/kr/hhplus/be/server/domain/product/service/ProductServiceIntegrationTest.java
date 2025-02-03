@@ -68,7 +68,7 @@ public class ProductServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 인기_상품을_조회한다() {
         // given
-        LocalDate date = LocalDate.of(2025, 2, 1);
+        LocalDate date = LocalDate.of(2025, 1, 3);
 
         // when
         List<ProductInfo.TopSelling> products = productService.getTopSellingProducts(date, 5);
