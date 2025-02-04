@@ -20,11 +20,11 @@ public class CouponController {
 
     private final CouponService couponService;
 
-    @Operation(summary = "선착순 쿠폰 발급 API", description = "사용자가 쿠폰을 발급받는다.")
+    @Operation(summary = "선착순 쿠폰 발급 요청 API", description = "사용자가 쿠폰을 발급을 요청한다.")
     @PostMapping("issue")
     public ApiResponse<IssuedCouponResponse.Coupon> issueCoupon(@RequestBody CouponRequest.Issue request) {
-        LocalDateTime issuedAt = LocalDateTime.now();
-        IssuedCouponInfo.Coupon issuedCouponInfo = couponService.issue(request.couponId(), request.userId(), issuedAt);
+        Long currentMillis = System.currentTimeMillis();
+        IssuedCouponInfo.Coupon issuedCouponInfo = couponService.issuePending(request.toCriteria(currentMillis));
         return ApiResponse.ok(IssuedCouponResponse.Coupon.of(issuedCouponInfo));
     }
 

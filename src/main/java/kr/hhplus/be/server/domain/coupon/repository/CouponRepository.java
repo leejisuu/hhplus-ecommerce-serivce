@@ -21,4 +21,6 @@ public interface CouponRepository {
     Set<Long> getRequestUserIds(long couponId, long batchSize);
 
     void addIssuedCouponHistory(Long userId, long couponId);
+
+    void setCouponCount(Long id, int maxCapacity);
 }
