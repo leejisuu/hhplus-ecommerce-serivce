@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.support.distributedlock.redisson;
+package kr.hhplus.be.server.support.aop;
 
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
