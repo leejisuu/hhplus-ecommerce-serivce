@@ -22,10 +22,10 @@ public class CouponController {
 
     @Operation(summary = "선착순 쿠폰 발급 요청 API", description = "사용자가 쿠폰을 발급을 요청한다.")
     @PostMapping("issue")
-    public ApiResponse<IssuedCouponResponse.Coupon> issueCoupon(@RequestBody CouponRequest.Issue request) {
-        Long currentMillis = System.currentTimeMillis();
-        IssuedCouponInfo.Coupon issuedCouponInfo = couponService.issuePending(request.toCriteria(currentMillis));
-        return ApiResponse.ok(IssuedCouponResponse.Coupon.of(issuedCouponInfo));
+    public ApiResponse<String> issueCoupon(@RequestBody CouponRequest.Issue request) {
+        long currentMillis = System.currentTimeMillis();
+        String result = couponService.issuePending(request.toCriteria(currentMillis));
+        return ApiResponse.ok(result);
     }
 
     @Operation(summary = "보유 쿠폰 조회 API", description = "유저가 보유한 쿠폰 목록을 반환한다.")

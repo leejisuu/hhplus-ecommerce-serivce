@@ -1,31 +1,33 @@
 package kr.hhplus.be.server.infrastructure.coupon;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-@Repository
+@Component
 public class CouponCacheRepository {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final String COUPON_REMAIN_QUANTITY_PREFIX = "coupon_quantity:"; // 쿠폰 잔여 개수
+    private final String COUPON_REMAIN_QUANTITY_PREFIX = "coupon:"; // 쿠폰 잔여 개수
     private final String ISSUED_COUPON_HISTORY_PREFIX = "issued_coupon_history:"; // 발급된 쿠폰 이력
     private final String COUPON_ISSUE_REQUEST_KEY = "coupon_issue_request"; // 쿠폰 요청 발급
 
-    public void setCouponCount(Long countId, int maxQuantity) {
+    public void setRemainCounponCount(Long countId, int maxQuantity) {
         String key = COUPON_REMAIN_QUANTITY_PREFIX + countId;
         redisTemplate.opsForValue().set(key, String.valueOf(maxQuantity));
     }
 
-    public int getCouponCount(Long couponId) {
+    public int getRemainCounponCount(Long couponId) {
         String key = COUPON_REMAIN_QUANTITY_PREFIX + couponId;
-        Object obj = redisTemplate.opsForValue().get(key);
-        return obj != null ? Integer.parseInt(obj) : 0;
+        Object value = redisTemplate.opsForValue().get(key);
+        return value != null ? Integer.parseInt(value.toString()) : 0;
     }
 
     public boolean checkAlreadyIssue(Long userId, Long couponId) {
@@ -33,28 +35,26 @@ public class CouponCacheRepository {
         return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, String.valueOf(userId)));
     }
 
-    public boolean addIssueRequest(Long userId, Long couponId, long currentMillis) {
-        String key = COUPON_ISSUE_REQUEST_KEY
-        return Boolean.TRUE.equals(redisTemplate.opsForZSet().add(key, String.valueOf(userId), currentMillis));
+    public boolean addIssueRequest(CouponDto couponDto) {
+        return Boolean.TRUE.equals(redisTemplate.opsForZSet().add(COUPON_ISSUE_REQUEST_KEY, couponDto, couponDto.getCurrentMillis()));
     }
 
-    public int decreaseCouponCount(Long couponId) {
+    public void decreaseCouponCount(Long couponId) {
         String key = COUPON_REMAIN_QUANTITY_PREFIX + couponId;
-        long value = redisTemplate.opsForValue().decrement(key, couponId);
-        return (int) value;
+        redisTemplate.opsForValue().decrement(key, couponId);
     }
 
-    public Set<Long> getRequestUserIds(long couponId, long batchSize) {
-        String key = COUPON_ISSUE_REQUEST_KEY
-        return redisTemplate.opsForZSet().popMin(key, batchSize)
-                .stream()
-                .map(ZSetOperations.TypedTuple::getValue) // value(String) 추출
-                .map(Long::parseLong) // String → Long 변환
-                .collect(Collectors.toSet());
-    }
+    public List<CouponDto> getIssuePending(long batchSize) {
+        // sorted set에서 score가 작은순으로 batchSize만큼 pop
+        Set<ZSetOperations.TypedTuple<Object>> values = redisTemplate.opsForZSet().popMin(COUPON_ISSUE_REQUEST_KEY, batchSize);
 
-    public void addIssuedCouponHistory(Long userId, long couponId) {
-        String key = ISSUED_COUPON_HISTORY_PREFIX + couponId;
-        redisTemplate.opsForSet().add(key, String.valueOf(userId));
+        if(values == null) {
+            return Collections.emptyList();
+        }
+
+        return values.stream()
+                .map(ZSetOperations.TypedTuple::getValue)
+                .map(obj -> (CouponDto) obj)
+                .toList();
     }
 }

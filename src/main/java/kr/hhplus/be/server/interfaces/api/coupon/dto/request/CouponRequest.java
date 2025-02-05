@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.interfaces.api.coupon.dto.request;
 
-import kr.hhplus.be.server.domain.coupon.dto.criteria.CouponCriteria;
+import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
 
 public class CouponRequest {
 
@@ -8,8 +8,8 @@ public class CouponRequest {
             Long userId,
             Long couponId
     ) {
-        public CouponCriteria.Issue toCriteria(long currentMillis) {
-            return new CouponCriteria.Issue(userId, couponId, currentMillis);
+        public CouponCommand.Issue toCriteria(long currentMillis) {
+            return new CouponCommand.Issue(userId, couponId, currentMillis);
         }
     }
 }

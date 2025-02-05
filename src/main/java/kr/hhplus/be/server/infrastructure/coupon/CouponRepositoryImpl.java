@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.infrastructure.coupon;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
+import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
@@ -7,6 +9,7 @@ import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -27,9 +30,14 @@ public class CouponRepositoryImpl implements CouponRepository {
     }
 
     @Override
-    public int getCounponCount(Long couponId) {
+    public void setRemainCounponCount(Long id, int maxCapacity) {
+        couponCacheRepository.setRemainCounponCount(id, maxCapacity);
+    }
+
+    @Override
+    public int getRemainCounponCount(Long couponId) {
         // 레디스 쿠폰 개수 확인
-        return couponCacheRepository.getCouponCount(couponId);
+        return couponCacheRepository.getRemainCounponCount(couponId);
     }
 
     @Override
@@ -38,27 +46,22 @@ public class CouponRepositoryImpl implements CouponRepository {
     }
 
     @Override
-    public boolean addIssueRequest(Long userId, Long couponId, long currentMillis) {
-        return couponCacheRepository.addIssueRequest(userId, couponId, currentMillis);
+    public boolean addIssueRequest(CouponDto couponDto) {
+        return couponCacheRepository.addIssueRequest(couponDto);
     }
 
     @Override
-    public int decreaseCouponCount(Long couponId) {
-        return couponCacheRepository.decreaseCouponCount(couponId);
+    public void decreaseCouponCountWithLock(Long couponId) {
+        couponJpaRepository.decreaseCouponCountWithLock(couponId);
     }
 
     @Override
-    public Set<Long> getRequestUserIds(long couponId, long batchSize) {
-        return couponCacheRepository.getRequestUserIds(couponId, batchSize);
+    public void decreaseCacheCouponCount(Long couponId) {
+        couponCacheRepository.decreaseCouponCount(couponId);
     }
 
     @Override
-    public void addIssuedCouponHistory(Long userId, long couponId) {
-        couponCacheRepository.addIssuedCouponHistory(userId, couponId);
-    }
-
-    @Override
-    public void setCouponCount(Long id, int maxCapacity) {
-        couponCacheRepository.setCouponCount(id, maxCapacity);
+    public List<CouponDto> getIssuePending(long batchSize) {
+        return couponCacheRepository.getIssuePending(batchSize);
     }
 }

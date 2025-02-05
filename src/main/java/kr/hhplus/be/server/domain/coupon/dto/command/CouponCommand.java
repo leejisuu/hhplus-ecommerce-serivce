@@ -1,5 +1,6 @@
-package kr.hhplus.be.server.domain.coupon.dto.criteria;
+package kr.hhplus.be.server.domain.coupon.dto.command;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.enums.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
@@ -8,7 +9,7 @@ import lombok.Builder;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class CouponCriteria {
+public class CouponCommand {
 
     public record Create (
             String name,
@@ -26,11 +27,15 @@ public class CouponCriteria {
     }
 
     public record Issue(
-            Long userId,
             Long couponId,
+            Long userId,
             Long currentMillis
     ) {
         @Builder
         public Issue {}
+
+        public CouponDto toCouponDto() {
+            return new CouponDto(couponId, userId, currentMillis);
+        }
     }
 }

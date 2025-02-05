@@ -1,8 +1,9 @@
 package kr.hhplus.be.server.domain.coupon.repository;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 
-import java.util.Set;
+import java.util.List;
 
 public interface CouponRepository {
 
@@ -10,17 +11,17 @@ public interface CouponRepository {
 
     Coupon save(Coupon coupon);
 
-    int getCounponCount(Long couponId);
+    void setRemainCounponCount(Long id, int maxCapacity);
+
+    int getRemainCounponCount(Long couponId);
 
     boolean checkAlreadyIssue(Long userId, Long couponId);
 
-    boolean addIssueRequest(Long userId, Long couponId, long currentMillis);
+    boolean addIssueRequest(CouponDto couponDto);
 
-    int decreaseCouponCount(Long couponId);
+    void decreaseCouponCountWithLock(Long couponId);
 
-    Set<Long> getRequestUserIds(long couponId, long batchSize);
+    void decreaseCacheCouponCount(Long couponId);
 
-    void addIssuedCouponHistory(Long userId, long couponId);
-
-    void setCouponCount(Long id, int maxCapacity);
+    List<CouponDto> getIssuePending(long batchSize);
 }
