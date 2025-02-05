@@ -6,6 +6,7 @@ import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.domain.product.dto.StockDto;
 import kr.hhplus.be.server.domain.product.dto.TopSellingProductDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class ProductService {
         return pagedStockDto.map(ProductInfo.Stock::of);
     }
 
+    @Cacheable(value = "topSellingProducts", key = "#todayDate.toString() + '-' + #limit")
     public List<ProductInfo.TopSelling> getTopSellingProducts(LocalDate todayDate, int limit) {
         List<TopSellingProductDto> topSellings = productRepository.getTopSellingProducts(todayDate, limit);
         return topSellings.stream()
