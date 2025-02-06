@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product.service;
 
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductsWrapper;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class ProductServiceIntegrationTest extends IntegrationTestSupport {
         // then
         assertThat(productInfoPage.getTotalElements()).isEqualTo(7);
         assertThat(productInfoPage.getContent())
-                .extracting("id", "name", "price", "quantity")
+                .extracting("productId", "name", "price", "quantity")
                 .containsExactly(
                         tuple(1L, "레몬 사탕", setScaleFromInt(2500), 9999),
                         tuple(3L, "청포도 젤리", setScaleFromInt(3200), 500),
@@ -71,7 +72,8 @@ public class ProductServiceIntegrationTest extends IntegrationTestSupport {
         LocalDate date = LocalDate.of(2025, 1, 3);
 
         // when
-        List<ProductInfo.TopSelling> products = productService.getTopSellingProducts(date, 5);
+        TopSellingProductsWrapper wrapper = productService.getTopSellingProducts(date, 5);
+        List<ProductInfo.TopSelling> products = wrapper.getTopSellingProducts();
 
         // then
         assertThat(products).hasSize(2);
