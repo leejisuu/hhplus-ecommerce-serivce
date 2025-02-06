@@ -19,13 +19,13 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
-    @Bean(name = "datasourceRedisConnectionFactory")
+    @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(@Qualifier("datasourceRedisConnectionFactory") RedisConnectionFactory connectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
