@@ -14,17 +14,13 @@ public class ProductCacheScheduler {
 
     private final ProductService productService;
 
-    // 10분마다 인기상품 캐시 갱신
-    @Scheduled(cron = "0 */10 * * * *")
-    public void cacheTopSellingProducts() {
+    // 4시간마다 인기 상품 캐시 갱신
+    @CachePut(value = "topSellingProducts", key = "'topSellingProducts'")
+    @Scheduled(cron = "0 * */4 * * *")
+    public void cachingTopSellingProducts() {
         LocalDate todayDate = LocalDate.now();
         int limit = 5;
 
-        cacheTopSellingProducts(todayDate, limit);
-    }
-
-    @CachePut(value = "topSellingProducts", key = "#todayDate.toString() + '-' + #limit")
-    public void cacheTopSellingProducts(LocalDate todayDate, int limit) {
         productService.getTopSellingProducts(todayDate, limit);
     }
 }

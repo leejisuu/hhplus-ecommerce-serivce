@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product.service;
 
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductsWrapper;
 import kr.hhplus.be.server.domain.product.enums.ProductSellingStatus;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.domain.product.dto.StockDto;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -26,19 +26,21 @@ public class ProductService {
         return pagedStockDto.map(ProductInfo.Stock::of);
     }
 
-    @Cacheable(value = "topSellingProducts", key = "#todayDate.toString() + '-' + #limit")
-    public List<ProductInfo.TopSelling> getTopSellingProducts(LocalDate todayDate, int limit) {
+    @Cacheable(value = "topSellingProducts", key = "'topSellingProducts'")
+    public TopSellingProductsWrapper getTopSellingProducts(LocalDate todayDate, int limit) {
         List<TopSellingProductDto> topSellings = productRepository.getTopSellingProducts(todayDate, limit);
-        return topSellings.stream()
+        List<ProductInfo.TopSelling> topSellingList = topSellings.stream()
                 .map(ProductInfo.TopSelling::of)
-                .collect(Collectors.toList());
+                .toList();
+
+        return new TopSellingProductsWrapper(topSellingList);
     }
 
     public List<ProductInfo.ProductDto> getProducts(List<Long> productIds) {
         return productRepository.findAllByIdInAndSellingStatus(productIds, ProductSellingStatus.SELLING)
                 .stream()
                 .map(ProductInfo.ProductDto::of)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
