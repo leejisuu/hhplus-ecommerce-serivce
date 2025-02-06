@@ -24,4 +24,6 @@ public interface CouponRepository {
     void decreaseCacheCouponCount(Long couponId);
 
     List<CouponDto> getIssuePending(long batchSize);
+
+    boolean existsCouponQuantityKey(Long aLong);
 }

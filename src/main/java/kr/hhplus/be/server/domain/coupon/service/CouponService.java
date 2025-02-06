@@ -41,30 +41,34 @@ public class CouponService {
 
     // 쿠폰 발급 요청 이력 redis sorted set에 add
     public String issuePending(CouponCommand.Issue command) {
-        // 레디스 오류를 생각해서 레디스에 쿠폰 발급 개수가 없다면 이때만 DB 조회해서 올리는게 좋을지?
+        // 레디스에 쿠폰 발급 개수 키가 없다면 DB 조회해서 다시 올리기
+        boolean keyExists = couponRepository.existsCouponQuantityKey(command.couponId());
+        if(!keyExists) {
+            Coupon coupon = couponRepository.getCoupon(command.couponId());
+            couponRepository.setRemainCounponCount(coupon.getId(), coupon.getMaxCapacity());
+        }
 
-        // 1. 레디스로 쿠폰 잔여 개수 조회
-        int remainCounponCount = couponRepository.getRemainCounponCount(command.couponId());
+        // 레디스의 쿠폰 잔여 개수 조회
+        int remainCounponCount = couponRepository.getRemainCounponCount(command.couponId()); // 레디스
         // 개수가 0 이하라면 예외 발생
         if(remainCounponCount <= 0) {
             throw new CustomException(ErrorCode.INSUFFICIENT_COUPON_QUANTITY);
         }
 
-        // 2. redis 쿠폰 set에서 이미 발급 받았는지 체크
-        boolean alreadyIssued = couponRepository.checkAlreadyIssue(command.userId(), command.couponId());
+        // redis 쿠폰 발급 이력 set에서 이미 발급 받았는지 체크
+        boolean alreadyIssued = couponRepository.checkAlreadyIssue(command.userId(), command.couponId()); // 레디스
         // 이미 발급 받았다면 예외 발생
         if(alreadyIssued) {
             throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
         }
         
-        // 3. 발급 받지 않았다면 sorted set에 등록
-        boolean addIssueRequest = couponRepository.addIssueRequest(command.toCouponDto());
-        // 쿠폰 개수 하나 차감
+        // 3. 쿠폰을 발급 받지 않았다면 쿠폰 발급 요청 sorted set에 등록
+        boolean addIssueRequest = couponRepository.addIssueRequest(command.toCouponDto()); // 레디스
         if(addIssueRequest) {
             // 레디스에서 쿠폰 개수 차감
-            couponRepository.decreaseCacheCouponCount(command.couponId());
+            couponRepository.decreaseCacheCouponCount(command.couponId()); // 레디스
             // DB에서 쿠폰 개수 차감
-            couponRepository.decreaseCouponCountWithLock(command.couponId());
+            couponRepository.decreaseCouponCountWithLock(command.couponId()); // MYSQL
         }
 
         return "선착순 쿠폰 발급 요청 성공했습니다.";
@@ -75,20 +79,20 @@ public class CouponService {
         long batchSize = 100;
 
         // 쿠폰 번호와 쿠폰dto 리스트를 담을 map
-        Map<Long, List<CouponDto>> map = new HashMap<>();
+        Map<Long, List<CouponDto>> map;
         List<IssuedCoupon> issuedCoupons = new ArrayList<>();
 
         // sorted set에서 쿠폰 발급 요청 batchSize만큼 가져오기
-        List<CouponDto> requests = couponRepository.getIssuePending(batchSize);
+        List<CouponDto> requests = couponRepository.getIssuePending(batchSize); // 레디스
 
         if (requests != null) {
             // couponId로 그룹핑
             map = requests.stream()
                     .collect(Collectors.groupingBy(CouponDto::getCouponId));
 
-            // 쿠폰 발급
+            // 쿠폰 발급 처리
             for (Long couponId : map.keySet()) {
-                Coupon couponMst = couponRepository.getCoupon(couponId);
+                Coupon couponMst = couponRepository.getCoupon(couponId); // MYSQL
 
                 List<CouponDto> coupons = map.get(couponId);
                 for (CouponDto couponDto : coupons) {
@@ -97,11 +101,11 @@ public class CouponService {
                     issuedCoupons.add(issuedCoupon);
 
                     // 레디스에 발급 이력 올리기
-                    issuedCouponRepository.uploadIssuedHistory(issuedCoupon.getCouponId(), issuedCoupon.getUserId());
+                    issuedCouponRepository.uploadIssuedHistory(issuedCoupon.getCouponId(), issuedCoupon.getUserId()); // 레디스
                 }
             }
             // 쿠폰 저장
-            issuedCouponRepository.saveAll(issuedCoupons);
+            issuedCouponRepository.saveAll(issuedCoupons); // MYSQL
         }
     }
 

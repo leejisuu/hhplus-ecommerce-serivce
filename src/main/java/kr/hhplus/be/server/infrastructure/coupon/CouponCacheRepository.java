@@ -57,4 +57,10 @@ public class CouponCacheRepository {
                 .map(obj -> (CouponDto) obj)
                 .toList();
     }
+
+    // 쿠폰 발급 개수 key가 존재하는지 확인
+    public boolean existsCouponQuantityKey(Long couponId) {
+        String key = COUPON_REMAIN_QUANTITY_PREFIX + couponId;
+        return redisTemplate.hasKey(key);
+    }
 }

@@ -64,4 +64,9 @@ public class CouponRepositoryImpl implements CouponRepository {
     public List<CouponDto> getIssuePending(long batchSize) {
         return couponCacheRepository.getIssuePending(batchSize);
     }
+
+    @Override
+    public boolean existsCouponQuantityKey(Long couponId) {
+        return couponCacheRepository.existsCouponQuantityKey(couponId);
+    }
 }
