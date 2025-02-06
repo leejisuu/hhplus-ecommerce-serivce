@@ -8,6 +8,9 @@ public class CouponDto {
     private long userId;
     private long currentMillis;
 
+    // 기본 생성자 추가
+    public CouponDto() {}
+
     public CouponDto(long couponId, long userId, long currentMillis) {
         this.couponId = couponId;
         this.userId = userId;

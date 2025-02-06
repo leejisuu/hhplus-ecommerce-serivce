@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,80 +31,67 @@ public class CouponService {
     private final IssuedCouponRepository issuedCouponRepository;
 
     public CouponInfo.Create create(CouponCommand.Create command) {
-        // 쿠폰 마스터 생성
         Coupon coupon = couponRepository.save(command.createCoupon());
-        // 레디스에 쿠폰 잔여 수량 적재
-        couponRepository.setRemainCounponCount(coupon.getId(), coupon.getMaxCapacity());
+        couponRepository.setRemainCapacityToCache(coupon.getId(), coupon.getRemainCapacity());
         return CouponInfo.Create.of(coupon);
     }
 
-    // 쿠폰 발급 요청 이력 redis sorted set에 add
-    public String issuePending(CouponCommand.Issue command) {
-        // 레디스에 쿠폰 발급 개수 키가 없다면 DB 조회해서 다시 올리기
-        boolean keyExists = couponRepository.existsCouponQuantityKey(command.couponId());
-        if(!keyExists) {
-            Coupon coupon = couponRepository.getCoupon(command.couponId());
-            couponRepository.setRemainCounponCount(coupon.getId(), coupon.getMaxCapacity());
+    /*
+    * 쿠폰 발급 요청 Redis에 저장
+    * */
+    public boolean addCouponIssueRequest(CouponCommand.Issue command) {
+        // 캐시에 있는 쿠폰 잔여 개수 체크
+        int remainCapacity = couponRepository.getRemainCapacityFromCache(command.couponId());
+        if(remainCapacity <= 0) throw new CustomException(ErrorCode.INSUFFICIENT_COUPON_QUANTITY);
+
+        // 캐시에 있는 쿠폰 발급 중복 체크
+        boolean hasRequest = couponRepository.hasCouponIssuedHistoryFromCache(command.userId(), command.couponId());
+        if(hasRequest) throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
+
+        // 캐시 발급 요청 sorted set에 요청 정보 등록
+        boolean addRequest = couponRepository.addCouponIssueRequestToCache(command.toCouponDto());
+        if(addRequest) {
+            couponRepository.decreaseRemainCapacityInCache(command.couponId());
         }
 
-        // 레디스의 쿠폰 잔여 개수 조회
-        int remainCounponCount = couponRepository.getRemainCounponCount(command.couponId()); // 레디스
-        // 개수가 0 이하라면 예외 발생
-        if(remainCounponCount <= 0) {
-            throw new CustomException(ErrorCode.INSUFFICIENT_COUPON_QUANTITY);
-        }
-
-        // redis 쿠폰 발급 이력 set에서 이미 발급 받았는지 체크
-        boolean alreadyIssued = couponRepository.checkAlreadyIssue(command.userId(), command.couponId()); // 레디스
-        // 이미 발급 받았다면 예외 발생
-        if(alreadyIssued) {
-            throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
-        }
-        
-        // 3. 쿠폰을 발급 받지 않았다면 쿠폰 발급 요청 sorted set에 등록
-        boolean addIssueRequest = couponRepository.addIssueRequest(command.toCouponDto()); // 레디스
-        if(addIssueRequest) {
-            // 레디스에서 쿠폰 개수 차감
-            couponRepository.decreaseCacheCouponCount(command.couponId()); // 레디스
-            // DB에서 쿠폰 개수 차감
-            couponRepository.decreaseCouponCountWithLock(command.couponId()); // MYSQL
-        }
-
-        return "선착순 쿠폰 발급 요청 성공했습니다.";
+        return addRequest;
     }
 
-    // 실제 쿠폰 발급
+    /*
+    * 쿠폰 발급
+    * */
+    @Transactional
     public void issue() {
         long batchSize = 100;
 
-        // 쿠폰 번호와 쿠폰dto 리스트를 담을 map
-        Map<Long, List<CouponDto>> map;
+        Map<Long, List<CouponDto>> couponMap;
         List<IssuedCoupon> issuedCoupons = new ArrayList<>();
 
-        // sorted set에서 쿠폰 발급 요청 batchSize만큼 가져오기
-        List<CouponDto> requests = couponRepository.getIssuePending(batchSize); // 레디스
+        // Redis에서 쿠폰 발급 요청 pop
+        List<CouponDto> issueRequests = couponRepository.getCouponIssueRequestsFromCache(batchSize);
 
-        if (requests != null) {
-            // couponId로 그룹핑
-            map = requests.stream()
+        if (issueRequests != null) {
+            couponMap = issueRequests.stream()
                     .collect(Collectors.groupingBy(CouponDto::getCouponId));
 
-            // 쿠폰 발급 처리
-            for (Long couponId : map.keySet()) {
-                Coupon couponMst = couponRepository.getCoupon(couponId); // MYSQL
+            for (Long couponId : couponMap.keySet()) {
+                Coupon couponMst = couponRepository.getCoupon(couponId);
 
-                List<CouponDto> coupons = map.get(couponId);
-                for (CouponDto couponDto : coupons) {
-                    // 쿠폰 생성
+                List<CouponDto> couponDtos = couponMap.get(couponId);
+                for (CouponDto couponDto : couponDtos) {
+                    // 쿠폰 발급 처리
                     IssuedCoupon issuedCoupon = couponMst.issue(couponDto.getUserId(), LocalDateTime.now());
                     issuedCoupons.add(issuedCoupon);
 
-                    // 레디스에 발급 이력 올리기
-                    issuedCouponRepository.uploadIssuedHistory(issuedCoupon.getCouponId(), issuedCoupon.getUserId()); // 레디스
+                    // 쿠폰 잔여 개수 차감
+                    couponMst.decreaseRemainCapacity();
+                    couponRepository.save(couponMst);
+                    // Redis에 쿠폰 발급 이력 add
+                    couponRepository.addCouponIssuedHistoryToCache(issuedCoupon.getUserId(), issuedCoupon.getCouponId());
                 }
             }
-            // 쿠폰 저장
-            issuedCouponRepository.saveAll(issuedCoupons); // MYSQL
+            // 쿠폰 bulk 저장
+            issuedCouponRepository.saveAll(issuedCoupons);
         }
     }
 

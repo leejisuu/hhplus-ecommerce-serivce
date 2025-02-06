@@ -30,43 +30,43 @@ public class CouponRepositoryImpl implements CouponRepository {
     }
 
     @Override
-    public void setRemainCounponCount(Long id, int maxCapacity) {
-        couponCacheRepository.setRemainCounponCount(id, maxCapacity);
+    public void setRemainCapacityToCache(Long id, int maxCapacity) {
+        couponCacheRepository.setRemainCapacityToCache(id, maxCapacity);
     }
 
     @Override
-    public int getRemainCounponCount(Long couponId) {
+    public int getRemainCapacityFromCache(Long couponId) {
         // 레디스 쿠폰 개수 확인
-        return couponCacheRepository.getRemainCounponCount(couponId);
+        return couponCacheRepository.getRemainCapacityFromCache(couponId);
     }
 
     @Override
-    public boolean checkAlreadyIssue(Long userId, Long couponId) {
-        return couponCacheRepository.checkAlreadyIssue(userId, couponId);
+    public boolean hasCouponIssuedHistoryFromCache(Long userId, Long couponId) {
+        return couponCacheRepository.hasCouponIssuedHistoryFromCache(userId, couponId);
     }
 
     @Override
-    public boolean addIssueRequest(CouponDto couponDto) {
-        return couponCacheRepository.addIssueRequest(couponDto);
+    public boolean addCouponIssueRequestToCache(CouponDto couponDto) {
+        return couponCacheRepository.addCouponIssueRequestToCache(couponDto);
     }
 
     @Override
-    public void decreaseCouponCountWithLock(Long couponId) {
-        couponJpaRepository.decreaseCouponCountWithLock(couponId);
+    public void decreaseRemainCapacity(Long couponId) {
+        couponJpaRepository.decreaseRemainCapacity(couponId);
     }
 
     @Override
-    public void decreaseCacheCouponCount(Long couponId) {
-        couponCacheRepository.decreaseCouponCount(couponId);
+    public void decreaseRemainCapacityInCache(Long couponId) {
+        couponCacheRepository.decreaseRemainCapacityInCache(couponId);
     }
 
     @Override
-    public List<CouponDto> getIssuePending(long batchSize) {
-        return couponCacheRepository.getIssuePending(batchSize);
+    public List<CouponDto> getCouponIssueRequestsFromCache(long batchSize) {
+        return couponCacheRepository.getCouponIssueRequestsFromCache(batchSize);
     }
 
     @Override
-    public boolean existsCouponQuantityKey(Long couponId) {
-        return couponCacheRepository.existsCouponQuantityKey(couponId);
+    public void addCouponIssuedHistoryToCache(Long userId, Long couponId) {
+        couponCacheRepository.addCouponIssuedHistoryToCache(userId, couponId);
     }
 }

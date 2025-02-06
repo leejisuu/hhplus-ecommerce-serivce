@@ -17,7 +17,5 @@ public interface IssuedCouponRepository {
 
     IssuedCoupon findByCouponIdAndUserId(Long couponId, Long userId);
 
-    void uploadIssuedHistory(Long couponId, Long userId);
-
     void saveAll(List<IssuedCoupon> issuedCoupons);
 }

@@ -22,9 +22,9 @@ public class CouponController {
 
     @Operation(summary = "선착순 쿠폰 발급 요청 API", description = "사용자가 쿠폰을 발급을 요청한다.")
     @PostMapping("issue")
-    public ApiResponse<String> issueCoupon(@RequestBody CouponRequest.Issue request) {
+    public ApiResponse<Boolean> issueCoupon(@RequestBody CouponRequest.Issue request) {
         long currentMillis = System.currentTimeMillis();
-        String result = couponService.issuePending(request.toCriteria(currentMillis));
+        boolean result = couponService.addCouponIssueRequest(request.toCriteria(currentMillis));
         return ApiResponse.ok(result);
     }
 

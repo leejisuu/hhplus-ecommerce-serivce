@@ -11,7 +11,7 @@ public class CouponIssueScheduler {
 
     private final CouponService couponService;
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(cron = "0 */2 * * * *")
     public void issue() {
         couponService.issue();
     }

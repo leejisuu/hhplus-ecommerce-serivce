@@ -1,8 +1,11 @@
 package kr.hhplus.be.server.infrastructure.coupon;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
@@ -14,53 +17,68 @@ import java.util.Set;
 @Component
 public class CouponCacheRepository {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final String COUPON_REMAIN_QUANTITY_PREFIX = "coupon:"; // 쿠폰 잔여 개수
-    private final String ISSUED_COUPON_HISTORY_PREFIX = "issued_coupon_history:"; // 발급된 쿠폰 이력
-    private final String COUPON_ISSUE_REQUEST_KEY = "coupon_issue_request"; // 쿠폰 요청 발급
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    public void setRemainCounponCount(Long countId, int maxQuantity) {
-        String key = COUPON_REMAIN_QUANTITY_PREFIX + countId;
-        redisTemplate.opsForValue().set(key, String.valueOf(maxQuantity));
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    private static final String COUPON_REMAIN_QUANTITY_KEY = "coupon-%d-remain-quantity"; // 쿠폰 잔여 개수
+    private static final String COUPON_ISSUED_HISTORY_KEY = "coupon-%d-issued"; // 발급된 쿠폰 이력
+    private static final String COUPON_ISSUE_REQUEST_KEY = "coupon-requests"; // 쿠폰 요청 발급
+
+    public void setRemainCapacityToCache(Long countId, int remainCapacity) {
+        String key = String.format(COUPON_REMAIN_QUANTITY_KEY, countId);
+        redisTemplate.opsForValue().set(key, String.valueOf(remainCapacity));
     }
 
-    public int getRemainCounponCount(Long couponId) {
-        String key = COUPON_REMAIN_QUANTITY_PREFIX + couponId;
+    public int getRemainCapacityFromCache(Long couponId) {
+        String key = String.format(COUPON_REMAIN_QUANTITY_KEY, couponId);
         Object value = redisTemplate.opsForValue().get(key);
         return value != null ? Integer.parseInt(value.toString()) : 0;
     }
 
-    public boolean checkAlreadyIssue(Long userId, Long couponId) {
-        String key = ISSUED_COUPON_HISTORY_PREFIX + couponId;
+    public boolean hasCouponIssuedHistoryFromCache(Long userId, Long couponId) {
+        String key = String.format(COUPON_ISSUED_HISTORY_KEY, couponId);
         return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, String.valueOf(userId)));
     }
 
-    public boolean addIssueRequest(CouponDto couponDto) {
-        return Boolean.TRUE.equals(redisTemplate.opsForZSet().add(COUPON_ISSUE_REQUEST_KEY, couponDto, couponDto.getCurrentMillis()));
+    public boolean addCouponIssueRequestToCache(CouponDto couponDto) {
+        String jsonCouponDto = "";
+        try {
+            jsonCouponDto = objectMapper.writeValueAsString(couponDto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize CouponDto to JSON: " + e.getMessage(), e);
+        }
+        return Boolean.TRUE.equals(redisTemplate.opsForZSet().add(COUPON_ISSUE_REQUEST_KEY, jsonCouponDto, couponDto.getCurrentMillis()));
     }
 
-    public void decreaseCouponCount(Long couponId) {
-        String key = COUPON_REMAIN_QUANTITY_PREFIX + couponId;
-        redisTemplate.opsForValue().decrement(key, couponId);
+    public void decreaseRemainCapacityInCache(Long couponId) {
+        String key = String.format(COUPON_REMAIN_QUANTITY_KEY, couponId);
+        redisTemplate.opsForValue().decrement(key);
     }
 
-    public List<CouponDto> getIssuePending(long batchSize) {
-        // sorted set에서 score가 작은순으로 batchSize만큼 pop
-        Set<ZSetOperations.TypedTuple<Object>> values = redisTemplate.opsForZSet().popMin(COUPON_ISSUE_REQUEST_KEY, batchSize);
+    public List<CouponDto> getCouponIssueRequestsFromCache(long batchSize) {
+        Set<ZSetOperations.TypedTuple<String>> values = redisTemplate.opsForZSet().popMin(COUPON_ISSUE_REQUEST_KEY, batchSize-1);
 
         if(values == null) {
             return Collections.emptyList();
         }
 
         return values.stream()
-                .map(ZSetOperations.TypedTuple::getValue)
-                .map(obj -> (CouponDto) obj)
+                .map(tuple -> {
+                    String request = tuple.getValue();
+                    try {
+                        return objectMapper.readValue(request, CouponDto.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Failed to serialize JSON to CouponDto: " + e.getMessage(), e);
+                    }
+                })
                 .toList();
     }
 
-    // 쿠폰 발급 개수 key가 존재하는지 확인
-    public boolean existsCouponQuantityKey(Long couponId) {
-        String key = COUPON_REMAIN_QUANTITY_PREFIX + couponId;
-        return redisTemplate.hasKey(key);
+    public void addCouponIssuedHistoryToCache(Long userId, Long couponId) {
+        String key = String.format(COUPON_ISSUED_HISTORY_KEY, couponId);
+        redisTemplate.opsForSet().add(key, String.valueOf(userId));
     }
 }

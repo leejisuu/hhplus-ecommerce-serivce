@@ -15,7 +15,6 @@ import java.util.List;
 public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
 
     private final IssuedCouponJpaRepository issuedCouponJpaRepository;
-    private final IssuedCouponCacheRepository issuedCouponCacheRepository;
 
     @Override
     public IssuedCoupon save(IssuedCoupon issuedCoupon) {
@@ -35,11 +34,6 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     @Override
     public IssuedCoupon findByCouponIdAndUserId(Long couponId, Long userId) {
         return issuedCouponJpaRepository.findByCouponIdAndUserId(couponId, userId);
-    }
-
-    @Override
-    public void uploadIssuedHistory(Long couponId, Long userId) {
-        issuedCouponCacheRepository.uploadIssuedHistory(couponId, userId);
     }
 
     @Override

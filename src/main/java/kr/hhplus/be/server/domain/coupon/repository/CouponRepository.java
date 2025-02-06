@@ -11,19 +11,19 @@ public interface CouponRepository {
 
     Coupon save(Coupon coupon);
 
-    void setRemainCounponCount(Long id, int maxCapacity);
+    void setRemainCapacityToCache(Long id, int remainCapacity);
 
-    int getRemainCounponCount(Long couponId);
+    int getRemainCapacityFromCache(Long couponId);
 
-    boolean checkAlreadyIssue(Long userId, Long couponId);
+    boolean hasCouponIssuedHistoryFromCache(Long userId, Long couponId);
 
-    boolean addIssueRequest(CouponDto couponDto);
+    boolean addCouponIssueRequestToCache(CouponDto couponDto);
 
-    void decreaseCouponCountWithLock(Long couponId);
+    void decreaseRemainCapacity(Long couponId);
 
-    void decreaseCacheCouponCount(Long couponId);
+    void decreaseRemainCapacityInCache(Long couponId);
 
-    List<CouponDto> getIssuePending(long batchSize);
+    List<CouponDto> getCouponIssueRequestsFromCache(long batchSize);
 
-    boolean existsCouponQuantityKey(Long aLong);
+    void addCouponIssuedHistoryToCache(Long userId, Long couponId);
 }
