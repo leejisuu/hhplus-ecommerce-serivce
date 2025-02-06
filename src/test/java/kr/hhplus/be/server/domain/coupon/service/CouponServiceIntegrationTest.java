@@ -1,13 +1,16 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
+import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
+import kr.hhplus.be.server.domain.coupon.dto.info.CouponInfo;
+import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
+import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import kr.hhplus.be.server.domain.coupon.enums.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
-import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
-import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -28,6 +32,78 @@ public class CouponServiceIntegrationTest extends IntegrationTestSupport {
 
     @Autowired
     CouponService couponService;
+
+    @Autowired
+    CouponRepository couponRepository;
+
+    @Autowired
+    IssuedCouponRepository issuedCouponRepository;
+
+    @Nested
+    @DisplayName("쿠폰 조회 통합 테스트")
+    class AddCouponIssueRequestTest {
+        @Test
+        void 쿠폰_발급_요청_시_쿠폰_잔여_개수가_0_이하면_CustomException_INSUFFICIENT_COUPON_QUANTITY_예외를_발생한다() {
+            // given
+            long userId = 1L;
+            long currentMillis = 1000;
+            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 0, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
+            CouponInfo.Create coupon = couponService.create(createCommand);
+
+            CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis);
+
+            // when // then
+            assertThatThrownBy(() -> couponService.addCouponIssueRequest(issueCommand))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.INSUFFICIENT_COUPON_QUANTITY.getMessage());
+
+        }
+
+        @Test
+        void 쿠폰_발급_요청_시_이미_발급받은_쿠폰이라면_CustomException_ALREADY_ISSUED_COUPON_예외를_발생한다() {
+            // given
+            long userId = 1L;
+            long currentMillis = 1000;
+            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 1, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
+            CouponInfo.Create coupon = couponService.create(createCommand);
+
+            CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis);
+
+            couponService.addCouponIssueRequest(issueCommand);
+            couponService.issue();
+
+            // when // then
+            assertThatThrownBy(() -> couponService.addCouponIssueRequest(issueCommand))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(ErrorCode.INSUFFICIENT_COUPON_QUANTITY.getMessage());
+
+        }
+
+        @Test
+        void 쿠폰_발급_요청_시_쿠폰_잔여_개수와_발급_요청을_Redis에_저장한다() {
+            // given
+            long userId = 1L;
+            long currentMillis = 1000;
+            int batchSize = 100;
+            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 5, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
+            CouponInfo.Create coupon = couponService.create(createCommand);
+
+            CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis);
+
+            // when
+            couponService.addCouponIssueRequest(issueCommand);
+
+            // then
+            int remainCapacity = couponRepository.getRemainCapacityFromCache(coupon.id());
+            List<CouponDto> issueRequest = couponRepository.getCouponIssueRequestsFromCache(batchSize);
+
+            assertThat(remainCapacity).isEqualTo(coupon.remainCapacity()-1);
+            assertThat(issueRequest).hasSize(1);
+            assertThat(issueRequest.get(0))
+                    .extracting("couponId", "userId", "currentMillis")
+                    .containsExactly(coupon.id(), userId, currentMillis);
+        }
+    }
 
     @Nested
     @DisplayName("쿠폰 조회 통합 테스트")
