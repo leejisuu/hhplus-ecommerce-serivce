@@ -103,6 +103,30 @@ public class CouponServiceIntegrationTest extends IntegrationTestSupport {
                     .extracting("couponId", "userId", "currentMillis")
                     .containsExactly(coupon.id(), userId, currentMillis);
         }
+
+        @Test
+        void Redis에서_쿠폰_발급_요청을_가져와_쿠폰을_발급한다() {
+            // given
+            long userId = 1L;
+            long currentMillis = 1000;
+            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 5, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
+            CouponInfo.Create info = couponService.create(createCommand);
+
+            CouponCommand.Issue issueCommand = new CouponCommand.Issue(info.id(), userId, currentMillis);
+
+            couponService.addCouponIssueRequest(issueCommand);
+
+            // when
+            couponService.issue();
+
+            // then
+            IssuedCoupon issuedCoupon = issuedCouponRepository.findByCouponIdAndUserId(info.id(), userId);
+            Coupon coupon = couponRepository.getCoupon(info.id());
+
+            assertThat(issuedCoupon).isNotNull();
+            assertThat(coupon.getRemainCapacity()).isEqualTo(createCommand.remainCapacity()-1);
+        }
+
     }
 
     @Nested
