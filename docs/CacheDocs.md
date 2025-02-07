@@ -186,9 +186,54 @@ TTL 값을 설정하는 데 있어 최적의 값을 찾기 어려울 수 있다.
 # 이커머스 시나리오에 캐시 적용
 
 ## 인기 상품 조회 로직
-최근 3일간 판매량을 기준으로 상위 상품을 조회하여 후 캐싱하여 빠른 응답 제공 및 DB 부하 감소
+### 선정 배경
+이커머스 플랫폼에서 인기 상품 조회 기능은 사용자들이 자주 접근하는 핵심 기능 중 하나입니다.
+특히, 최근 3일간의 판매량을 기준으로 인기 상품을 조회하는 기능은 실시간성이 요구되지 않지만, 트래픽이 많아질수록 DB 부하가 커지는 문제가 발생할 수 있습니다.
 
-ProductService.getTopSellingProducts
+이를 해결하기 위해 최근 3일간 판매량을 기준으로 상위 상품을 조회하는 로직에 캐싱을 적용했습니다.
+조회가 실시간성이 아닌 3일전 00시부터 전일 23시59분을 기준으로 하므로 데이터가 빈번하게 변하지 않으므로 매 요청마다 DB에서 조회하는 대신 캐시를 활용하여 성능을 최적화하는 것이 효과적이라고 판단하였습니다. 
+
+### 구현
+* 캐시 설정
+[RedisCacheConfig.java](../src/main/java/kr/hhplus/be/server/support/config/RedisCacheConfig.java)
+```java
+@EnableCaching
+@Configuration
+public class RedisCacheConfig {
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofDays(1))
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+
+        return RedisCacheManager.builder(redisConnectionFactory)
+                .cacheDefaults(redisCacheConfiguration)
+                .build();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.activateDefaultTyping(
+                objectMapper.getPolymorphicTypeValidator(),
+                ObjectMapper.DefaultTyping.NON_FINAL
+        );
+        return objectMapper;
+    }
+}
+```
+* Spring Cache에서 사용할 CacheManager를 Redis 기반으로 설정하였습니다.
+* TTL(Time To Live, 캐시 유효기간) 1일로 설정했습니다.
+* 캐시의 키를 String 형태로 직렬화하고, value는 JSON 형태로 직렬화하도록 설정했습니다.
+
+* objectMapper는 다양한 객체 타입을 JSON 형태로 저장 가능하도록 작성했습니다. 
+
+--------
+
+* 인기 상품 조회 도메인 서비스에 캐시 적용
+[ProductService.java](../src/main/java/kr/hhplus/be/server/domain/product/service/ProductService.java) getTopSellingProducts
 ```java
 @Cacheable(value = "topSellingProducts", key = "'topSellingProducts'")
 public TopSellingProductsWrapper getTopSellingProducts(LocalDate todayDate, int limit) {
@@ -198,4 +243,76 @@ List<ProductInfo.TopSelling> topSellingList = topSellings.stream()
 .toList();
         return new TopSellingProductsWrapper(topSellingList);
     }
+```
+* @Cacheable 어노테이션을 통해 최초 조회 후 캐싱되고 같은 키로 조회하면 DB가 아닌 Redis 캐시에서 바로 데이터를 가져옵니다.
+* TopSellingProductsWrapper 클래스는 Redis 캐시에 저장할 때 List<T> 형태로 저장하면 직렬화 과정에서 오류가 발생하므로 TopSellingProductsWrapper 객체로 감싸서 저장하도록 했습니다.
+
+------
+
+* 상품 캐시 스케줄러
+[ProductCacheScheduler.java](../src/main/java/kr/hhplus/be/server/interfaces/scheuler/ProductCacheScheduler.java)
+```java
+@RequiredArgsConstructor
+@Component
+public class ProductCacheScheduler {
+
+    private final ProductService productService;
+
+    // 4시간마다 인기 상품 캐시 갱신
+    @CachePut(value = "topSellingProducts", key = "'topSellingProducts'")
+    @Scheduled(cron = "0 * */4 * * *")
+    public void cachingTopSellingProducts() {
+        LocalDate todayDate = LocalDate.now();
+        int limit = 5;
+
+        productService.getTopSellingProducts(todayDate, limit);
+    }
+}
+```
+* 캐시 TTL을 1일로 설정했지만, 상품 정보 변경이나 캐시 스템피드 문제를 방지하기 위해 4시간마다 캐시를 갱신하도록 @Scheduled를 적용했습니다.
+* 기존 캐시를 삭제하지 않고 유지하면서 새로운 데이터를 업데이트하기 위해 @CachePut을 사용하여 캐시를 덮어쓰는 방식을 채택했습니다.
+
+--------
+* 캐시 테스트
+[ProductServiceCacheTest.java](../src/test/java/kr/hhplus/be/server/domain/product/service/ProductServiceCacheTest.java)
+
+```java
+@SpringBootTest
+public class ProductServiceCacheTest {
+
+    @Autowired
+    private ProductService productService;
+
+    @MockitoSpyBean
+    private ProductRepository productRepository;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Test
+    void 인기_상품_조회_메서드에_캐시가_적용되어_서비스를_여러번_호출했을때_레포지토리는_한번만_호출되는지_확인한다() {
+        // given
+        LocalDate todayDate = LocalDate.of(2025, 1, 1);
+        int limit = 5;
+
+        cacheManager.getCache("topSellingProducts").clear();
+
+        // when
+        productService.getTopSellingProducts(todayDate, limit);
+        productService.getTopSellingProducts(todayDate, limit);
+
+        // then
+        verify(productRepository, times(1)).getTopSellingProducts(todayDate, limit);
+    }
+}
+```
+* 조회 메서드에 캐시를 적용하여 메서드를 여러번 호출 했을 때 DB는 딱 한번만 조회되는것을 테스트 코드를 작성하여 확인했습니다. 
+![img.png](../assets/images/cache/test.PNG)
+
+### 결론 
+캐싱 적용을 통해 조회 빈도가 높은 인기 상품 조회 API에서 데이터베이스의 부하를 줄이고, 보다 빠른 응답 속도를 제공할 수 있도록 개선하였습니다.
+
+또한, **TTL(1일)과 정기적인 캐시 갱신(4시간 주기)**을 조합하여, 캐시 일관성을 유지하면서도 데이터 변경을 반영할 수 있는 구조를 마련했습니다.
+이를 통해 상품 정보가 변경될 때도 최신 데이터를 적절히 반영할 수 있으며, 동시에 캐시 스템피드 현상을 예방하는 효과를 기대할 수 있습니다.
+
 
