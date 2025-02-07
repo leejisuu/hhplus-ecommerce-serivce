@@ -1,11 +1,11 @@
 package kr.hhplus.be.server.interfaces.api.product;
 
 import io.swagger.v3.oas.annotations.Operation;
-import kr.hhplus.be.server.domain.product.dto.TopSellingProductsWrapper;
 import kr.hhplus.be.server.domain.product.service.ProductService;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.interfaces.api.product.dto.ProductResponse;
+import kr.hhplus.be.server.interfaces.api.product.dto.TopSellingProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,14 +33,13 @@ public class ProductController {
 
     @Operation(summary = "상위 상품 목록 조회 API", description = "상위 인기 상품 목록을 조회한다.")
     @GetMapping("/top-selling")
-    public ApiResponse<List<ProductResponse.TopSelling>> getTopSellingProducts() {
+    public ApiResponse<List<TopSellingProductResponse>> getTopSellingProducts() {
         LocalDate todayDate = LocalDate.now();
         int limit = 5;
 
-        TopSellingProductsWrapper wrapper = productService.getTopSellingProducts(todayDate, limit);
-        List<ProductResponse.TopSelling> response = wrapper.getTopSellingProducts().stream()
-                .map(ProductResponse.TopSelling::of)
-                .toList();
+        List<TopSellingProductResponse> response = productService.getTopSellingProducts(todayDate, limit).stream()
+                .map(TopSellingProductResponse::of)
+                .collect(Collectors.toList());
 
         return ApiResponse.ok(response);
     }

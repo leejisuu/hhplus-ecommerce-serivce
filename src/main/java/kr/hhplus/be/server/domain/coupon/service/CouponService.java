@@ -10,7 +10,9 @@ import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
 import kr.hhplus.be.server.domain.support.exception.ErrorCode;
+import kr.hhplus.be.server.support.aop.DistributedLock;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CouponService {
@@ -39,6 +42,7 @@ public class CouponService {
     /*
     * 쿠폰 발급 요청 Redis에 저장
     * */
+    @DistributedLock(key = "#command.couponId")
     public boolean addCouponIssueRequest(CouponCommand.Issue command) {
         // 캐시에 있는 쿠폰 잔여 개수 체크
         int remainCapacity = couponRepository.getRemainCapacityFromCache(command.couponId());
@@ -83,8 +87,6 @@ public class CouponService {
                     IssuedCoupon issuedCoupon = couponMst.issue(couponDto.getUserId(), LocalDateTime.now());
                     issuedCoupons.add(issuedCoupon);
 
-                    // 쿠폰 잔여 개수 차감
-                    couponMst.decreaseRemainCapacity();
                     couponRepository.save(couponMst);
                     // Redis에 쿠폰 발급 이력 add
                     couponRepository.addCouponIssuedHistoryToCache(issuedCoupon.getUserId(), issuedCoupon.getCouponId());

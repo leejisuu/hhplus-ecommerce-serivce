@@ -22,22 +22,6 @@ public class ProductInfo {
         }
     }
 
-    public record TopSelling(
-            Long productId,
-            String name,
-            BigDecimal price,
-            int totalQuantity
-    ) {
-        public static ProductInfo.TopSelling of(TopSellingProductDto topSellingProductDto) {
-            return new ProductInfo.TopSelling(
-                    topSellingProductDto.getProductId(),
-                    topSellingProductDto.getName(),
-                    topSellingProductDto.getPrice(),
-                    topSellingProductDto.getTotalQuantity()
-            );
-        }
-    }
-
     public record ProductDto(
             Long id,
             String name,

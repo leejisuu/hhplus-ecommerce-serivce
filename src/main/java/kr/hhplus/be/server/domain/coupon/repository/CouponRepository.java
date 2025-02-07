@@ -19,8 +19,6 @@ public interface CouponRepository {
 
     boolean addCouponIssueRequestToCache(CouponDto couponDto);
 
-    void decreaseRemainCapacity(Long couponId);
-
     void decreaseRemainCapacityInCache(Long couponId);
 
     List<CouponDto> getCouponIssueRequestsFromCache(long batchSize);

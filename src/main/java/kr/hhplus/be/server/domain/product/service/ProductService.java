@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.product.service;
 
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
-import kr.hhplus.be.server.domain.product.dto.TopSellingProductsWrapper;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductInfo;
 import kr.hhplus.be.server.domain.product.enums.ProductSellingStatus;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.domain.product.dto.StockDto;
@@ -27,13 +27,12 @@ public class ProductService {
     }
 
     @Cacheable(value = "topSellingProducts", key = "'topSellingProducts'")
-    public TopSellingProductsWrapper getTopSellingProducts(LocalDate todayDate, int limit) {
+    public List<TopSellingProductInfo> getTopSellingProducts(LocalDate todayDate, int limit) {
         List<TopSellingProductDto> topSellings = productRepository.getTopSellingProducts(todayDate, limit);
-        List<ProductInfo.TopSelling> topSellingList = topSellings.stream()
-                .map(ProductInfo.TopSelling::of)
+        return topSellings.stream()
+                .map(TopSellingProductInfo::of)
                 .toList();
 
-        return new TopSellingProductsWrapper(topSellingList);
     }
 
     public List<ProductInfo.ProductDto> getProducts(List<Long> productIds) {
