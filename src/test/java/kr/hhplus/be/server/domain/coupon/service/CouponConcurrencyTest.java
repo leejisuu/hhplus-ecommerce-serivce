@@ -1,5 +1,9 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
+import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
+import kr.hhplus.be.server.domain.coupon.dto.info.CouponInfo;
+import kr.hhplus.be.server.infrastructure.coupon.CouponCacheRepository;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,21 +36,23 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
     @Autowired
     IssuedCouponJpaRepository issuedCouponJpaRepository;
 
-    /*@Test
-    public void 동시에_동일한_선착순_쿠폰에_대해_10명이_발급했을_때_5명만_성공한다() throws InterruptedException {
-        int maxCapacity = 5;
+    @Autowired
+    CouponCacheRepository couponCacheRepository;
 
+    @Test
+    public void 동시에_동일한_선착순_쿠폰에_대해_10명이_발급_요청_했을_때_5명만_성공한다() throws InterruptedException {
         // given
-        LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 11, 00, 00);
-        LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 00, 00, 00);
-        LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 31, 23, 59, 59);
-
-        Coupon couponInfo = Coupon.create("선착순 쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), maxCapacity, maxCapacity, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
-        Coupon savedCoupon = couponJpaRepository.save(couponInfo);
+        int maxCapacity = 5;
+        long currentMillis = 1000;
+        CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), maxCapacity, maxCapacity, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
+        CouponInfo.Create coupon = couponService.create(createCommand);
 
         int threadCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
+
+        AtomicInteger sucessCnt = new AtomicInteger(0);
+        AtomicInteger failCnt = new AtomicInteger(0);
 
         // when
         for (int i = 1; i <= threadCount; i++) {
@@ -53,8 +60,11 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
 
             executorService.submit(() -> {
                 try {
-                        couponService.issue(savedCoupon.getId(), userId, currentTime);
+                    CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis+userId);
+                    couponService.addCouponIssueRequest(issueCommand);
+                    sucessCnt.incrementAndGet();
                 } catch (Exception e) {
+                    failCnt.incrementAndGet();
                 } finally {
                     countDownLatch.countDown();
                 }
@@ -64,52 +74,13 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
         countDownLatch.await();
         executorService.shutdown();
 
-        Coupon soldOutCoupon = couponJpaRepository.findById(savedCoupon.getId()).orElse(null);
-        List<IssuedCoupon> coupons = issuedCouponJpaRepository.findAllByCouponId(savedCoupon.getId());
-
         // then
-        // 쿠폰 모두 소진됨
-        assertThat(soldOutCoupon.getRemainCapacity()).isEqualTo(0);
-        // 발급된 쿠폰 개수가 최대 발행 개수랑 동일함
-        assertThat(coupons.size()).isEqualTo(maxCapacity);
-    }*/
+        assertThat(couponCacheRepository.getRemainCapacityFromCache(coupon.id())).isEqualTo(0);
 
-    /*@Test
-    public void 동일한_유저가_선착순_쿠폰을_5번_발급신청하면_1번만_성공한다() throws InterruptedException {
-        int maxCapacity = 10;
-        Long userId = 1L;
+        List<CouponDto> coupons = couponCacheRepository.getCouponIssueRequestsFromCache(10);
+        assertThat(coupons).hasSize(maxCapacity);
 
-        // given
-        LocalDateTime currentTime = LocalDateTime.of(2025, 1, 10, 11, 00, 00);
-        LocalDateTime validStartedAt = LocalDateTime.of(2025, 1, 1, 00, 00, 00);
-        LocalDateTime validEndedAt = LocalDateTime.of(2025, 1, 31, 23, 59, 59);
-
-        Coupon couponInfo = Coupon.create("선착순 쿠폰", DiscountType.FIXED_AMOUNT, new BigDecimal(1000), maxCapacity, maxCapacity, validStartedAt, validEndedAt, CouponStatus.ACTIVE);
-        Coupon savedCoupon = couponJpaRepository.save(couponInfo);
-
-        int threadCount = 5;
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-
-        // when
-        for (int i = 1; i <= threadCount; i++) {
-            executorService.submit(() -> {
-                try {
-                    couponService.issue(savedCoupon.getId(), userId, currentTime);
-                } catch (CustomException e) {
-                } finally {
-                    countDownLatch.countDown();
-                }
-            });
-        }
-
-        countDownLatch.await();
-        executorService.shutdown();
-
-        List<IssuedCoupon> coupons = issuedCouponJpaRepository.findAllByCouponIdAndUserId(savedCoupon.getId(), userId);
-
-        // then
-        // 유저가 발급 받은 쿠폰은 하나
-        assertThat(coupons.size()).isEqualTo(1);
-    }*/
+        assertThat(sucessCnt.get()).isEqualTo(maxCapacity);
+        assertThat(failCnt.get()).isEqualTo(threadCount-maxCapacity);
+    }
 }

@@ -51,11 +51,6 @@ public class CouponRepositoryImpl implements CouponRepository {
     }
 
     @Override
-    public void decreaseRemainCapacity(Long couponId) {
-        couponJpaRepository.decreaseRemainCapacity(couponId);
-    }
-
-    @Override
     public void decreaseRemainCapacityInCache(Long couponId) {
         couponCacheRepository.decreaseRemainCapacityInCache(couponId);
     }
