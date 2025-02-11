@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.support.config.web;
+package kr.hhplus.be.server.support.config;
 
 import kr.hhplus.be.server.interfaces.interceptor.UserValidationInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userValidationInterceptor)
-                .addPathPatterns("/**");
+                .addPathPatterns("/point/**", "/coupon/**", "/order/**", "/payment/**");
     }
 }

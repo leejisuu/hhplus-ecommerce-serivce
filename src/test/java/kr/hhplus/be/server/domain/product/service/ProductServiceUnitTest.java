@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product.service;
 
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductsWrapper;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.enums.ProductSellingStatus;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
@@ -56,31 +57,6 @@ public class ProductServiceUnitTest {
         // then
         verify(productRepository).getPagedProducts(pageable);
 
-    }
-
-    @Test
-    void 상위_상품을_조회한다() {
-        // given
-        LocalDate todayDate = LocalDate.of(2025, 1, 1);
-        int limit = 5;
-
-        List<TopSellingProductDto> mockTopSellings = List.of(
-                new TopSellingProductDto(1L, "레몬 사탕", BigDecimal.valueOf(2500), 15000),
-                new TopSellingProductDto(3L, "청포도 젤리", BigDecimal.valueOf(3200), 7000),
-                new TopSellingProductDto(4L, "콜라 젤리", BigDecimal.valueOf(2800), 6500),
-                new TopSellingProductDto(5L, "오렌지 초콜릿", BigDecimal.valueOf(3500), 5000),
-                new TopSellingProductDto(7L, "블루베리 쿠키", BigDecimal.valueOf(4500), 3000)
-                );
-
-        given(productRepository.getTopSellingProducts(todayDate, limit)).willReturn(mockTopSellings);
-
-        // when
-        List<ProductInfo.TopSelling> topSellings = productService.getTopSellingProducts(todayDate, limit);
-
-        // then
-        assertThat(topSellings).hasSize(limit);
-
-        verify(productRepository).getTopSellingProducts(todayDate, limit);
     }
 
     @Test

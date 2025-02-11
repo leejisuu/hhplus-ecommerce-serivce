@@ -9,14 +9,14 @@ import java.math.BigDecimal;
 public class ProductResponse {
 
     public record Stock(
-            Long id,
+            Long productId,
             String name,
             BigDecimal price,
             int quantity
     ) {
         public static ProductResponse.Stock of(ProductInfo.Stock productInfo) {
             return new ProductResponse.Stock (
-                    productInfo.id(),
+                    productInfo.productId(),
                     productInfo.name(),
                     productInfo.price(),
                     productInfo.quantity()

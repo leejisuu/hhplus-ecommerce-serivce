@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.support.distributedlock.redisson;
+package kr.hhplus.be.server.support.aop;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class DistributedLockAop {
 
     private static final String REDISSON_LOCK_PREFIX = "LOCK:";
 
-    @Around("@annotation(kr.hhplus.be.server.support.distributedlock.redisson.DistributedLock)")
+    @Around("@annotation(kr.hhplus.be.server.support.aop.DistributedLock)")
     public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

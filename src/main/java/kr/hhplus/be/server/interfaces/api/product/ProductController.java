@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.interfaces.api.product;
 
 import io.swagger.v3.oas.annotations.Operation;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductsWrapper;
 import kr.hhplus.be.server.domain.product.service.ProductService;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
@@ -36,9 +37,10 @@ public class ProductController {
         LocalDate todayDate = LocalDate.now();
         int limit = 5;
 
-        List<ProductResponse.TopSelling> response = productService.getTopSellingProducts(todayDate, limit).stream()
+        TopSellingProductsWrapper wrapper = productService.getTopSellingProducts(todayDate, limit);
+        List<ProductResponse.TopSelling> response = wrapper.getTopSellingProducts().stream()
                 .map(ProductResponse.TopSelling::of)
-                .collect(Collectors.toList());
+                .toList();
 
         return ApiResponse.ok(response);
     }

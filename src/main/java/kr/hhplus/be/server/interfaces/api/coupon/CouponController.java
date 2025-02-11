@@ -20,12 +20,12 @@ public class CouponController {
 
     private final CouponService couponService;
 
-    @Operation(summary = "선착순 쿠폰 발급 API", description = "사용자가 쿠폰을 발급받는다.")
+    @Operation(summary = "선착순 쿠폰 발급 요청 API", description = "사용자가 쿠폰을 발급을 요청한다.")
     @PostMapping("issue")
-    public ApiResponse<IssuedCouponResponse.Coupon> issueCoupon(@RequestBody CouponRequest.Issue request) {
-        LocalDateTime issuedAt = LocalDateTime.now();
-        IssuedCouponInfo.Coupon issuedCouponInfo = couponService.issue(request.couponId(), request.userId(), issuedAt);
-        return ApiResponse.ok(IssuedCouponResponse.Coupon.of(issuedCouponInfo));
+    public ApiResponse<Boolean> issueCoupon(@RequestBody CouponRequest.Issue request) {
+        long currentMillis = System.currentTimeMillis();
+        boolean result = couponService.addCouponIssueRequest(request.toCriteria(currentMillis));
+        return ApiResponse.ok(result);
     }
 
     @Operation(summary = "보유 쿠폰 조회 API", description = "유저가 보유한 쿠폰 목록을 반환한다.")

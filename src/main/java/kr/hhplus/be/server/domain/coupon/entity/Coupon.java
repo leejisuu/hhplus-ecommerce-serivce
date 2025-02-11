@@ -107,4 +107,8 @@ public class Coupon extends BaseEntity {
                 .status(IssuedCouponStatus.UNUSED)
                 .build();
     }
+
+    public void decreaseRemainCapacity() {
+        this.remainCapacity--;
+    }
 }
