@@ -12,6 +12,7 @@
 * [API 명세서](docs/ApiDocs.md) 작성 (Swagger-ui)
 * [Chapter2 회고](docs/review.md)
 * [동시성 제어 방식 보고서](https://velog.io/@jsks0826/%ED%95%AD%ED%95%B4-%ED%94%8C%EB%9F%AC%EC%8A%A4%EC%9D%B4%EC%BB%A4%EB%A8%B8%EC%8A%A4-%EC%8B%9C%EB%82%98%EB%A6%AC%EC%98%A4-%EB%8F%99%EC%8B%9C%EC%84%B1-%EC%A0%9C%EC%96%B4-%EB%B0%A9%EC%8B%9D-%EB%B9%84%EA%B5%90)
+* [Index 적용 보고서](https://velog.io/@jsks0826/%EC%9D%B4%EC%BB%A4%EB%A8%B8%EC%8A%A4-%EC%8B%9C%EB%82%98%EB%A6%AC%EC%98%A4-%EC%BF%BC%EB%A6%AC-Index-%EC%A0%81%EC%9A%A9-%EB%B3%B4%EA%B3%A0%EC%84%9C)
 ---
 
 ## Getting Started
