@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.listener;
+package kr.hhplus.be.server.interfaces.event;
 
 import kr.hhplus.be.server.domain.dataplatform.DataPlatformClient;
 import kr.hhplus.be.server.domain.order.event.OrderCreateEvent;

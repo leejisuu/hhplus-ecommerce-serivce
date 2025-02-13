@@ -1,6 +1,5 @@
-package kr.hhplus.be.server.application.order.event;
+package kr.hhplus.be.server.domain.order.event;
 
-import kr.hhplus.be.server.domain.order.event.OrderCreateEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
