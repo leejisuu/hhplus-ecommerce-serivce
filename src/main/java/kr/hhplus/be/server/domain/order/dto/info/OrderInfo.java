@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.order.dto.info;
 
 import kr.hhplus.be.server.domain.order.entity.Order;
+import kr.hhplus.be.server.domain.order.event.OrderCreateEvent;
 
 import java.math.BigDecimal;
 
@@ -16,6 +17,10 @@ public class OrderInfo {
                     order.getId(),
                     order.getTotalOriginalAmt()
             );
+        }
+
+        public OrderCreateEvent toCreateEvent() {
+            return OrderCreateEvent.create(id, totalOriginalAmt);
         }
     }
 }

@@ -2,8 +2,8 @@ package kr.hhplus.be.server.application.order;
 
 import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.result.OrderResult;
+import kr.hhplus.be.server.application.order.event.OrderEventPublisher;
 import kr.hhplus.be.server.support.aop.DistributedLock;
-import kr.hhplus.be.server.domain.dataplatform.DataPlatformClient;
 import kr.hhplus.be.server.domain.order.service.OrderService;
 import kr.hhplus.be.server.domain.order.dto.info.OrderInfo;
 import kr.hhplus.be.server.domain.product.service.ProductService;
@@ -21,7 +21,7 @@ public class OrderApplicationService {
     private final OrderService orderService;
     private final ProductService productService;
     private final ProductStockService productStockService;
-    private final DataPlatformClient dataPlatformClient;
+    private final OrderEventPublisher orderEventPublisher;
 
     @DistributedLock(key ="'Order:productIds:' + #criteria.getProductIds()")
     @Transactional
@@ -29,9 +29,7 @@ public class OrderApplicationService {
         List<ProductInfo.ProductDto> products = productService.getProducts(criteria.getProductIds());
         productStockService.deductQuantity(criteria.toStockCommand());
         OrderInfo.OrderDto order = orderService.order(criteria.toCommand(products));
-
-        dataPlatformClient.sendData(order);
-
+        orderEventPublisher.publish(order.toCreateEvent());
         return OrderResult.Order.of(order);
     }
 }
