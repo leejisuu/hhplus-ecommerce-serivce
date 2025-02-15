@@ -27,12 +27,12 @@
 
 
 # 개요
-작성 배경
+## 작성 배경
 이커머스 시나리오에서 자주 조회되거나, 복잡한 쿼리에 대해 Index를 적용할 부분에 대해 분석해보고 Index를 적용하여, Index를 적용하지 않고 조회했을 때와 성능 차이를 비교하고 정리하기 위해 작성했다.
 
 ## Index
 ### Index란?
-인덱스는 데이터베이스 테이블에 대한 검색 성능의 속도를 높여주는 자료 구조를 뜻한다.
+인덱스는 데이터베이스 테이블에 대한 검색 성능의 속도를 높여주는 자료 구조를 뜻한다.</br>
 즉, 데이터를 빨리 찾기 위해 **특정 컬럼**을 기준으로 **미리 정렬**해놓은 표이다.
 
 #### 장점
@@ -155,7 +155,7 @@ where절에 사용한 `user_id` 컬럼에 인덱스 설정을 고려한다.
 CREATE UNIQUE INDEX idx_user_id_unique ON point(user_id);
 ```
 * 인덱스 설명 :
-  유저 한 명당 포인트 정보는 한개씩만 가질 수 있으므로 User와 Point 테이블은 1대1 매핑 관계이다.
+  유저 한 명당 포인트 정보는 한개씩만 가질 수 있으므로 User와 Point 테이블은 1대1 매핑 관계이다.</br>
   point 테이블의 user_id 컬럼은 중복 값을 허용하지 않으므로 Unique Index를 적용하였다.
 
 * 수행 시간 : 0.000764s
@@ -185,7 +185,7 @@ CREATE UNIQUE INDEX idx_user_id_unique ON point(user_id);
 #### 테스트 쿼리
 ```sql
 select 
-		p.id
+            p.id
 	  , p.name 
 	  , p.price 
 	  , ps.quantity 
@@ -199,7 +199,7 @@ limit 0, 100;
 쿼리 설명 : 판매중인 상품의 정보를 페이징 처리하여 조회한다.
 
 #### 테스트 데이터 개수
-product 테이블 : 데이터 1000만건
+product 테이블 : 데이터 1000만건</br>
 product_stock 테이블 : 데이터 1000만건
 
 #### 인덱스 적용 전
@@ -252,8 +252,8 @@ CREATE UNIQUE INDEX idx_product_id_unique ON product_stock(product_id);
     * 상품과 상품의 재고는 1대1로 맵핑된다. `product_stock`의 `product_id`는 `product`의 PK인 `id`와 조인되고, product_stock의 `product_id`는 중복 값을 허용하지 않으므로 Unique Index를 적용하였다.
 
 * 수행 시간 : 0.007859s
-* Explain 실행 계획
-  p : product 테이블
+* Explain 실행 계획</br>
+  p : product 테이블</br>
   ps : product_stock 테이블
 
 | id  | select_type | table | type  | partitions | possible_keys                    | key                        | key_len | ref                    | rows    | filtered | Extra |
@@ -283,7 +283,7 @@ CREATE UNIQUE INDEX idx_product_id_unique ON product_stock(product_id);
 
 
 #### 결과 분석
-인덱스 적용 전 product_stock에 적용 가능한 인덱스가 없어 풀 스캔 테이블 데이터 조회(약 996만)가 인덱스 적용 후 1건으로 조회된다.
+인덱스 적용 전 product_stock에 적용 가능한 인덱스가 없어 풀 스캔 테이블 데이터 조회(약 996만)가 인덱스 적용 후 1건으로 조회된다.</br>
 
 인덱스 적용 전 11.353469s 였던 수행 시간을 인덱스 적용 후 0.007859s로 감소시켜 조회 성능이 약 99.93% 개선되었다.
   
@@ -323,16 +323,16 @@ select
 판매량이 가장 많은 상위 5개 상품을 구하는 쿼리
 
 #### 테스트 데이터 개수
-product 테이블 : 데이터 1000만건
-product_stock 테이블 : 데이터 1000만건
-order 테이블 : 데이터 1000만건
+product 테이블 : 데이터 1000만건</br>
+product_stock 테이블 : 데이터 1000만건</br>
+order 테이블 : 데이터 1000만건</br>
 order_detail 테이블 : 데이터 1500만건
 
 #### 인덱스 적용 전
 * 수행 시간 : 44.690238s
-* Explain 실행 계획
-  od : order_detail 테이블
-  o : order 테이블
+* Explain 실행 계획</br>
+  od : order_detail 테이블</br>
+  o : order 테이블</br>
   p : product 테이블
 
 | id  | select_type | table | type   | partitions | possible_keys | key     | key_len | ref                                 | rows    | filtered | Extra                                    |
@@ -372,7 +372,7 @@ order_detail 테이블 : 데이터 1500만건
 | Extra           | Using where | WHERE 조건 필터링 수행                                   |
 
 #### 인덱스 적용 개선 방안 고려
-order_detail 테이블에 풀 테이블 스캔 및 Using temporary, Using filesort 발생하여 성능이 저하된다.
+order_detail 테이블에 풀 테이블 스캔 및 Using temporary, Using filesort 발생하여 성능이 저하된다.</br>
 order_detail 테이블 where 절이나 join 조건에 맞는 인덱스 추가를 고려한다.
 
 #### 인덱스 적용 후
@@ -475,8 +475,8 @@ CREATE INDEX idx_order_detail_multi ON order_detail(order_id, product_id, quanti
 | Extra           | Using where                              | where 조건 필터링                                 |
 
 
-> Q. 1번의 order_detail 멀티 인덱스와 2번의 order_detail 멀티 인덱스의 차이는 order_detail 멀티 인덱스 마지막에 quantity가 추가된건데 인덱싱을 타고 안타고의 차이가 있다?
-A. 1번처럼 (order_id, product_id)로 멀티 인덱스를 생성하면 (order_id, product_id)로 데이터를 필터링한 후, quantity 값을 찾으러 테이블에 접근을 해야한다.
+> Q. 1번의 order_detail 멀티 인덱스와 2번의 order_detail 멀티 인덱스의 차이는 order_detail 멀티 인덱스 마지막에 quantity가 추가된건데 인덱싱을 타고 안타고의 차이가 있다?</br>
+A. 1번처럼 (order_id, product_id)로 멀티 인덱스를 생성하면 (order_id, product_id)로 데이터를 필터링한 후, quantity 값을 찾으러 테이블에 접근을 해야한다.</br>
 2번처럼 quantity까지 포함하여 (order_id, product_id, quantity) 멀티 인덱스를 생성하면 커버링 인덱스가 되어, 테이블에 접근하지 않고도 인덱스에서 quantity를 사용하여 테이블에 접근하지 않으므로 조회 성능이 빨라진다.
 
 
@@ -709,6 +709,6 @@ CREATE INDEX idx_issued_coupon_multi ON issued_coupon(user_id, status, valid_sta
 
 ----
 
-출처
+# 출처
 * [코딩팩토리 - 데이터베이스 인덱스(Index) 란 무엇인가?](https://coding-factory.tistory.com/746)
 * [망나니개발자 - 인덱스(index)란?](https://mangkyu.tistory.com/96)
