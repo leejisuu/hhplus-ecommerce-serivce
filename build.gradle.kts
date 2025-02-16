@@ -62,6 +62,10 @@ dependencies {
     // Redisson
     implementation("org.redisson:redisson-spring-boot-starter:3.22.0")
 
+    // kafka
+    implementation("org.springframework.kafka:spring-kafka")
+
+
 }
 
 // QueryDSL Q 클래스 생성 디렉토리 설정
