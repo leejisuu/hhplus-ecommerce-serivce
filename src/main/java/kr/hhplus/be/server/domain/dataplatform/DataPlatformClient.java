@@ -11,7 +11,7 @@ public class DataPlatformClient {
     public void sendData(OrderCreateEvent orderCreateEvent) {
         log.info("DataPlatformClient sendData {}", orderCreateEvent.toString());
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             log.warn("DataPlatformClient sendData exception", e);
             Thread.currentThread().interrupt();
