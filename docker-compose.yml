@@ -20,7 +20,7 @@ services:
     command: redis-server
 
   kafka:
-    image: confluentinc/cp-kafka:7.5.0
+    image: confluentinc/cp-kafka:latest
     container_name: kraft-kafka
     ports:
       - "9092:9092"

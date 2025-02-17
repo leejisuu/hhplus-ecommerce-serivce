@@ -46,6 +46,7 @@ dependencies {
     testImplementation("org.testcontainers:mysql")
     testImplementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.testcontainers:kafka")
 
     // Swagger UI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")

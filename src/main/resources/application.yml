@@ -30,6 +30,10 @@ spring:
       port: 6379
   kafka:
     bootstrap-servers: localhost:9092
+    producer:
+      bootstrap-servers: localhost:9092
+    consumer:
+      bootstrap-servers: localhost:9092
 
 springdoc:
   swagger-ui:
