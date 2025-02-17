@@ -33,8 +33,8 @@ public class IssuedCoupon extends BaseEntity {
     @Column(name = "coupon_name", nullable = false)
     private String name;
 
-    @Column(name = "discount_type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "discount_type", nullable = false, columnDefinition = "VARCHAR(20)")
     private DiscountType discountType;
 
     @Column(name = "discount_amt", nullable = false)
@@ -53,7 +53,7 @@ public class IssuedCoupon extends BaseEntity {
     private LocalDateTime usedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20)")
     private IssuedCouponStatus status;
 
     @Builder

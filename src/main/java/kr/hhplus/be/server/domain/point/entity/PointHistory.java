@@ -21,7 +21,7 @@ public class PointHistory extends BaseCreatedAtEntity {
     private Long pointId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "point_history_type", nullable = false)
+    @Column(name = "point_history_type", nullable = false, columnDefinition = "VARCHAR(20)")
     private PointHistoryType pointHistoryType;
 
     @Column(name = "amount", nullable = false)

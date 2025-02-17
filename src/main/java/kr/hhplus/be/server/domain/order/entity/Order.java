@@ -23,8 +23,8 @@ public class Order extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20)")
     private OrderStatus status;
 
     // 순수 구매 금액 (각 상품 재고 곱하기 가격의 합)
