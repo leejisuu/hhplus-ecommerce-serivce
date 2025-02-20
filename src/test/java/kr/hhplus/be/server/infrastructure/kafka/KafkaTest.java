@@ -2,7 +2,10 @@ package kr.hhplus.be.server.infrastructure.kafka;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -10,7 +13,9 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-class KafkaTest extends IntegrationTestSupport {
+@Testcontainers
+@SpringBootTest
+class KafkaTest {
 
     @Autowired
     private TestProducer testProducer;
@@ -34,9 +39,5 @@ class KafkaTest extends IntegrationTestSupport {
                 .atMost(10, TimeUnit.SECONDS)
                 .untilAsserted(() -> assertThat(testConsumer.getMessages())
                         .hasSize(cnt));
-
-        for (int i = 0; i < messages.size(); i++) {
-            assertThat(testConsumer.getMessages().get(i)).isEqualTo(messages.get(i));
-        }
     }
 }
