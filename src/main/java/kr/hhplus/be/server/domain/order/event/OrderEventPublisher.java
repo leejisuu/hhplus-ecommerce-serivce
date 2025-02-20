@@ -1,20 +1,6 @@
 package kr.hhplus.be.server.domain.order.event;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
+public interface OrderEventPublisher {
 
-@RequiredArgsConstructor
-@Component
-public class OrderEventPublisher {
-    private final ApplicationEventPublisher applicationEventPublisher;
-
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void publish(OrderCreateEvent orderCreateEvent) {
-        applicationEventPublisher.publishEvent(orderCreateEvent);
-    }
+    void publish(OrderEvent.Created createEvent);
 }
