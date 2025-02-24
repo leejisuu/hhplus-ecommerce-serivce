@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,7 +44,7 @@ public class IssuedCouponCustomRepositoryImpl implements IssuedCouponCustomRepos
                         issuedCoupon.validEndedAt.gt(currentTime)
                 );
 
-        return new PageImpl<>(content, pageable, countQuery.fetchCount());
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override

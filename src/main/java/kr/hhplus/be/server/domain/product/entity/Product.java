@@ -20,7 +20,7 @@ public class Product extends BaseEntity {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "selling_status", nullable = false)
+    @Column(name = "selling_status", nullable = false, columnDefinition = "VARCHAR(20)")
     private ProductSellingStatus sellingStatus;
 
     @Column(nullable = false)

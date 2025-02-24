@@ -27,8 +27,8 @@ public class Coupon extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "discount_type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "discount_type", nullable = false, columnDefinition = "VARCHAR(20)")
     private DiscountType discountType;
 
     @Column(name = "discount_amt", nullable = false)
@@ -46,8 +46,8 @@ public class Coupon extends BaseEntity {
     @Column(name = "valid_ended_at", nullable = false)
     private LocalDateTime validEndedAt;
 
-    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20)")
     private CouponStatus status;
 
     @Builder

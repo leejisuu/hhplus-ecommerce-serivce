@@ -23,7 +23,7 @@ public class Payment extends BaseEntity {
     private Long orderId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20)")
     private PaymentStatus status;
 
     @Column(name = "total_original_amt", nullable = false)

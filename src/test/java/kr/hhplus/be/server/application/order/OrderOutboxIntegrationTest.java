@@ -91,8 +91,7 @@ public class OrderOutboxIntegrationTest extends IntegrationTestSupport {
             throw new RuntimeException(e);
         }
 
-        OrderCreatedOutbox orderCreatedOutbox = OrderCreatedOutbox.create(event.messageId(), orderId, eventToJson);
-        OrderCreatedOutbox beforeOutbox = orderCreatedOutboxJpaRepository.save(orderCreatedOutbox);
+        OrderCreatedOutbox beforeOutbox = orderCreatedOutboxJpaRepository.save(OrderCreatedOutbox.create(event.messageId(), orderId, eventToJson));
 
         // when
         orderCreatedOutboxScheduler.resendOrderCreatedMessage();

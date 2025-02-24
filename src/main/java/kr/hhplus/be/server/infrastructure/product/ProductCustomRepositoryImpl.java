@@ -61,7 +61,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
     public List<TopSellingProductDto> getTopSellingProducts(LocalDate todayDate, int limit) {
 
         LocalDate startDate = todayDate.minusDays(3);
-        LocalDate endDate = todayDate.plusDays(1);
+        LocalDate endDate = todayDate.minusDays(1);
 
         return queryFactory
                 .select(Projections.constructor(
@@ -71,11 +71,11 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         product.price,
                         orderDetail.quantity.sum().as("totalQuantity")
                 ))
-                .from(orderDetail)
-                .join(orderDetail.order, order)  // OrderDetail → Order 조인
+                .from(order)
+                .join(orderDetail).on(order.id.eq(orderDetail.order.id))  // OrderDetail → Order 조인
                 .join(product).on(orderDetail.productId.eq(product.id))  // OrderDetail → Product 조인
-                .leftJoin(productStock).on(product.id.eq(productStock.productId))  // Product → ProductStock 조인
                 .where(
+                        product.sellingStatus.eq(ProductSellingStatus.SELLING),
                         order.status.eq(OrderStatus.COMPLETED), // 완료된 주문만 조회
                         order.createdAt.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)) // 최근 3일 주문 데이터 조회
                 )

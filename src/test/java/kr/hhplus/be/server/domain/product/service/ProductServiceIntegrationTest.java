@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.product.service;
 
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
-import kr.hhplus.be.server.domain.product.dto.TopSellingProductsWrapper;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductInfo;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +72,7 @@ public class ProductServiceIntegrationTest extends IntegrationTestSupport {
         LocalDate date = LocalDate.of(2025, 1, 3);
 
         // when
-        TopSellingProductsWrapper wrapper = productService.getTopSellingProducts(date, 5);
-        List<ProductInfo.TopSelling> products = wrapper.getTopSellingProducts();
+        List<TopSellingProductInfo> products = productService.getTopSellingProducts(date, 5);
 
         // then
         assertThat(products).hasSize(2);

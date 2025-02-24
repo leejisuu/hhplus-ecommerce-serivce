@@ -1,10 +1,12 @@
 package kr.hhplus.be.server.domain.dataplatform;
 
 import kr.hhplus.be.server.domain.order.event.OrderEvent;
-import kr.hhplus.be.server.domain.order.event.OrderEvent.Created;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/*
+* 주문 정보를 Kafak로 전달하면 주문 도메인에서의 책임은 끝이므로 해당 소스 미사용
+* */
 @Slf4j
 @Component
 public class DataPlatformClient {

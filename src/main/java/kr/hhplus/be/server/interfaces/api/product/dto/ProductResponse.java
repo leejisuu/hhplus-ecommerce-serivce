@@ -1,8 +1,7 @@
 package kr.hhplus.be.server.interfaces.api.product.dto;
 
-import kr.hhplus.be.server.domain.order.entity.OrderDetail;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
-import kr.hhplus.be.server.domain.product.entity.Product;
+import kr.hhplus.be.server.domain.product.dto.TopSellingProductInfo;
 
 import java.math.BigDecimal;
 
@@ -31,14 +30,13 @@ public class ProductResponse {
             BigDecimal price,
             int totalQuantity
     ) {
-        public static ProductResponse.TopSelling of(ProductInfo.TopSelling topSelling) {
+        public static ProductResponse.TopSelling of(TopSellingProductInfo topSelling) {
             return new ProductResponse.TopSelling (
-                    topSelling.productId(),
-                    topSelling.name(),
-                    topSelling.price(),
-                    topSelling.totalQuantity()
+                    topSelling.getProductId(),
+                    topSelling.getName(),
+                    topSelling.getPrice(),
+                    topSelling.getTotalQuantity()
             );
         }
-
     }
 }

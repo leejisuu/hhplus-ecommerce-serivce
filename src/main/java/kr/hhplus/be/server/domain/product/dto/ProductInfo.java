@@ -13,27 +13,11 @@ public class ProductInfo {
             int quantity
     ) {
         public static ProductInfo.Stock of(StockDto stockDto) {
-            return new ProductInfo.Stock (
+            return new ProductInfo.Stock(
                     stockDto.productId(),
                     stockDto.name(),
                     stockDto.price(),
                     stockDto.quantity()
-            );
-        }
-    }
-
-    public record TopSelling(
-            Long productId,
-            String name,
-            BigDecimal price,
-            int totalQuantity
-    ) {
-        public static ProductInfo.TopSelling of(TopSellingProductDto topSellingProductDto) {
-            return new ProductInfo.TopSelling(
-                    topSellingProductDto.getProductId(),
-                    topSellingProductDto.getName(),
-                    topSellingProductDto.getPrice(),
-                    topSellingProductDto.getTotalQuantity()
             );
         }
     }
