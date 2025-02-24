@@ -2,6 +2,7 @@ package kr.hhplus.be.server.application.order;
 
 import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.result.OrderResult;
+import kr.hhplus.be.server.domain.order.event.OrderEvent;
 import kr.hhplus.be.server.domain.order.event.OrderEventPublisher;
 import kr.hhplus.be.server.support.aop.DistributedLock;
 import kr.hhplus.be.server.domain.order.service.OrderService;
@@ -29,7 +30,7 @@ public class OrderApplicationService {
         List<ProductInfo.ProductDto> products = productService.getProducts(criteria.getProductIds());
         productStockService.deductQuantity(criteria.toStockCommand());
         OrderInfo.OrderDto order = orderService.order(criteria.toCommand(products));
-        orderEventPublisher.publish(order.toCreateEvent());
+        orderEventPublisher.publish(order.toCreatedEvent());
         return OrderResult.Order.of(order);
     }
 }
