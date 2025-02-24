@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,25 +13,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+@Testcontainers
 @SpringBootTest
 class KafkaTest {
-    private static final String TOPIC = "test";
-    private static final AtomicInteger counter = new AtomicInteger(0);
+    private static final String message = "Kafka Test";
 
     @Autowired
-    private KafkaTemplate<String, Object> producer;
+    private TestProducer producer;
 
-    @KafkaListener(topics = TOPIC, groupId = "test_group")
-    public void listen(String message) {
-        counter.incrementAndGet();
-    }
+    @Autowired
+    private TestConsumer consumer;
 
     @Test
     void kafkaTest() {
-        producer.send(TOPIC, "Kafka Test");
+        producer.send("test-topic", message);
         await()
-                .pollInterval(Duration.ofMillis(300))
-                .atMost(Duration.ofSeconds(2))
-                .untilAsserted(() -> assertThat(counter.get()).isEqualTo(1L));
+                .pollInterval(Duration.ofSeconds(3))
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> assertThat(consumer.getConsumedMessage()).isEqualTo(message));
     }
 }

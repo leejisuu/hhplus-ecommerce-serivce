@@ -11,10 +11,10 @@ import java.util.List;
 @Component
 public class TestConsumer {
 
-    private final List<String> messages = new ArrayList<>();
+    private String consumedMessage = "";
 
     @KafkaListener(topics = "test-topic", groupId = "test-group")
     public void listen(String message) {
-        messages.add(message);
+        consumedMessage = message;
     }
 }
