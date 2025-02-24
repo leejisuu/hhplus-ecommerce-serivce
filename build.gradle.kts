@@ -46,6 +46,7 @@ dependencies {
     testImplementation("org.testcontainers:mysql")
     testImplementation("com.redis.testcontainers:testcontainers-redis:1.6.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.testcontainers:kafka")
 
     // Swagger UI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
@@ -53,6 +54,8 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+    testImplementation("org.projectlombok:lombok")
+    testAnnotationProcessor("org.projectlombok:lombok")
 
     // QueryDSL 의존성 추가
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta") // QueryDSL JPA 모듈 (Jakarta API 지원)
@@ -61,6 +64,10 @@ dependencies {
 
     // Redisson
     implementation("org.redisson:redisson-spring-boot-starter:3.22.0")
+
+    // kafka
+    implementation("org.springframework.kafka:spring-kafka")
+
 
 }
 
