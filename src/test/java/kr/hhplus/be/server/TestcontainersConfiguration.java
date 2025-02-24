@@ -37,13 +37,10 @@ class TestcontainersConfiguration {
 		System.setProperty("spring.data.redis.host", REDIS_CONTAINER.getHost());
 		System.setProperty("spring.data.redis.port", REDIS_CONTAINER.getMappedPort(6379).toString());
 
-		KAFKA_CONTAINER = new ConfluentKafkaContainer("confluentinc/cp-kafka:latest");
+		KAFKA_CONTAINER = new ConfluentKafkaContainer("confluentinc/cp-kafka:7.5.0");
 		KAFKA_CONTAINER.start();
 
 		System.setProperty("spring.kafka.bootstrap-servers", KAFKA_CONTAINER.getBootstrapServers());
-		System.setProperty("spring.kafka.producer.bootstrap-servers", KAFKA_CONTAINER.getBootstrapServers());
-		System.setProperty("spring.kafka.consumer.bootstrap-servers", KAFKA_CONTAINER.getBootstrapServers());
-
 	}
 
 	@PreDestroy

@@ -32,7 +32,7 @@ spring:
     bootstrap-servers: localhost:9092
     properties:
       auto:
-        offset.reset: earliest
+        offset.reset: latest
         create.topics.enable: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

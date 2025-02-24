@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class TestProducer {
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     public void send(String topic, String message) {
         kafkaTemplate.send(topic, message);

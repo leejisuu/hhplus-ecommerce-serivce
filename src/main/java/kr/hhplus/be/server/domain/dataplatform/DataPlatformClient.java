@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.dataplatform;
 
-import kr.hhplus.be.server.domain.order.event.OrderCreateEvent;
+import kr.hhplus.be.server.domain.order.event.OrderEvent;
+import kr.hhplus.be.server.domain.order.event.OrderEvent.Created;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -8,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataPlatformClient {
 
-    public void sendData(OrderCreateEvent orderCreateEvent) {
-        log.info("DataPlatformClient sendData {}", orderCreateEvent.toString());
+    public void sendData(OrderEvent.Created event) {
+        log.info("DataPlatformClient sendData {}", event.toString());
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
