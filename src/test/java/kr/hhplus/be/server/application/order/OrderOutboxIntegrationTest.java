@@ -14,9 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 public class OrderOutboxIntegrationTest extends IntegrationTestSupport {
 
@@ -69,19 +71,12 @@ public class OrderOutboxIntegrationTest extends IntegrationTestSupport {
         // then
         // 주문 직후 아웃 박스 조회
         OrderCreatedOutbox beforeOutbox = orderCreatedOutboxJpaRepository.findAll().get(0);
-
-        // 10초 대기
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        // 아웃 박스 조회
-        OrderCreatedOutbox afterOutbox = orderCreatedOutboxJpaRepository.findAll().get(0);
-
         assertThat(beforeOutbox.getStatus()).isEqualTo(OutboxStatus.INIT);
-        assertThat(afterOutbox.getStatus()).isEqualTo(OutboxStatus.COMPLETE);
+
+        await()
+                .pollInterval(Duration.ofSeconds(3))
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> assertThat(orderCreatedOutboxJpaRepository.findAll().get(0).getStatus()).isEqualTo(OutboxStatus.COMPLETE));
     }
 
     @Test
@@ -102,17 +97,12 @@ public class OrderOutboxIntegrationTest extends IntegrationTestSupport {
         // when
         orderCreatedOutboxScheduler.resendOrderCreatedMessage();
 
-        // 10초 대기
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
         // then
-        OrderCreatedOutbox afterOutbox = orderCreatedOutboxJpaRepository.findAll().get(0);
-
         assertThat(beforeOutbox.getStatus()).isEqualTo(OutboxStatus.INIT);
-        assertThat(afterOutbox.getStatus()).isEqualTo(OutboxStatus.COMPLETE);
+
+        await()
+                .pollInterval(Duration.ofSeconds(3))
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> assertThat(orderCreatedOutboxJpaRepository.findAll().get(0).getStatus()).isEqualTo(OutboxStatus.COMPLETE));
     }
 }
