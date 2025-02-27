@@ -4,7 +4,7 @@ spring:
   profiles:
     active: local
   datasource:
-    url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://mysql:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
     username: application
     password: application
     name: HangHaePlusDataSource
@@ -19,7 +19,8 @@ spring:
     generate-ddl: false
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
@@ -27,12 +28,15 @@ spring:
           default_storage: NORMALIZE_UTC
         jdbc:
           time_zone: UTC
+  sql:
+    init:
+      mode: always
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     properties:
       auto:
         offset.reset: latest
@@ -50,6 +54,7 @@ spring:
             trusted:
               packages: "*"
 
+
 springdoc:
   swagger-ui:
     enabled: true
@@ -58,6 +63,9 @@ springdoc:
 order-api:
   order-created:
     topic-name: "order-created"
+
+server:
+  port: 8080
 
 ---
 

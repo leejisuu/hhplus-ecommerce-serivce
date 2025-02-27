@@ -1,8 +1,44 @@
 services:
+  ecommerce-app:
+    image: ecommerce-app
+    container_name: ecommerce-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: application
+      SPRING_DATASOURCE_PASSWORD: application
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - my-networks
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
   mysql:
     image: mysql:8.0
+    container_name: mysql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=application
@@ -10,46 +46,93 @@ services:
       - MYSQL_DATABASE=hhplus
     volumes:
       - ./data/mysql/:/var/lib/mysql
+    networks:
+      - my-networks
 
   redis:
     image: redis:latest
     container_name: redis
     ports:
-      - 6379:6379
-    command: redis-server
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - my-networks
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - my-networks
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
     ports:
       - "9092:9092"
+    healthcheck:
+      test: [ "CMD", "kafka-broker-api-versions", "--bootstrap-server=localhost:9092" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
+    networks:
+      - my-networks
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
     ports:
-      - "8081:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      - "3000:3000"
+    volumes:
+      - ./grafana-provisioning:/etc/grafana/provisioning
+      - ./grafana-dashboard:/dashboard
     depends_on:
-      - kafka
+      - prometheus
+    networks:
+      - my-networks
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    command:
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
+      - --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - my-networks
+
+  k6:
+    image: grafana/k6
+    container_name: k6
+    volumes:
+      - ./k6-scripts:/scripts
+    command: run -o experimental-prometheus-rw /scripts/stress.js
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
+      - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
+    depends_on:
+      ecommerce-app:
+        condition: service_healthy
+    networks:
+      - my-networks
 networks:
-  default:
-    driver: bridge
+  my-networks:
+    external: true
 
