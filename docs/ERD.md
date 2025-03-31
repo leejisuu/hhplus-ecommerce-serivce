@@ -156,10 +156,14 @@
 * coupon(1) -> issued_coupon(N): 하나의 쿠폰은 여러 사용자 쿠폰에 참조될 수 있다.
 
 
+* product(1) -> product_stock(1) : 하나의 상품은 하나의 재고 정보를 가진다.
+* product(1) -> order_detail(N): 하나의 상품은 여러 주문 상세에 포함될 수 있다.
+
+
 * order(1) -> order_detail(N): 하나의 주문은 여러 개의 주문 상세(주문 상품)를 가질 수 있다.
 * order(1) -> payment(1): 하나의 주문은 하나의 결제를 참조한다.
 * order(1) -> order_created_outbox(N): 하나의 주문은 하나의 주문 완료 이벤트 아웃박스 정보를 가진다.
 
-* product(1) -> product_stock(1) : 하나의 상품은 하나의 재고 정보를 가진다.
-* product(1) -> order_detail(N): 하나의 상품은 여러 주문 상세에 포함될 수 있다.
+
+* payment(1) -> issued_coupon(0 or 1) : 결제 한 건당 하나의 할인 쿠폰을 사용할 수 있다(선택).
  
