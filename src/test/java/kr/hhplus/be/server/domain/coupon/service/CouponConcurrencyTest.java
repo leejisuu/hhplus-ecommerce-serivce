@@ -3,17 +3,14 @@ package kr.hhplus.be.server.domain.coupon.service;
 import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.dto.info.CouponInfo;
-import kr.hhplus.be.server.infrastructure.coupon.CouponCacheRepository;
+import kr.hhplus.be.server.domain.coupon.repository.CouponCacheRepository;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
-import kr.hhplus.be.server.domain.coupon.entity.Coupon;
-import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import kr.hhplus.be.server.domain.coupon.enums.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.enums.DiscountType;
-import kr.hhplus.be.server.domain.support.exception.CustomException;
-import kr.hhplus.be.server.infrastructure.coupon.CouponJpaRepository;
-import kr.hhplus.be.server.infrastructure.coupon.IssuedCouponJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -29,13 +26,8 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
 
     @Autowired
     CouponService couponService;
-
     @Autowired
-    CouponJpaRepository couponJpaRepository;
-
-    @Autowired
-    IssuedCouponJpaRepository issuedCouponJpaRepository;
-
+    CouponWaitingQueueService couponWaitingQueueService;
     @Autowired
     CouponCacheRepository couponCacheRepository;
 
@@ -60,8 +52,8 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
 
             executorService.submit(() -> {
                 try {
-                    CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis+userId);
-                    couponService.addCouponIssueRequest(issueCommand);
+                    CouponCommand.AddQueue command = new CouponCommand.AddQueue(coupon.id(), userId, currentMillis+userId);
+                    couponWaitingQueueService.addCouponIssueRequest(command);
                     sucessCnt.incrementAndGet();
                 } catch (Exception e) {
                     failCnt.incrementAndGet();
@@ -75,9 +67,9 @@ public class CouponConcurrencyTest extends IntegrationTestSupport {
         executorService.shutdown();
 
         // then
-        assertThat(couponCacheRepository.getRemainCapacityFromCache(coupon.id())).isEqualTo(0);
+        assertThat(couponCacheRepository.getRemainCapacity(coupon.id())).isEqualTo(0);
 
-        List<CouponDto> coupons = couponCacheRepository.getCouponIssueRequestsFromCache(10);
+        List<CouponDto> coupons = couponCacheRepository.getCouponIssueRequests(10);
         assertThat(coupons).hasSize(maxCapacity);
 
         assertThat(sucessCnt.get()).isEqualTo(maxCapacity);

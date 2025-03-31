@@ -3,7 +3,7 @@ package kr.hhplus.be.server.infrastructure.coupon;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
-import lombok.RequiredArgsConstructor;
+import kr.hhplus.be.server.domain.coupon.repository.CouponCacheRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -13,9 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-@RequiredArgsConstructor
 @Component
-public class CouponCacheRepository {
+public class CouponCacheRepositoryImpl implements CouponCacheRepository {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -27,23 +26,18 @@ public class CouponCacheRepository {
     private static final String COUPON_ISSUED_HISTORY_KEY = "coupon-%d-issued"; // 발급된 쿠폰 이력
     private static final String COUPON_ISSUE_REQUEST_KEY = "coupon-requests"; // 쿠폰 요청 발급
 
-    public void setRemainCapacityToCache(Long countId, int remainCapacity) {
-        String key = String.format(COUPON_REMAIN_QUANTITY_KEY, countId);
-        redisTemplate.opsForValue().set(key, String.valueOf(remainCapacity));
-    }
-
-    public int getRemainCapacityFromCache(Long couponId) {
+    public int getRemainCapacity(Long couponId) {
         String key = String.format(COUPON_REMAIN_QUANTITY_KEY, couponId);
         Object value = redisTemplate.opsForValue().get(key);
         return value != null ? Integer.parseInt(value.toString()) : 0;
     }
 
-    public boolean hasCouponIssuedHistoryFromCache(Long userId, Long couponId) {
+    public boolean hasCouponIssuedHistory(Long userId, Long couponId) {
         String key = String.format(COUPON_ISSUED_HISTORY_KEY, couponId);
         return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, String.valueOf(userId)));
     }
 
-    public boolean addCouponIssueRequestToCache(CouponDto couponDto) {
+    public boolean addCouponIssueRequest(CouponDto couponDto) {
         String jsonCouponDto = "";
         try {
             jsonCouponDto = objectMapper.writeValueAsString(couponDto);
@@ -53,12 +47,12 @@ public class CouponCacheRepository {
         return Boolean.TRUE.equals(redisTemplate.opsForZSet().add(COUPON_ISSUE_REQUEST_KEY, jsonCouponDto, couponDto.getCurrentMillis()));
     }
 
-    public void decreaseRemainCapacityInCache(Long couponId) {
+    public void decreaseRemainCapacity(Long couponId) {
         String key = String.format(COUPON_REMAIN_QUANTITY_KEY, couponId);
         redisTemplate.opsForValue().decrement(key);
     }
 
-    public List<CouponDto> getCouponIssueRequestsFromCache(long batchSize) {
+    public List<CouponDto> getCouponIssueRequests(long batchSize) {
         Set<ZSetOperations.TypedTuple<String>> values = redisTemplate.opsForZSet().popMin(COUPON_ISSUE_REQUEST_KEY, batchSize-1);
 
         if(values == null) {
@@ -77,7 +71,7 @@ public class CouponCacheRepository {
                 .toList();
     }
 
-    public void addCouponIssuedHistoryToCache(Long userId, Long couponId) {
+    public void addCouponIssuedHistory(Long userId, Long couponId) {
         String key = String.format(COUPON_ISSUED_HISTORY_KEY, couponId);
         redisTemplate.opsForSet().add(key, String.valueOf(userId));
     }

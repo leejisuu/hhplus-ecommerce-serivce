@@ -3,8 +3,10 @@ package kr.hhplus.be.server.domain.coupon.service;
 import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.dto.info.CouponInfo;
+import kr.hhplus.be.server.domain.coupon.repository.CouponCacheRepository;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
+import kr.hhplus.be.server.interfaces.scheuler.CouponIssueScheduler;
 import kr.hhplus.be.server.support.IntegrationTestSupport;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
@@ -31,13 +33,17 @@ import static org.assertj.core.api.Assertions.*;
 public class CouponServiceIntegrationTest extends IntegrationTestSupport {
 
     @Autowired
+    CouponWaitingQueueService couponWaitingQueueService;
+    @Autowired
     CouponService couponService;
-
     @Autowired
     CouponRepository couponRepository;
-
+    @Autowired
+    CouponCacheRepository couponCacheRepository;
     @Autowired
     IssuedCouponRepository issuedCouponRepository;
+    @Autowired
+    CouponIssueScheduler couponIssueScheduler;
 
     @Nested
     @DisplayName("쿠폰 조회 통합 테스트")
@@ -50,10 +56,10 @@ public class CouponServiceIntegrationTest extends IntegrationTestSupport {
             CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 0, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
             CouponInfo.Create coupon = couponService.create(createCommand);
 
-            CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis);
+            CouponCommand.AddQueue command = new CouponCommand.AddQueue(coupon.id(), userId, currentMillis);
 
             // when // then
-            assertThatThrownBy(() -> couponService.addCouponIssueRequest(issueCommand))
+            assertThatThrownBy(() -> couponWaitingQueueService.addCouponIssueRequest(command))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.INSUFFICIENT_COUPON_QUANTITY.getMessage());
 
@@ -64,18 +70,17 @@ public class CouponServiceIntegrationTest extends IntegrationTestSupport {
             // given
             long userId = 1L;
             long currentMillis = 1000;
-            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 1, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
+            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 5, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 31, 23, 59, 59), CouponStatus.ACTIVE);
             CouponInfo.Create coupon = couponService.create(createCommand);
 
-            CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis);
+            CouponCommand.AddQueue command = new CouponCommand.AddQueue(coupon.id(), userId, currentMillis);
 
-            couponService.addCouponIssueRequest(issueCommand);
-            couponService.issue();
+            couponWaitingQueueService.addCouponIssuedHistory(userId, coupon.id());
 
             // when // then
-            assertThatThrownBy(() -> couponService.addCouponIssueRequest(issueCommand))
+            assertThatThrownBy(() -> couponWaitingQueueService.addCouponIssueRequest(command))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(ErrorCode.INSUFFICIENT_COUPON_QUANTITY.getMessage());
+                    .hasMessage(ErrorCode.ALREADY_ISSUED_COUPON.getMessage());
 
         }
 
@@ -88,14 +93,14 @@ public class CouponServiceIntegrationTest extends IntegrationTestSupport {
             CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 5, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
             CouponInfo.Create coupon = couponService.create(createCommand);
 
-            CouponCommand.Issue issueCommand = new CouponCommand.Issue(coupon.id(), userId, currentMillis);
+            CouponCommand.AddQueue command = new CouponCommand.AddQueue(coupon.id(), userId, currentMillis);
 
             // when
-            couponService.addCouponIssueRequest(issueCommand);
+            couponWaitingQueueService.addCouponIssueRequest(command);
 
             // then
-            int remainCapacity = couponRepository.getRemainCapacityFromCache(coupon.id());
-            List<CouponDto> issueRequest = couponRepository.getCouponIssueRequestsFromCache(batchSize);
+            int remainCapacity = couponCacheRepository.getRemainCapacity(coupon.id());
+            List<CouponDto> issueRequest = couponCacheRepository.getCouponIssueRequests(batchSize);
 
             assertThat(remainCapacity).isEqualTo(coupon.remainCapacity()-1);
             assertThat(issueRequest).hasSize(1);
@@ -109,15 +114,15 @@ public class CouponServiceIntegrationTest extends IntegrationTestSupport {
             // given
             long userId = 1L;
             long currentMillis = 1000;
-            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 5, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2025, 2, 28, 23, 59, 59), CouponStatus.ACTIVE);
+            CouponCommand.Create createCommand = new CouponCommand.Create("웰컴 쿠폰", DiscountType.PERCENTAGE, BigDecimal.valueOf(15), 5, 5, LocalDateTime.of(2025, 2, 1, 0, 0, 0), LocalDateTime.of(2999, 12, 31, 12,59, 59), CouponStatus.ACTIVE);
             CouponInfo.Create info = couponService.create(createCommand);
 
-            CouponCommand.Issue issueCommand = new CouponCommand.Issue(info.id(), userId, currentMillis);
+            CouponCommand.AddQueue command = new CouponCommand.AddQueue(info.id(), userId, currentMillis);
 
-            couponService.addCouponIssueRequest(issueCommand);
+            couponWaitingQueueService.addCouponIssueRequest(command);
 
             // when
-            couponService.issue();
+            couponIssueScheduler.issue();
 
             // then
             IssuedCoupon issuedCoupon = issuedCouponRepository.findByCouponIdAndUserId(info.id(), userId);

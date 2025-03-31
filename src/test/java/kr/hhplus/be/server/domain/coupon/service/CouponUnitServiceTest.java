@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
+import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -46,7 +47,7 @@ class CouponUnitServiceTest {
     @Nested
     @DisplayName("쿠폰 발급 단위 테스트")
     class IssueCouponTest {
-        /*@Test
+        @Test
         void 쿠폰_발급_시_쿠폰_마스터_정보가_없으면_예외가_발생한다() {
             // given
             Long couponId = 1L;
@@ -56,12 +57,12 @@ class CouponUnitServiceTest {
             given(couponRepository.getCoupon(couponId)).willReturn(null);
 
             // when // then
-            assertThatThrownBy(() -> couponService.issue(couponId, userId, currentTime))
+            assertThatThrownBy(() -> couponService.issue(new CouponCommand.Issue(couponId, userId, currentTime)))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.COUPON_NOT_FOUND.getMessage());
-        }*/
+        }
 
-        /*@Test
+        @Test
         void 쿠폰_발급_시_이미_발급_받았다면_예외를_발생한다() {
             // given
             Long couponId = 1L;
@@ -76,12 +77,12 @@ class CouponUnitServiceTest {
             given(issuedCouponRepository.findByCouponIdAndUserId(couponId, userId)).willReturn(issuedCoupon);
 
             // when // then
-            assertThatThrownBy(() -> couponService.issue(couponId, userId, currentTime))
+            assertThatThrownBy(() -> couponService.issue(new CouponCommand.Issue(couponId, userId, currentTime)))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(ErrorCode.ALREADY_ISSUED_COUPON.getMessage());
-        }*/
+        }
 
-        /*@Test
+        @Test
         void 쿠폰을_발급_받는다() {
             // given
             Long couponId = 1L;
@@ -97,14 +98,14 @@ class CouponUnitServiceTest {
             given(issuedCouponRepository.save(any(IssuedCoupon.class))).willReturn(mockIssuedCoupon);
 
             // when
-            IssuedCouponInfo.Coupon issuedCoupon = couponService.issue(couponId, userId, currentTime);
+            IssuedCouponInfo.Coupon issuedCoupon = couponService.issue(new CouponCommand.Issue(couponId, userId, currentTime));
 
             // then
             assertThat(issuedCoupon).isNotNull();
             assertThat(issuedCoupon)
                     .extracting("name", "discountType", "discountAmt", "issuedAt", "validStartedAt", "validEndedAt", "usedAt")
                     .containsExactly(mockCoupon.getName(), mockCoupon.getDiscountType().name(), mockCoupon.getDiscountAmt(), currentTime, mockCoupon.getValidStartedAt(), mockCoupon.getValidEndedAt(), null);
-        }*/
+        }
     }
 
     @Nested
