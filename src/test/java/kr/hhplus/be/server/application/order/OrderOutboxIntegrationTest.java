@@ -74,7 +74,7 @@ public class OrderOutboxIntegrationTest extends IntegrationTestSupport {
         assertThat(beforeOutbox.getStatus()).isEqualTo(OutboxStatus.INIT);
 
         await()
-                .pollInterval(Duration.ofSeconds(3))
+                .pollInterval(Duration.ofSeconds(5))
                 .atMost(Duration.ofSeconds(30))
                 .untilAsserted(() -> assertThat(orderCreatedOutboxJpaRepository.findAll().get(0).getStatus()).isEqualTo(OutboxStatus.COMPLETE));
     }
@@ -100,7 +100,7 @@ public class OrderOutboxIntegrationTest extends IntegrationTestSupport {
         assertThat(beforeOutbox.getStatus()).isEqualTo(OutboxStatus.INIT);
 
         await()
-                .pollInterval(Duration.ofSeconds(3))
+                .pollInterval(Duration.ofSeconds(5))
                 .atMost(Duration.ofSeconds(30))
                 .untilAsserted(() -> assertThat(orderCreatedOutboxJpaRepository.findAll().get(0).getStatus()).isEqualTo(OutboxStatus.COMPLETE));
     }
