@@ -14,6 +14,7 @@ import kr.hhplus.be.server.support.aop.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,69 +31,36 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
+    private final StringRedisTemplate redisTemplate;
 
     public CouponInfo.Create create(CouponCommand.Create command) {
         Coupon coupon = couponRepository.save(command.createCoupon());
-        couponRepository.setRemainCapacityToCache(coupon.getId(), coupon.getRemainCapacity());
+        redisTemplate.opsForValue().set(String.format("coupon-%d-remain-quantity", coupon.getId()), String.valueOf(coupon.getRemainCapacity()));
         return CouponInfo.Create.of(coupon);
-    }
-
-    /*
-    * 쿠폰 발급 요청 Redis에 저장
-    * */
-    @DistributedLock(key = "#command.couponId")
-    public boolean addCouponIssueRequest(CouponCommand.Issue command) {
-        // 캐시에 있는 쿠폰 잔여 개수 체크
-        int remainCapacity = couponRepository.getRemainCapacityFromCache(command.couponId());
-        if(remainCapacity <= 0) throw new CustomException(ErrorCode.INSUFFICIENT_COUPON_QUANTITY);
-
-        // 캐시에 있는 쿠폰 발급 중복 체크
-        boolean hasRequest = couponRepository.hasCouponIssuedHistoryFromCache(command.userId(), command.couponId());
-        if(hasRequest) throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
-
-        // 캐시 발급 요청 sorted set에 요청 정보 등록
-        boolean addRequest = couponRepository.addCouponIssueRequestToCache(command.toCouponDto());
-        if(addRequest) {
-            couponRepository.decreaseRemainCapacityInCache(command.couponId());
-        }
-
-        return addRequest;
     }
 
     /*
     * 쿠폰 발급
     * */
+    @DistributedLock(key = "'Coupon:couponId:' + #couponId")
     @Transactional
-    public void issue() {
-        long batchSize = 100;
+    public IssuedCouponInfo.Coupon issue(CouponCommand.Issue command) {
+        Long couponId = command.couponId();
+        Long userId = command.userId();
 
-        Map<Long, List<CouponDto>> couponMap;
-        List<IssuedCoupon> issuedCoupons = new ArrayList<>();
-
-        // Redis에서 쿠폰 발급 요청 pop
-        List<CouponDto> issueRequests = couponRepository.getCouponIssueRequestsFromCache(batchSize);
-
-        if (issueRequests != null) {
-            couponMap = issueRequests.stream()
-                    .collect(Collectors.groupingBy(CouponDto::getCouponId));
-
-            for (Long couponId : couponMap.keySet()) {
-                Coupon couponMst = couponRepository.getCoupon(couponId);
-
-                List<CouponDto> couponDtos = couponMap.get(couponId);
-                for (CouponDto couponDto : couponDtos) {
-                    // 쿠폰 발급 처리
-                    IssuedCoupon issuedCoupon = couponMst.issue(couponDto.getUserId(), LocalDateTime.now());
-                    issuedCoupons.add(issuedCoupon);
-
-                    couponRepository.save(couponMst);
-                    // Redis에 쿠폰 발급 이력 add
-                    couponRepository.addCouponIssuedHistoryToCache(issuedCoupon.getUserId(), issuedCoupon.getCouponId());
-                }
-            }
-            // 쿠폰 bulk 저장
-            issuedCouponRepository.saveAll(issuedCoupons);
+        Coupon coupon = couponRepository.getCoupon(couponId);
+        if(coupon == null) {
+            throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
         }
+
+        IssuedCoupon issuedCoupon = issuedCouponRepository.findByCouponIdAndUserId(couponId, userId);
+        if (issuedCoupon != null) {
+            throw new CustomException(ErrorCode.ALREADY_ISSUED_COUPON);
+        }
+
+        IssuedCoupon savedIssuedCoupon = issuedCouponRepository.save(coupon.issue(userId, command.currentDateTime()));
+
+        return IssuedCouponInfo.Coupon.of(savedIssuedCoupon);
     }
 
     public Page<IssuedCouponInfo.Coupon> getPagedUserCoupons(Long userId, LocalDateTime currentTime, Pageable pageable) {

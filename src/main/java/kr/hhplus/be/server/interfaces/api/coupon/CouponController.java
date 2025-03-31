@@ -3,6 +3,7 @@ package kr.hhplus.be.server.interfaces.api.coupon;
 import io.swagger.v3.oas.annotations.Operation;
 import kr.hhplus.be.server.domain.coupon.service.CouponService;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
+import kr.hhplus.be.server.domain.coupon.service.CouponWaitingQueueService;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.interfaces.api.coupon.dto.request.CouponRequest;
 import kr.hhplus.be.server.interfaces.api.coupon.dto.response.IssuedCouponResponse;
@@ -19,12 +20,12 @@ import java.time.LocalDateTime;
 public class CouponController {
 
     private final CouponService couponService;
+    private final CouponWaitingQueueService couponWaitingQueueService;
 
     @Operation(summary = "선착순 쿠폰 발급 요청 API", description = "사용자가 쿠폰을 발급을 요청한다.")
     @PostMapping("issue")
-    public ApiResponse<Boolean> issueCoupon(@RequestBody CouponRequest.Issue request) {
-        long currentMillis = System.currentTimeMillis();
-        boolean result = couponService.addCouponIssueRequest(request.toCriteria(currentMillis));
+    public ApiResponse<Boolean> issueCoupon(@RequestBody CouponRequest.AddQueue request) {
+        boolean result = couponWaitingQueueService.addCouponIssueRequest(request.toAddQueueCommand(System.currentTimeMillis()));
         return ApiResponse.ok(result);
     }
 

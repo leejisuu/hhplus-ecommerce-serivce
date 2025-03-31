@@ -4,12 +4,12 @@ import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
 
 public class CouponRequest {
 
-    public record Issue(
-            Long userId,
-            Long couponId
+    public record AddQueue (
+        Long userId,
+        Long couponId
     ) {
-        public CouponCommand.Issue toCriteria(long currentMillis) {
-            return new CouponCommand.Issue(userId, couponId, currentMillis);
+        public CouponCommand.AddQueue toAddQueueCommand(long currentMillis) {
+            return new CouponCommand.AddQueue(userId, couponId, currentMillis);
         }
     }
 }

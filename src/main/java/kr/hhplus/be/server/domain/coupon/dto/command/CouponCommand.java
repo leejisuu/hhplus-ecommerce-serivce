@@ -29,11 +29,25 @@ public class CouponCommand {
     public record Issue(
             Long couponId,
             Long userId,
-            Long currentMillis
+            LocalDateTime currentDateTime
     ) {
         @Builder
         public Issue {}
 
+        public static CouponCommand.Issue of(CouponDto couponDto) {
+            return new CouponCommand.Issue(
+                    couponDto.getCouponId(),
+                    couponDto.getUserId(),
+                    LocalDateTime.now()
+            );
+        }
+    }
+
+    public record AddQueue(
+            Long couponId,
+            Long userId,
+            Long currentMillis
+    ) {
         public CouponDto toCouponDto() {
             return new CouponDto(couponId, userId, currentMillis);
         }
