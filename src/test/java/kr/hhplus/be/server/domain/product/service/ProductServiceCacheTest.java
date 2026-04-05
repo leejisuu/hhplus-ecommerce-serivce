@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.domain.product.service;
 
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
+import kr.hhplus.be.server.support.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import java.time.LocalDate;
@@ -11,8 +11,7 @@ import java.time.LocalDate;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
-public class ProductServiceCacheTest {
+public class ProductServiceCacheTest extends IntegrationTestSupport {
 
     @Autowired
     private ProductService productService;
