@@ -72,12 +72,15 @@ server:
 spring.config.activate.on-profile: test
 
 spring:
+  sql:
+    init:
+      mode: never
   jpa:
-    open-in-view: true
+    open-in-view: false
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
   kafka:
     properties:
       auto:
