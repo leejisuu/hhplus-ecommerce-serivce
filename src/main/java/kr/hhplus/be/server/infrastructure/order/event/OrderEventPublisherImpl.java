@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class OrderEventPublisherlmpl implements OrderEventPublisher {
+public class OrderEventPublisherImpl implements OrderEventPublisher {
 
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    public void publish(OrderEvent.Created createdEvent) {
-        eventPublisher.publishEvent(createdEvent);
+    public void publish(OrderEvent.Confirmed event) {
+        eventPublisher.publishEvent(event);
     }
 }

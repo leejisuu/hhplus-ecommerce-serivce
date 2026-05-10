@@ -6,15 +6,18 @@ import java.math.BigDecimal;
 
 public class OrderResult {
 
-    public record Order(
-            Long id,
-            BigDecimal totalOriginalAmt
+    public record Create(
+            String orderNo,
+            BigDecimal totalOriginalAmt,
+            BigDecimal discountAmt,
+            BigDecimal finalPaymentAmt
     ) {
-        public static OrderResult.Order of(OrderInfo.OrderDto orderInfo) {
-
-            return new OrderResult.Order(
-                    orderInfo.id(),
-                    orderInfo.totalOriginalAmt()
+        public static Create of(OrderInfo.Create orderInfo) {
+            return new Create(
+                    orderInfo.orderNo(),
+                    orderInfo.totalOriginalAmt(),
+                    orderInfo.discountAmt(),
+                    orderInfo.finalPaymentAmt()
             );
         }
     }

@@ -9,6 +9,6 @@ public enum OutboxStatus {
     INIT("메세지 저장"),
     COMPLETE("발송 성공");
 
-    private final String message;
+    private final String description;
 }
 

@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum OrderStatus {
-    COMPLETED("주문 완료"),
-    FAILED("주문 실패"),
-    CANCELED("주문 취소"),
-    PAID("결제 완료");
+    ORDERED("주문 완료"),
+    CONFIRMED("주문 확정"),
+    FAILED("주문 실패")
+    ;
 
-    private final String message;
+    private final String description;
 }

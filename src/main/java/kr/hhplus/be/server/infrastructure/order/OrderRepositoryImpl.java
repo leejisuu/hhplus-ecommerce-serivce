@@ -24,7 +24,12 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Order findByIdWithLock(Long orderId) {
-        return orderJpaRepository.findByIdWithLock(orderId);
+    public Order findByOrderNoWithLock(String orderNo) {
+        return orderJpaRepository.findByOrderNoWithLock(orderNo);
+    }
+
+    @Override
+    public Order getOrder(String orderNo) {
+        return orderJpaRepository.findByOrderNo(orderNo);
     }
 }

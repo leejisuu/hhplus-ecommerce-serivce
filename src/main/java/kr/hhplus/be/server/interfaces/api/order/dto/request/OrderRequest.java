@@ -1,27 +1,26 @@
 package kr.hhplus.be.server.interfaces.api.order.dto.request;
 
 import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
-import kr.hhplus.be.server.application.order.dto.criteria.OrderDetailCriteria;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OrderRequest {
 
-    public record Order(
+    public record Create(
             Long userId,
+            Long couponId,
             List<OrderDetail> details
     ) {
 
-        public OrderCriteria.Order toCriteria() {
+        public OrderCriteria.Create toCriteria() {
             List<OrderCriteria.OrderDetail> criteriaOrderDetails = details.stream()
                     .map(orderDetail -> new OrderCriteria.OrderDetail(
                             orderDetail.productId(),
                             orderDetail.quantity()
                     ))
-                    .collect(Collectors.toList());
+                    .toList();
 
-            return new OrderCriteria.Order(userId, criteriaOrderDetails);
+            return new OrderCriteria.Create(userId, couponId, criteriaOrderDetails);
         }
     }
 

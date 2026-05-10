@@ -5,7 +5,8 @@ import kr.hhplus.be.server.domain.order.dto.info.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 
 import kr.hhplus.be.server.domain.order.entity.OrderDetail;
-import kr.hhplus.be.server.domain.order.enums.OrderStatus;
+import kr.hhplus.be.server.domain.order.event.OrderEvent;
+import kr.hhplus.be.server.domain.order.event.OrderEventPublisher;
 import kr.hhplus.be.server.domain.order.repository.OrderDetailRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,17 +23,15 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final OrderEventPublisher orderEventPublisher;
 
-    public OrderInfo.OrderDto order(OrderCommand.Order orderCommand) {
+    @Transactional
+    public OrderInfo.Create order(OrderCommand.Create orderCommand) {
         if(orderCommand.details().isEmpty()) {
             throw new CustomException(ErrorCode.ORDER_DETAILS_NOT_EXISTS);
         }
 
-        BigDecimal totalOriginalAmt = orderCommand.details().stream()
-                .map(detail -> new BigDecimal(detail.quantity()).multiply(detail.price()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Order order = orderRepository.save(Order.create(orderCommand.userId(), totalOriginalAmt));
+        Order order = orderRepository.save(orderCommand.toEntity());
 
         List<OrderDetail> orderDetails = orderCommand.details().stream()
                 .map(orderDetail -> OrderDetail.create(
@@ -46,28 +44,57 @@ public class OrderService {
 
         orderDetailRepository.saveAll(orderDetails);
 
-        return OrderInfo.OrderDto.of(order);
+        return OrderInfo.Create.of(order);
     }
 
-    public OrderInfo.OrderDto getOrderWithLock(Long orderId) {
-        Order order = orderRepository.findByIdWithLock(orderId);
+    @Transactional(readOnly = true)
+    public OrderInfo.Detail getOrderWithLock(String orderNo) {
+        Order order = orderRepository.findByOrderNoWithLock(orderNo);
         if(order == null) {
             throw new CustomException(ErrorCode.ORDER_NOT_FOUND);
         }
 
-        return OrderInfo.OrderDto.of(order);
+        return OrderInfo.Detail.of(order);
     }
 
-    public void completePayment(Long orderId) {
-        Order order = orderRepository.findByIdWithLock(orderId);
+    @Transactional(readOnly = true)
+    public OrderInfo.Payment getOrderForPayment(String orderNo) {
+        Order order = orderRepository.findByOrderNoWithLock(orderNo);
+        if(order == null) {
+            throw new CustomException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        order.validateCanPay();
+
+        return OrderInfo.Payment.of(order);
+    }
+
+    @Transactional
+    public OrderInfo.Confirm confirm(String orderNo) {
+        Order order = orderRepository.findByOrderNoWithLock(orderNo);
         if(order == null) {
             throw new CustomException(ErrorCode.ORDER_NOT_FOUND);
         }
 
-        if(order.getStatus().name().equals(OrderStatus.PAID.name())) {
-            throw new CustomException(ErrorCode.ALREADY_PAID_ORDER);
+        order.confirm();
+
+        orderEventPublisher.publish(OrderEvent.Confirmed.of(order));
+
+        return OrderInfo.Confirm.of(order);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderInfo.Confirm getOrder(String orderNo) {
+        Order order = orderRepository.getOrder(orderNo);
+        return OrderInfo.Confirm.of(order);
+    }
+
+    @Transactional
+    public void failed(String orderNo) {
+        Order order = orderRepository.findByOrderNoWithLock(orderNo);
+        if(order == null) {
+            throw new CustomException(ErrorCode.ORDER_NOT_FOUND);
         }
 
-        order.completePayment();
+        order.failed();
     }
 }

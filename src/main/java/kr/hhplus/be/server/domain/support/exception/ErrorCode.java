@@ -17,6 +17,7 @@ public enum ErrorCode {
 
     // 상품
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품이 존재하지 않습니다."),
+    ORDER_PRODUCT_COUNT_MISMATCH(HttpStatus.NOT_FOUND, "주문 상품과 조회된 상품 수가 일치하지 않습니다."),
 
     // 발급 쿠폰
     ALREADY_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "이미 발급받은 쿠폰입니다."),
@@ -33,9 +34,21 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "주문이 존재하지 않습니다."),
     ORDER_DETAILS_NOT_EXISTS(HttpStatus.BAD_REQUEST, "주문 상세 목록이 비어있습니다."),
     ALREADY_PAID_ORDER(HttpStatus.BAD_REQUEST, "이미 결제 완료된 주문건입니다."),
+    INVALID_ORDER_STATUS_FOR_PAYMENT(HttpStatus.BAD_REQUEST, "결제 할 수 없는 주문 상태입니다."),
+    INVALID_ORDER_STATUS_FOR_FAIL(HttpStatus.BAD_REQUEST, "주문 실패 처리할 수 없는 주문 상태입니다."),
 
     // 유저
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다.");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
+
+    // saga
+    ORDER_SAGA_NOT_FOUND(HttpStatus.NOT_FOUND, "saga 정보를 찾을 수 없습니다."),
+    INVALID_SAGA_TRANSITION(HttpStatus.NOT_FOUND, ""),
+
+
+    // outbox
+    PAYMENT_OUTBOX_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 outbox를 찾을 수 없습니다."),
+
+    ;
 
     private final HttpStatus status;
     private final String message;

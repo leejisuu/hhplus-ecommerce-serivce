@@ -7,5 +7,7 @@ public interface OrderRepository {
 
     Order findById(Long orderId);
 
-    Order findByIdWithLock(Long orderId);
+    Order findByOrderNoWithLock(String orderNo);
+
+    Order getOrder(String orderNo);
 }

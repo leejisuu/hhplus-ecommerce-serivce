@@ -1,49 +1,32 @@
 package kr.hhplus.be.server.application.order.dto.criteria;
 
 import kr.hhplus.be.server.domain.order.dto.command.OrderCommand;
-import kr.hhplus.be.server.domain.product.dto.ProductInfo;
-import kr.hhplus.be.server.domain.product.dto.StockCommand;
-import kr.hhplus.be.server.domain.support.exception.CustomException;
-import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OrderCriteria {
-    public record Order(
+    public record Create(
             Long userId,
+            Long couponId,
             List<OrderDetail> details
     ) {
 
         @Builder
-        public Order {}
+        public Create {}
 
-        public StockCommand.OrderDetails toStockCommand() {
-            List<StockCommand.OrderDetail> orderDetils = details.stream()
-                    .map(orderDetail -> {
-                        return StockCommand.OrderDetail.builder()
-                                .productId(orderDetail.productId)
-                                .quantity(orderDetail.quantity)
-                                .build();
-                    })
+        public OrderCommand.Create toCommand(String orderNo,
+                                             Map<Long, BigDecimal> priceMap,
+                                             BigDecimal totalOriginalAmt,
+                                             BigDecimal discountAmt) {
+            List<OrderCommand.OrderDetail> orderDetails = this.details().stream()
+                    .map(orderDetail -> new OrderCommand.OrderDetail(orderDetail.productId(), orderDetail.quantity(), priceMap.get(orderDetail.productId())))
                     .collect(Collectors.toList());
 
-            return new StockCommand.OrderDetails(orderDetils);
-        }
-
-        public OrderCommand.Order toCommand(List<ProductInfo.ProductDto> products) {
-            List<OrderCommand.OrderDetail> commandOrderDetails = this.details().stream()
-                    .map(orderDetail -> {
-                        ProductInfo.ProductDto product = products.stream()
-                                .filter(p -> p.id().equals(orderDetail.productId()))
-                                .findFirst()
-                                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
-                        return new OrderCommand.OrderDetail(orderDetail.productId(), orderDetail.quantity(), product.price());
-                    })
-                    .collect(Collectors.toList());
-
-            return new OrderCommand.Order(this.userId(), commandOrderDetails);
+            return new OrderCommand.Create(orderNo, this.userId(), this.couponId(), orderDetails, totalOriginalAmt, discountAmt);
         }
 
         public List<Long> getProductIds() {

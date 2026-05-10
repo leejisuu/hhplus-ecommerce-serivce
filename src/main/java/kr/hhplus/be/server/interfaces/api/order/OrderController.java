@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.interfaces.api.order;
 
 import io.swagger.v3.oas.annotations.Operation;
-import kr.hhplus.be.server.application.order.OrderApplicationService;
+import kr.hhplus.be.server.application.order.OrderSagaOrchestrator;
 import kr.hhplus.be.server.application.order.dto.result.OrderResult;
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.interfaces.api.order.dto.request.OrderRequest;
@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
-    private final OrderApplicationService orderApplicationService;
+    private final OrderSagaOrchestrator orderSagaOrchestrator;
 
     @Operation(summary = "주문 API", description = "주문을 생성한다.")
     @PostMapping("create")
-    public ApiResponse<OrderResponse.Order> createOrder(@RequestBody OrderRequest.Order request) {
-        OrderResult.Order orderResult = orderApplicationService.order(request.toCriteria());
-        return ApiResponse.ok(OrderResponse.Order.of(orderResult));
+    public ApiResponse<OrderResponse.Create> createOrder(@RequestBody OrderRequest.Create request) {
+        OrderResult.Create createResult = orderSagaOrchestrator.create(request.toCriteria());
+        return ApiResponse.ok(OrderResponse.Create.of(createResult));
     }
 }

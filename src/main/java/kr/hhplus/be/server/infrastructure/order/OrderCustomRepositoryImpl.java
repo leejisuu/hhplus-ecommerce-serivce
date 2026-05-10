@@ -12,10 +12,10 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
     QOrder order = QOrder.order;
 
     @Override
-    public Order findByIdWithLock(Long orderId) {
+    public Order findByOrderNoWithLock(String orderNo) {
         return queryFactory
                 .selectFrom(order)
-                .where(order.id.eq(orderId))
+                .where(order.orderNo.eq(orderNo))
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne();
     }
