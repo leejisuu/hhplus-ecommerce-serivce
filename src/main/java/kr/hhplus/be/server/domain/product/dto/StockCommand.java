@@ -19,4 +19,11 @@ public class StockCommand {
         @Builder
         public OrderDetail {}
     }
+
+    public record Reserve(
+            String orderNo,
+            List<OrderDetail> details
+    ) {
+
+    }
 }
