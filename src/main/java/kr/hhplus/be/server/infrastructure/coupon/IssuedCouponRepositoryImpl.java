@@ -32,6 +32,11 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     }
 
     @Override
+    public IssuedCoupon getIssuedCouponWithLock(Long issuedCouponId) {
+        return issuedCouponJpaRepository.getIssuedCouponWithLock(issuedCouponId);
+    }
+
+    @Override
     public IssuedCoupon findByCouponIdAndUserId(Long couponId, Long userId) {
         return issuedCouponJpaRepository.findByCouponIdAndUserId(couponId, userId);
     }

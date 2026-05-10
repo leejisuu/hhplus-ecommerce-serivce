@@ -15,6 +15,8 @@ public interface IssuedCouponRepository {
 
     IssuedCoupon getIssuedCouponWithLock(Long issuedCouponId, LocalDateTime currentTime);
 
+    IssuedCoupon getIssuedCouponWithLock(Long issuedCouponId);
+
     IssuedCoupon findByCouponIdAndUserId(Long couponId, Long userId);
 
     void saveAll(List<IssuedCoupon> issuedCoupons);

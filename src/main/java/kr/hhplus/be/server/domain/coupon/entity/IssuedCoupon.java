@@ -71,7 +71,7 @@ public class IssuedCoupon extends BaseEntity {
         this.status = status;
     }
 
-    public BigDecimal use(BigDecimal totalOriginalPrice, LocalDateTime usedAt) {
+    public BigDecimal reserve(BigDecimal totalOriginalPrice) {
         BigDecimal discountAmt;
 
         if(discountType.equals(DiscountType.PERCENTAGE)) {
@@ -84,9 +84,17 @@ public class IssuedCoupon extends BaseEntity {
             throw new CustomException(ErrorCode.COUPON_DISCOUNT_EXCEEDS_NET_AMOUNT);
         }
 
-        this.status = IssuedCouponStatus.USED;
-        this.usedAt = usedAt;
+        this.status = IssuedCouponStatus.RESERVED;
 
         return discountAmt;
+    }
+
+    public void confirm(LocalDateTime usedAt) {
+        this.status = IssuedCouponStatus.USED;
+        this.usedAt = usedAt;
+    }
+
+    public void cancel() {
+        this.status = IssuedCouponStatus.AVAILABLE;
     }
 }

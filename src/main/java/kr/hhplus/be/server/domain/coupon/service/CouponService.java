@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.coupon.service;
 
-import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.dto.info.CouponInfo;
 import kr.hhplus.be.server.domain.coupon.dto.info.IssuedCouponInfo;
@@ -16,14 +15,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -63,6 +59,7 @@ public class CouponService {
         return IssuedCouponInfo.Coupon.of(savedIssuedCoupon);
     }
 
+    @Transactional(readOnly = true)
     public Page<IssuedCouponInfo.Coupon> getPagedUserCoupons(Long userId, LocalDateTime currentTime, Pageable pageable) {
         Page<IssuedCoupon> userCouponsPage = issuedCouponRepository.getPagedUserCoupons(userId, currentTime, pageable);
 
@@ -70,15 +67,43 @@ public class CouponService {
     }
 
     @Transactional
-    public BigDecimal useIssuedCoupon(Long issuedCouponId, BigDecimal totalOriginalAmt, LocalDateTime currentTime) {
-        if(issuedCouponId == null) {
+    public BigDecimal reserve(Long couponId, BigDecimal totalOriginalAmt, LocalDateTime currentDateTime) {
+        if(couponId == null) {
             return BigDecimal.ZERO;
         }
 
-        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(issuedCouponId, currentTime);
+        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(couponId, currentDateTime);
         if(issuedCoupon == null) {
             throw new CustomException(ErrorCode.ISSUED_COUPON_NOT_FOUND);
         }
-        return issuedCoupon.use(totalOriginalAmt, currentTime);
+
+        BigDecimal discountAmt = issuedCoupon.reserve(totalOriginalAmt);
+
+        issuedCouponRepository.save(issuedCoupon);
+
+        return discountAmt;
+    }
+
+    @Transactional
+    public void confirm(Long couponId) {
+        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(couponId);
+        if(issuedCoupon == null) {
+            throw new CustomException(ErrorCode.ISSUED_COUPON_NOT_FOUND);
+        }
+        issuedCoupon.confirm(LocalDateTime.now());
+
+        issuedCouponRepository.save(issuedCoupon);
+    }
+
+    @Transactional
+    public void cancel(Long couponId) {
+        IssuedCoupon issuedCoupon = issuedCouponRepository.getIssuedCouponWithLock(couponId);
+        if(issuedCoupon == null) {
+            throw new CustomException(ErrorCode.ISSUED_COUPON_NOT_FOUND);
+        }
+
+        issuedCoupon.cancel();
+
+        issuedCouponRepository.save(issuedCoupon);
     }
 }

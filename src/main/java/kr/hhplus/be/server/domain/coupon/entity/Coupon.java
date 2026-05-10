@@ -104,7 +104,7 @@ public class Coupon extends BaseEntity {
                 .validStartedAt(this.validStartedAt)
                 .validEndedAt(this.validEndedAt)
                 .usedAt(null)
-                .status(IssuedCouponStatus.UNUSED)
+                .status(IssuedCouponStatus.AVAILABLE)
                 .build();
     }
 

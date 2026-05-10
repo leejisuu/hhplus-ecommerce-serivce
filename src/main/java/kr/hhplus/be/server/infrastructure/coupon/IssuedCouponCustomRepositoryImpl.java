@@ -8,7 +8,6 @@ import kr.hhplus.be.server.domain.coupon.entity.QIssuedCoupon;
 import kr.hhplus.be.server.domain.coupon.enums.IssuedCouponStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
@@ -27,7 +26,7 @@ public class IssuedCouponCustomRepositoryImpl implements IssuedCouponCustomRepos
         List<IssuedCoupon> content = queryFactory.selectFrom(issuedCoupon)
                 .where(
                         issuedCoupon.userId.eq(userId),
-                        issuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
+                        issuedCoupon.status.eq(IssuedCouponStatus.AVAILABLE),
                         issuedCoupon.validStartedAt.loe(currentTime),
                         issuedCoupon.validEndedAt.gt(currentTime)
                 )
@@ -39,7 +38,7 @@ public class IssuedCouponCustomRepositoryImpl implements IssuedCouponCustomRepos
                 .from(issuedCoupon)
                 .where(
                         issuedCoupon.userId.eq(userId),
-                        issuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
+                        issuedCoupon.status.eq(IssuedCouponStatus.AVAILABLE),
                         issuedCoupon.validStartedAt.loe(currentTime),
                         issuedCoupon.validEndedAt.gt(currentTime)
                 );
@@ -52,9 +51,20 @@ public class IssuedCouponCustomRepositoryImpl implements IssuedCouponCustomRepos
         return queryFactory
                 .selectFrom(issuedCoupon)
                 .where(issuedCoupon.id.eq(issuedCouponId),
-                        issuedCoupon.status.eq(IssuedCouponStatus.UNUSED),
+                        issuedCoupon.status.eq(IssuedCouponStatus.AVAILABLE),
                         issuedCoupon.validStartedAt.loe(currentTime),
                         issuedCoupon.validEndedAt.gt(currentTime)
+                )
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .fetchOne();
+    }
+
+    @Override
+    public IssuedCoupon getIssuedCouponWithLock(Long issuedCouponId) {
+        return queryFactory
+                .selectFrom(issuedCoupon)
+                .where(issuedCoupon.id.eq(issuedCouponId),
+                        issuedCoupon.status.eq(IssuedCouponStatus.RESERVED)
                 )
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne();

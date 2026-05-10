@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.scheuler;
+package kr.hhplus.be.server.interfaces.scheduler;
 
 import kr.hhplus.be.server.domain.coupon.dto.CouponDto;
 import kr.hhplus.be.server.domain.coupon.dto.command.CouponCommand;

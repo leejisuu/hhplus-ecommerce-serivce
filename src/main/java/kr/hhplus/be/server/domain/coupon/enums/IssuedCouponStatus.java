@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum IssuedCouponStatus {
-    USED("이미 사용됨"),
-    UNUSED("아직 미사용됨");
+    AVAILABLE("사용 가능"),
+    RESERVED("사용 예약"),
+    USED("사용 완료"),
+    ;
 
-    private final String name;
+    private final String description;
 }
