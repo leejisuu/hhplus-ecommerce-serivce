@@ -38,8 +38,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         product.id,
                         product.name,
                         product.price,
-                        productStock.quantity
-                ))
+                        productStock.totalQuantity.subtract(productStock.reservedQuantity)                ))
                 .from(product)
                 .join(productStock).on(product.id.eq(productStock.productId)) // on() 절로 조인
                 .where(product.sellingStatus.eq(ProductSellingStatus.SELLING))
@@ -76,7 +75,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 .join(product).on(orderDetail.productId.eq(product.id))  // OrderDetail → Product 조인
                 .where(
                         product.sellingStatus.eq(ProductSellingStatus.SELLING),
-                        order.status.eq(OrderStatus.COMPLETED), // 완료된 주문만 조회
+                        order.status.eq(OrderStatus.CONFIRMED), // 확정된 주문만 조회
                         order.createdAt.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)) // 최근 3일 주문 데이터 조회
                 )
                 .groupBy(product.id, product.name, product.price)

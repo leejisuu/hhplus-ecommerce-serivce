@@ -9,5 +9,5 @@ public enum ProductSellingStatus {
     SELLING("판매중"),
     STOPPED("판매 종료");
 
-    private final String title;
+    private final String description;
 }

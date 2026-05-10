@@ -22,24 +22,36 @@ public class ProductStock extends BaseEntity {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
-    @Column(nullable = false)
-    private int quantity;
+    @Column(name = "total_quantity", nullable = false)
+    private int totalQuantity;
+
+    @Column(name = "reserved_quantity", nullable = false)
+    private int reservedQuantity;
 
     @Builder
-    private ProductStock(Long productId, int quantity) {
+    private ProductStock(Long productId, int totalQuantity, int reservedQuantity) {
         this.productId = productId;
-        this.quantity = quantity;
+        this.totalQuantity = totalQuantity;
+        this.reservedQuantity = reservedQuantity;
     }
 
-    public static ProductStock create(Long productId, int quantity) {
-        return new ProductStock(productId, quantity);
+    public static ProductStock create(Long productId, int totalQuantity, int reservedQuantity) {
+        return new ProductStock(productId, totalQuantity, reservedQuantity);
     }
 
-    public void deductQuantity(int quantity) {
-        if(this.quantity - quantity < 0) {
+    public void reserve(int quantity) {
+        if(totalQuantity - (reservedQuantity + quantity) <= 0) {
             throw new CustomException(ErrorCode.INSUFFICIENT_STOCK);
         }
 
-        this.quantity -= quantity;
+        reservedQuantity += quantity;
+    }
+
+    public void cancel(int quantity) {
+        this.reservedQuantity -= quantity;
+    }
+
+    public int getAvailableQuantity() {
+        return this.totalQuantity - this.reservedQuantity;
     }
 }

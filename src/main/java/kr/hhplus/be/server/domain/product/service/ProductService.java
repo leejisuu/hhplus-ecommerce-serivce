@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,11 +22,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public Page<ProductInfo.Stock> getPagedProducts(Pageable pageable) {
         Page<StockDto> pagedStockDto = productRepository.getPagedProducts(pageable);
         return pagedStockDto.map(ProductInfo.Stock::of);
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = "topSellingProducts", key = "'topSellingProducts'")
     public List<TopSellingProductInfo> getTopSellingProducts(LocalDate todayDate, int limit) {
         List<TopSellingProductDto> topSellings = productRepository.getTopSellingProducts(todayDate, limit);
@@ -35,6 +38,7 @@ public class ProductService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ProductInfo.ProductDto> getProducts(List<Long> productIds) {
         return productRepository.findAllByIdInAndSellingStatus(productIds, ProductSellingStatus.SELLING)
                 .stream()

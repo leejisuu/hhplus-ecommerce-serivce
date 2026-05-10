@@ -1,11 +1,14 @@
 package kr.hhplus.be.server.infrastructure.product;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.LockModeType;
 import kr.hhplus.be.server.domain.product.entity.ProductStock;
 import kr.hhplus.be.server.domain.product.entity.QProduct;
 import kr.hhplus.be.server.domain.product.entity.QProductStock;
 import kr.hhplus.be.server.domain.product.enums.ProductSellingStatus;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class ProductStockCustomRepositoryImpl implements ProductStockCustomRepository {
@@ -25,5 +28,14 @@ public class ProductStockCustomRepositoryImpl implements ProductStockCustomRepos
                         product.sellingStatus.eq(ProductSellingStatus.SELLING)
                 )
                 .fetchOne();
+    }
+
+    @Override
+    public List<ProductStock> findAllByProductIdInWithLock(List<Long> productIds) {
+        return queryFactory
+                .selectFrom(productStock)
+                .where(productStock.productId.in(productIds))
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .fetch();
     }
 }
