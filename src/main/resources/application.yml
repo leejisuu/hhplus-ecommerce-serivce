@@ -61,8 +61,13 @@ springdoc:
     path: /swagger-ui.html
 
 order-api:
-  order-created:
-    topic-name: "order-created"
+  confirmed:
+    topic-name: "order-confirmed"
+payment-api:
+  paid:
+    topic-name: "payment-paid"
+  failed:
+    topic-name: "payment-failed"
 
 server:
   port: 8080
