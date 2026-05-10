@@ -8,21 +8,17 @@ import java.time.LocalDateTime;
 public class PaymentResponse {
     public record Payment(
             Long id,
-            Long orderId,
+            String orderNo,
             String status,
-            BigDecimal totalOriginalAmt,
-            BigDecimal discountAmt,
-            BigDecimal finalPaymentAmt,
+            BigDecimal paymentAmt,
             LocalDateTime createdAt
     ) {
         public static PaymentResponse.Payment of(PaymentResult.Payment result) {
             return new PaymentResponse.Payment(
                     result.id(),
-                    result.orderId(),
+                    result.orderNo(),
                     result.status(),
-                    result.totalOriginalAmt(),
-                    result.discountAmt(),
-                    result.finalPaymentAmt(),
+                    result.paymentAmt(),
                     result.createdAt()
             );
         }

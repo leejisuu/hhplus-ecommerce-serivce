@@ -9,21 +9,17 @@ public class PaymentInfo {
 
     public record PaymentDto(
             Long id,
-            Long orderId,
+            String orderNo,
             String status,
-            BigDecimal totalOriginalAmt,
-            BigDecimal discountAmt,
-            BigDecimal finalPaymentAmt,
+            BigDecimal paymentAmt,
             LocalDateTime createdAt
     ) {
         public static PaymentInfo.PaymentDto of(Payment payment) {
             return new PaymentInfo.PaymentDto(
                     payment.getId(),
-                    payment.getOrderId(),
+                    payment.getOrderNo(),
                     payment.getStatus().name(),
-                    payment.getTotalOriginalAmt(),
-                    payment.getDiscountAmt(),
-                    payment.getFinalPaymentAmt(),
+                    payment.getPaymentAmt(),
                     payment.getCreatedAt()
             );
         }

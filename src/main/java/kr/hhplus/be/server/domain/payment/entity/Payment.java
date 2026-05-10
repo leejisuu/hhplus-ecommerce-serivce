@@ -19,43 +19,28 @@ public class Payment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_id", nullable = false)
-    private Long orderId;
+    @Column(name = "order_no", nullable = false)
+    private String orderNo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20)")
     private PaymentStatus status;
 
-    @Column(name = "total_original_amt", nullable = false)
-    private BigDecimal totalOriginalAmt;
-
-    @Column(name = "discount_amt", nullable = false)
-    private BigDecimal discountAmt;
-
-    @Column(name = "final_payment_amt", nullable = false)
-    private BigDecimal finalPaymentAmt;
-
-    @Column(name = "issued_coupon_id")
-    private Long issuedCouponId;
+    @Column(name = "payment_amt", nullable = false)
+    private BigDecimal paymentAmt;
 
     @Builder
-    private Payment(Long orderId, PaymentStatus status, BigDecimal totalOriginalAmt, BigDecimal discountAmt, BigDecimal finalPaymentAmt, Long issuedCouponId) {
-        this.orderId = orderId;
+    private Payment(String orderNo, PaymentStatus status, BigDecimal paymentAmt) {
+        this.orderNo = orderNo;
         this.status = status;
-        this.totalOriginalAmt = totalOriginalAmt;
-        this.discountAmt = discountAmt;
-        this.finalPaymentAmt = finalPaymentAmt;
-        this.issuedCouponId = issuedCouponId;
+        this.paymentAmt = paymentAmt;
     }
 
-    public static Payment create(Long orderId, BigDecimal totalOriginalAmt, BigDecimal discountAmt, Long issuedCouponId) {
+    public static Payment create(String orderNo, BigDecimal paymentAmt) {
         return Payment.builder()
-                .orderId(orderId)
+                .orderNo(orderNo)
                 .status(PaymentStatus.COMPLETED)
-                .totalOriginalAmt(totalOriginalAmt)
-                .discountAmt(discountAmt)
-                .finalPaymentAmt(totalOriginalAmt.subtract(discountAmt))
-                .issuedCouponId(issuedCouponId)
+                .paymentAmt(paymentAmt)
                 .build();
     }
 }

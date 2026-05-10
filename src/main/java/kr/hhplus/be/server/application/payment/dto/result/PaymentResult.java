@@ -9,21 +9,17 @@ public class PaymentResult {
     
     public record Payment(
             Long id,
-            Long orderId,
+            String orderNo,
             String status,
-            BigDecimal totalOriginalAmt,
-            BigDecimal discountAmt,
-            BigDecimal finalPaymentAmt,
+            BigDecimal paymentAmt,
             LocalDateTime createdAt
     ) {
         public static PaymentResult.Payment of(PaymentInfo.PaymentDto info) {
             return new PaymentResult.Payment(
                     info.id(),
-                    info.orderId(),
+                    info.orderNo(),
                     info.status(),
-                    info.totalOriginalAmt(),
-                    info.discountAmt(),
-                    info.finalPaymentAmt(),
+                    info.paymentAmt(),
                     info.createdAt()
             );
         }
