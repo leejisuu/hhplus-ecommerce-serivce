@@ -43,7 +43,6 @@ public class OrderSaga extends BaseEntity {
         this.couponId = couponId;
     }
 
-    // ===== [S] 라이프사이클 전이 (Status 변경) =====
     public static OrderSaga start(String orderNo, Long couponId) {
         return OrderSaga.builder()
                 .orderNo(orderNo)
@@ -52,11 +51,59 @@ public class OrderSaga extends BaseEntity {
                 .build();
     }
 
+    public void onStockReserved() {
+        if (status != SagaStatus.STARTED) {
+            throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
+        }
+        currentStep = OrderSagaStepType.STOCK_RESERVED;
+    }
+
+    public void onCouponReserved() {
+        if (status != SagaStatus.STARTED) {
+            throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
+        }
+        currentStep = OrderSagaStepType.COUPON_RESERVED;
+    }
+
+    public void onOrderCreated() {
+        if (status != SagaStatus.STARTED) {
+            throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
+        }
+        currentStep = OrderSagaStepType.ORDER_CREATED;
+    }
+
+    public void onOrderConfirmed() {
+        if (status != SagaStatus.STARTED) {
+            throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
+        }
+        currentStep = OrderSagaStepType.ORDER_CONFIRMED;
+    }
+
+    public void onOrderFailed() {
+        if (status != SagaStatus.STARTED) {
+            throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
+        }
+        currentStep = OrderSagaStepType.ORDER_FAILED;
+    }
+
+    public void onCouponReserveCanceled() {
+        if (status != SagaStatus.COMPENSATING) {
+            throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
+        }
+        currentStep = OrderSagaStepType.COUPON_RESERVE_CANCELED;
+    }
+
+    public void onStockReserveCanceled() {
+        if (status != SagaStatus.COMPENSATING) {
+            throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
+        }
+        currentStep = OrderSagaStepType.STOCK_RESERVE_CANCELED;
+    }
+
     public void complete() {
         if (status != SagaStatus.STARTED) {
             throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
         }
-
         status = SagaStatus.COMPLETED;
     }
 
@@ -64,7 +111,6 @@ public class OrderSaga extends BaseEntity {
         if (status != SagaStatus.STARTED) {
             throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
         }
-
         status = SagaStatus.COMPENSATING;
     }
 
@@ -72,7 +118,6 @@ public class OrderSaga extends BaseEntity {
         if (status != SagaStatus.COMPENSATING) {
             throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
         }
-
         status = SagaStatus.COMPENSATED;
     }
 
@@ -80,26 +125,10 @@ public class OrderSaga extends BaseEntity {
         if (status != SagaStatus.COMPENSATING) {
             throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
         }
-
         status = SagaStatus.COMPENSATE_FAILED;
     }
 
-    // ===== [E] 라이프사이클 전이 (Status 변경) =====
-
-    public void onStockReserved() {
-        this.currentStep = OrderSagaStepType.STOCK_RESERVED;
+    public boolean isPendingPayment() {
+        return status == SagaStatus.STARTED && currentStep == OrderSagaStepType.ORDER_CREATED;
     }
-
-    public void onCouponReserved() {
-        this.currentStep = OrderSagaStepType.COUPON_RESERVED;
-    }
-
-    public void onOrderCreated() {
-        this.currentStep = OrderSagaStepType.ORDER_CREATED;
-    }
-
-    public void onOrderConfirmed() {
-        this.currentStep = OrderSagaStepType.ORDER_CONFIRMED;
-    }
-
 }

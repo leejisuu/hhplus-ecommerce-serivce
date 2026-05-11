@@ -18,54 +18,56 @@ public class OrderSagaService {
         return orderSagaRepository.save(OrderSaga.start(orderNo, couponId));
     }
 
+    @Transactional(readOnly = true)
+    public OrderSaga findByOrderNo(String orderNo) {
+        return orderSagaRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
+    }
+
     @Transactional
     public OrderSaga startCompensate(Long sagaId) {
-        OrderSaga saga = orderSagaRepository.getOrderSaga(sagaId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
+        OrderSaga saga = getSaga(sagaId);
         saga.startCompensate();
         return saga;
     }
 
     @Transactional
     public void compensated(Long sagaId) {
-        OrderSaga saga = orderSagaRepository.getOrderSaga(sagaId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
+        OrderSaga saga = getSaga(sagaId);
         saga.compensated();
     }
 
     @Transactional
     public void compensateFailed(Long sagaId) {
-        OrderSaga saga = orderSagaRepository.getOrderSaga(sagaId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
+        OrderSaga saga = getSaga(sagaId);
         saga.compensateFailed();
     }
 
     @Transactional
     public void stockReserved(Long sagaId) {
-        OrderSaga saga = orderSagaRepository.getOrderSaga(sagaId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
+        OrderSaga saga = getSaga(sagaId);
         saga.onStockReserved();
         orderSagaStepRepository.save(OrderSagaStep.success(sagaId, OrderSagaStepType.STOCK_RESERVED));
     }
 
     @Transactional
     public void couponReserved(Long sagaId) {
-        OrderSaga saga = orderSagaRepository.getOrderSaga(sagaId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
+        OrderSaga saga = getSaga(sagaId);
         saga.onCouponReserved();
         orderSagaStepRepository.save(OrderSagaStep.success(sagaId, OrderSagaStepType.COUPON_RESERVED));
     }
 
     @Transactional
     public void orderCreated(Long sagaId) {
-        OrderSaga saga = orderSagaRepository.getOrderSaga(sagaId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
+        OrderSaga saga = getSaga(sagaId);
         saga.onOrderCreated();
         orderSagaStepRepository.save(OrderSagaStep.success(sagaId, OrderSagaStepType.ORDER_CREATED));
     }
 
     @Transactional
     public void couponReserveCancel(Long sagaId) {
+        OrderSaga saga = getSaga(sagaId);
+        saga.onCouponReserveCanceled();
         orderSagaStepRepository.save(OrderSagaStep.success(sagaId, OrderSagaStepType.COUPON_RESERVE_CANCELED));
     }
 
@@ -76,6 +78,8 @@ public class OrderSagaService {
 
     @Transactional
     public void stockReserveCancel(Long sagaId) {
+        OrderSaga saga = getSaga(sagaId);
+        saga.onStockReserveCanceled();
         orderSagaStepRepository.save(OrderSagaStep.success(sagaId, OrderSagaStepType.STOCK_RESERVE_CANCELED));
     }
 
@@ -86,6 +90,8 @@ public class OrderSagaService {
 
     @Transactional
     public void orderFailed(Long sagaId) {
+        OrderSaga saga = getSaga(sagaId);
+        saga.onOrderFailed();
         orderSagaStepRepository.save(OrderSagaStep.success(sagaId, OrderSagaStepType.ORDER_FAILED));
     }
 
@@ -95,13 +101,11 @@ public class OrderSagaService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
         saga.onOrderConfirmed();
         saga.complete();
-
         orderSagaStepRepository.save(OrderSagaStep.success(saga.getId(), OrderSagaStepType.ORDER_CONFIRMED));
     }
 
-    @Transactional(readOnly = true)
-    public OrderSaga findByOrderNo(String orderNo) {
-        return orderSagaRepository.findByOrderNo(orderNo)
+    private OrderSaga getSaga(Long sagaId) {
+        return orderSagaRepository.getOrderSaga(sagaId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_SAGA_NOT_FOUND));
     }
 }

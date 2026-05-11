@@ -5,7 +5,6 @@ import kr.hhplus.be.server.application.order.client.ProductClient;
 import kr.hhplus.be.server.application.order.client.ProductStockClient;
 import kr.hhplus.be.server.application.order.dto.criteria.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.result.OrderResult;
-import kr.hhplus.be.server.domain.common.saga.SagaStatus;
 import kr.hhplus.be.server.domain.order.OrderNoGenerator;
 import kr.hhplus.be.server.domain.order.dto.info.OrderInfo;
 import kr.hhplus.be.server.domain.order.saga.OrderSaga;
@@ -13,6 +12,7 @@ import kr.hhplus.be.server.domain.order.saga.OrderSagaService;
 import kr.hhplus.be.server.domain.order.saga.OrderSagaStepType;
 import kr.hhplus.be.server.domain.order.service.OrderService;
 import kr.hhplus.be.server.domain.support.exception.CustomException;
+import kr.hhplus.be.server.domain.support.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -65,7 +65,7 @@ public class OrderSagaOrchestrator {
 
             // 쿠폰 선점 & 할인 금액 계산
             BigDecimal discountAmt = BigDecimal.ZERO;
-            if(couponId != null) {
+            if (couponId != null) {
                 discountAmt = couponClient.reserve(couponId, totalOriginalAmt, currentDateTime);
                 orderSagaService.couponReserved(sagaId);
             }
@@ -80,11 +80,38 @@ public class OrderSagaOrchestrator {
         }
     }
 
+    public void confirm(String orderNo) {
+        OrderInfo.Confirm order = orderService.getOrder(orderNo);
+
+        productStockClient.confirm(order.orderNo());
+
+        if (order.couponId() != null) {
+            couponClient.confirm(order.couponId());
+        }
+
+        orderService.confirm(orderNo);
+        orderSagaService.complete(orderNo);
+    }
+
+    public void fail(String orderNo) {
+        OrderSaga saga = orderSagaService.findByOrderNo(orderNo);
+
+        if (!saga.isPendingPayment()) {
+            return;
+        }
+
+        // 주문 실패
+        orderService.failed(orderNo);
+        orderSagaService.orderFailed(saga.getId());
+
+        compensate(saga.getId());
+    }
+
     private void compensate(Long sagaId) {
         OrderSaga saga = orderSagaService.startCompensate(sagaId);
         OrderSagaStepType currentStep = saga.getCurrentStep();
 
-        if(currentStep == null) {
+        if (currentStep == null) {
             orderSagaService.compensated(sagaId);
             return;
         }
@@ -93,7 +120,7 @@ public class OrderSagaOrchestrator {
         boolean stockSuccess = true;
 
         switch (currentStep) {
-            case ORDER_CREATED:
+            case ORDER_FAILED:
             case COUPON_RESERVED:
                 if (saga.getCouponId() != null) {
                     couponSuccess = cancelReservedCoupon(sagaId, saga.getCouponId());
@@ -101,9 +128,11 @@ public class OrderSagaOrchestrator {
             case STOCK_RESERVED:
                 stockSuccess = cancelReservedStock(sagaId, saga.getOrderNo());
                 break;
+            default:
+                throw new CustomException(ErrorCode.INVALID_SAGA_TRANSITION);
         }
 
-        if(couponSuccess && stockSuccess) orderSagaService.compensated(sagaId);
+        if (couponSuccess && stockSuccess) orderSagaService.compensated(sagaId);
         else orderSagaService.compensateFailed(sagaId);
     }
 
@@ -129,33 +158,5 @@ public class OrderSagaOrchestrator {
             log.error("재고 선점 취소 실패, sagaId={}, orderNo={}", sagaId, orderNo, e);
             return false;
         }
-    }
-
-    public void confirm(String orderNo) {
-        OrderInfo.Confirm order = orderService.getOrder(orderNo);
-
-        productStockClient.confirm(order.orderNo());
-
-        if (order.couponId() != null) {
-            couponClient.confirm(order.couponId());
-        }
-
-        orderService.confirm(orderNo);
-        orderSagaService.complete(orderNo);
-    }
-
-    public void fail(String orderNo) {
-        OrderSaga saga = orderSagaService.findByOrderNo(orderNo);
-
-        if (saga.getStatus() != SagaStatus.STARTED
-                || saga.getCurrentStep() != ORDER_CREATED) {
-            return;
-        }
-
-        // 주문 실패
-        orderService.failed(orderNo);
-        orderSagaService.orderFailed(saga.getId());
-
-        compensate(saga.getId());
     }
 }
